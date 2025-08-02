@@ -24,6 +24,14 @@ jobs:
     - name: 构建项目
       run: npm run build
       
+    - name: 调试SSH连接
+      run: |
+        echo "正在调试SSH连接..."
+        echo "HOST: ${{ secrets.HOST }} 已设置: ${{ secrets.HOST != '' }}"
+        echo "USERNAME: ${{ secrets.USERNAME }} 已设置: ${{ secrets.USERNAME != '' }}"
+        echo "SSH_PRIVATE_KEY 已设置: ${{ secrets.SSH_PRIVATE_KEY != '' }}"
+        echo "PORT 已设置: ${{ secrets.PORT != '' }}"
+        
     - name: 部署到服务器
       uses: appleboy/scp-action@v0.1.4
       with:
@@ -34,6 +42,7 @@ jobs:
         source: "dist/"
         target: "/var/www/dongboge"
         strip_components: 1
+        debug: true
         
     - name: 重启Nginx
       uses: appleboy/ssh-action@v1.0.3
