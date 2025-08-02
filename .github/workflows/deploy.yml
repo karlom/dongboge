@@ -24,7 +24,7 @@ jobs:
     - name: 构建项目
       run: npm run build
       
-    - name: 调试SSH连接
+    - name: 调试SSH连接信息
       run: |
         echo "正在调试SSH连接..."
         echo "HOST: ${{ secrets.HOST }} 已设置: ${{ secrets.HOST != '' }}"
