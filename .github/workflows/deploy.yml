@@ -15,7 +15,7 @@ jobs:
     - name: 设置Node.js环境
       uses: actions/setup-node@v4
       with:
-        node-version: '23'
+        node-version: '18'
         cache: 'npm'
         
     - name: 安装依赖
@@ -25,21 +25,24 @@ jobs:
       run: npm run build
       
     - name: 部署到服务器
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.PORT || '22' }}
+        source: "dist/"
+        target: "/var/www/dongboge"
+        strip_components: 1
+        
+    - name: 重启Nginx
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        port: ${{ secrets.PORT }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.PORT || '22' }}
         script: |
-          echo "🚀 开始部署到服务器..."
-          cd /var/www/dongboge
-          echo "📥 拉取最新代码..."
-          git pull origin main
-          echo "📦 安装依赖..."
-          npm ci
-          echo "🏗️ 构建项目..."
-          npm run build
           echo "🔄 重载Nginx..."
           sudo systemctl reload nginx
           echo "✅ 部署完成！"
