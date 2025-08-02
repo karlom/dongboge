@@ -38,6 +38,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
         port: ${{ secrets.PORT || '22' }}
         source: "dist/"
         target: "/var/www/dongboge"
@@ -50,6 +51,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
         port: ${{ secrets.PORT || '22' }}
         script: |
           echo "🔄 重载Nginx..."
