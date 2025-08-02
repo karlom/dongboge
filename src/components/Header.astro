@@ -1,0 +1,162 @@
+---
+import { SITE_TITLE } from "../consts";
+import HeaderLink from "./HeaderLink.astro";
+---
+
+<header>
+  <nav>
+    <h2>
+      <a href="/" class="flex items-center">
+        <img
+          src="/images/index-logo.png"
+          alt="东波哥"
+          class="w-[180px] h-[95px]"
+        />
+      </a>
+    </h2>
+    <div class="internal-links">
+      <HeaderLink href="/">首页</HeaderLink>
+      <HeaderLink href="/blog">博客文章</HeaderLink>
+      <HeaderLink href="/training-cases">培训案例</HeaderLink>
+      <HeaderLink href="/services">我的服务</HeaderLink>
+      <HeaderLink href="/about">关于我</HeaderLink>
+    </div>
+    <div class="social-links">
+      <!-- 公众号图标 -->
+      <div class="social-icon-container">
+        <img
+          src="/images/gongzhonghao_logo.png"
+          alt="公众号"
+          class="social-icon"
+        />
+        <div class="hover-image hover-image-left">
+          <img src="/images/gongzhonghao.png" alt="公众号二维码" />
+        </div>
+      </div>
+
+      <!-- 视频号图标 -->
+      <div class="social-icon-container">
+        <img
+          src="/images/shipinhao_logo.png"
+          alt="视频号"
+          class="social-icon"
+        />
+        <div class="hover-image hover-image-center">
+          <img src="/images/shipinhao.png" alt="视频号二维码" />
+        </div>
+      </div>
+
+      <!-- 抖音图标 -->
+      <div class="social-icon-container">
+        <img src="/images/douyin_logo.png" alt="抖音" class="social-icon" />
+        <div class="hover-image hover-image-right">
+          <img src="/images/douyin.png" alt="抖音二维码" />
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<style>
+  header {
+    margin: 0;
+    padding: 0 1em;
+    background: white;
+    box-shadow: 0 2px 8px rgba(var(--black), 5%);
+    position: relative;
+    overflow: visible;
+  }
+  h2 {
+    margin: 0;
+    font-size: 1em;
+  }
+
+  h2 a,
+  h2 a.active {
+    text-decoration: none;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: visible;
+  }
+  nav a {
+    padding: 1em 0.5em;
+    color: var(--black);
+    border-bottom: 4px solid transparent;
+    text-decoration: none;
+  }
+  nav a.active {
+    text-decoration: none;
+    border-bottom-color: var(--accent);
+  }
+  .social-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-right: 1rem;
+  }
+
+  .social-icon-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .social-icon {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .social-icon:hover {
+    transform: scale(1.1);
+  }
+
+  .hover-image {
+    position: absolute;
+    top: 100%;
+    margin-top: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .hover-image img {
+    max-width: 200px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid #fff;
+  }
+
+  /* 前两个图标的二维码居中显示 */
+  .hover-image-left,
+  .hover-image-center {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* 最右边的抖音图标二维码右对齐，确保不被截断 */
+  .hover-image-right {
+    right: 0;
+    transform: none;
+  }
+
+  .social-icon-container:hover .hover-image {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (max-width: 720px) {
+    .social-links {
+      display: none;
+    }
+  }
+</style>

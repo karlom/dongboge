@@ -1,0 +1,272 @@
+---
+interface NavigationProps {
+  prevPost?: {
+    id: string;
+    data: {
+      title: string;
+      pubDate: Date;
+    };
+  };
+  nextPost?: {
+    id: string;
+    data: {
+      title: string;
+      pubDate: Date;
+    };
+  };
+}
+
+const { prevPost, nextPost } = Astro.props as NavigationProps;
+
+// 如果没有任何导航链接，不显示导航区域
+const hasNavigation = prevPost || nextPost;
+---
+
+{hasNavigation && (
+  <nav class="blog-navigation" aria-label="文章导航">
+    <div class="nav-container">
+      <!-- 上一篇文章 -->
+      <div class="nav-item prev">
+        {prevPost ? (
+          <a href={`/blog/${prevPost.id}/`} class="nav-link prev-link" rel="prev">
+            <div class="nav-direction">
+              <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              <span class="nav-label">上一篇</span>
+            </div>
+            <div class="nav-title">{prevPost.data.title}</div>
+          </a>
+        ) : (
+          <div class="nav-placeholder"></div>
+        )}
+      </div>
+
+      <!-- 下一篇文章 -->
+      <div class="nav-item next">
+        {nextPost ? (
+          <a href={`/blog/${nextPost.id}/`} class="nav-link next-link" rel="next">
+            <div class="nav-direction">
+              <span class="nav-label">下一篇</span>
+              <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </div>
+            <div class="nav-title">{nextPost.data.title}</div>
+          </a>
+        ) : (
+          <div class="nav-placeholder"></div>
+        )}
+      </div>
+    </div>
+  </nav>
+)}
+
+<style>
+  .blog-navigation {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgb(229, 231, 235);
+  }
+
+  .nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    max-width: 100%;
+  }
+
+  .nav-item {
+    flex: 1;
+    max-width: 45%;
+  }
+
+  .nav-item.prev {
+    text-align: left;
+  }
+
+  .nav-item.next {
+    text-align: right;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 1.5rem;
+    background: rgb(249, 250, 251);
+    border: 1px solid rgb(229, 231, 235);
+    border-radius: 12px;
+    text-decoration: none;
+    color: rgb(55, 65, 81);
+    transition: all 0.2s ease;
+    height: 100%;
+    min-height: 120px;
+  }
+
+  .nav-link:hover {
+    background: rgb(243, 244, 246);
+    border-color: rgb(59, 130, 246);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .nav-direction {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgb(107, 114, 128);
+  }
+
+  .nav-item.prev .nav-direction {
+    justify-content: flex-start;
+  }
+
+  .nav-item.next .nav-direction {
+    justify-content: flex-end;
+  }
+
+  .nav-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .nav-item.prev .nav-icon {
+    margin-right: 0.5rem;
+  }
+
+  .nav-item.next .nav-icon {
+    margin-left: 0.5rem;
+  }
+
+  .nav-label {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: rgb(17, 24, 39);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .nav-link:hover .nav-title {
+    color: rgb(59, 130, 246);
+  }
+
+  .nav-placeholder {
+    height: 120px;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .nav-container {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .nav-item {
+      max-width: 100%;
+    }
+
+    .nav-item.next {
+      text-align: left;
+    }
+
+    .nav-item.next .nav-direction {
+      justify-content: flex-start;
+    }
+
+    .nav-item.next .nav-icon {
+      margin-left: 0;
+      margin-right: 0.5rem;
+      order: -1;
+    }
+
+    .nav-link {
+      min-height: 100px;
+      padding: 1.25rem;
+    }
+
+    .nav-title {
+      font-size: 1rem;
+    }
+  }
+
+  /* 可访问性增强 */
+  .nav-link:focus {
+    outline: 2px solid rgb(59, 130, 246);
+    outline-offset: 2px;
+  }
+
+  .nav-link:focus-visible {
+    outline: 2px solid rgb(59, 130, 246);
+    outline-offset: 2px;
+  }
+
+  /* 键盘导航支持 */
+  .nav-link:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link {
+      transition: none;
+    }
+    
+    .nav-link:hover {
+      transform: none;
+    }
+  }
+
+  /* 高对比度模式支持 */
+  @media (prefers-contrast: high) {
+    .nav-link {
+      border-width: 2px;
+    }
+    
+    .nav-link:hover {
+      border-color: rgb(17, 24, 39);
+    }
+  }
+
+  /* 打印样式优化 */
+  @media print {
+    .blog-navigation {
+      display: none;
+    }
+  }
+
+  /* 深色模式支持（如果需要） */
+  @media (prefers-color-scheme: dark) {
+    .nav-link {
+      background: rgb(31, 41, 55);
+      border-color: rgb(75, 85, 99);
+      color: rgb(229, 231, 235);
+    }
+    
+    .nav-link:hover {
+      background: rgb(55, 65, 81);
+      border-color: rgb(59, 130, 246);
+    }
+    
+    .nav-direction {
+      color: rgb(156, 163, 175);
+    }
+    
+    .nav-title {
+      color: rgb(243, 244, 246);
+    }
+    
+    .nav-link:hover .nav-title {
+      color: rgb(96, 165, 250);
+    }
+  }
+</style>

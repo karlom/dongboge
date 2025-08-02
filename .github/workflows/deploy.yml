@@ -1,0 +1,45 @@
+name: 部署到腾讯云服务器
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 设置Node.js环境
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: 安装依赖
+      run: npm ci
+      
+    - name: 构建项目
+      run: npm run build
+      
+    - name: 部署到服务器
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.PRIVATE_KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          echo "🚀 开始部署到服务器..."
+          cd /var/www/dongboge
+          echo "📥 拉取最新代码..."
+          git pull origin main
+          echo "📦 安装依赖..."
+          npm ci
+          echo "🏗️ 构建项目..."
+          npm run build
+          echo "🔄 重载Nginx..."
+          sudo systemctl reload nginx
+          echo "✅ 部署完成！"
