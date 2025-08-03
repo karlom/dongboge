@@ -23,11 +23,11 @@ export default defineConfig({
 	vite: {
 		// 定义环境变量，确保在构建时可用
 		define: {
-			'import.meta.env.PUBLIC_CDN_URL': JSON.stringify(process.env.PUBLIC_CDN_URL || ''),
+			'import.meta.env.PUBLIC_CDN_URL': JSON.stringify('https://cdn.dongboge.cn'),
 		},
 		build: {
-			// 启用CSS代码分割
-			cssCodeSplit: true,
+			// 禁用CSS代码分割，生成单一CSS文件
+			cssCodeSplit: false,
 			// 配置资源处理
 			assetsInlineLimit: 4096, // 小于4kb的文件将被内联为base64
 			// 配置rollup选项
@@ -40,7 +40,7 @@ export default defineConfig({
 				},
 			},
 		},
-		// 移除CDN基础路径，由cdnUrl函数处理
-		// base: process.env.PUBLIC_CDN_URL || 'https://cdn.dongboge.cn',
+		// 设置CDN基础路径，确保以斜杠结尾
+		base: 'https://cdn.dongboge.cn/',
 	},
 });

@@ -16,10 +16,13 @@
     0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%);
 }
 
-/* 字体文件使用相对路径加载，CDN会通过BaseHead.astro中的预加载处理 */
+/* 
+ * 字体文件使用绝对路径加载
+ * 直接使用完整的CDN URL，避免任何路径解析问题
+ */
 @font-face {
   font-family: "Atkinson";
-  src: url("/fonts/atkinson-regular.woff") format("woff");
+  src: url("https://cdn.dongboge.cn/fonts/atkinson-regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -27,7 +30,7 @@
 
 @font-face {
   font-family: "Atkinson";
-  src: url("/fonts/atkinson-bold.woff") format("woff");
+  src: url("https://cdn.dongboge.cn/fonts/atkinson-bold.woff") format("woff");
   font-weight: 700;
   font-style: normal;
   font-display: swap;

@@ -31,17 +31,17 @@ const { title, description, image = FallbackImage } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
-<!-- Font preloads -->
+<!-- 字体预加载 - 使用绝对URL确保在任何环境下都能正确加载 -->
 <link
 	rel="preload"
-	href={debugCdnUrl("/fonts/atkinson-regular.woff")}
+	href="https://cdn.dongboge.cn/fonts/atkinson-regular.woff"
 	as="font"
 	type="font/woff"
 	crossorigin
 />
 <link
 	rel="preload"
-	href={debugCdnUrl("/fonts/atkinson-bold.woff")}
+	href="https://cdn.dongboge.cn/fonts/atkinson-bold.woff"
 	as="font"
 	type="font/woff"
 	crossorigin

@@ -18,6 +18,7 @@ const { title, description } = Astro.props;
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/png" href={cdnUrl("/Favicon.png")} />
 		<meta name="generator" content={Astro.generator} />
+		<!-- 移除直接引入的CSS，让Astro处理样式加载 -->
 		<meta name="theme-color" content="#3B82F6" />
 		<meta name="robots" content="index, follow" />
 		<meta property="og:title" content={title} />

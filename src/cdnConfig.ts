@@ -1,40 +1,29 @@
-// CDN配置
-export const CDN_URL = import.meta.env.PUBLIC_CDN_URL || '';
+// CDN配置 - 硬编码CDN URL，避免环境变量问题
+export const CDN_URL = 'https://cdn.dongboge.cn';
 
-// 生成CDN路径的辅助函数
+/**
+ * 生成CDN路径的辅助函数
+ * 简化版本，直接使用硬编码的CDN URL
+ */
 export function cdnUrl(path: string): string {
     // 如果路径是完整的URL，直接返回
-    if (path.startsWith('http://') || path.startsWith('https://')) {
+    if (path.startsWith('http')) {
         return path;
     }
 
     // 确保路径以/开头
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
-    // 如果CDN_URL为空，返回相对路径
-    if (!CDN_URL) {
-        return normalizedPath;
-    }
-
-    // 确保CDN_URL不包含协议前缀，避免双重协议问题
-    let cdnBase = CDN_URL;
-    if (cdnBase.startsWith('https://')) {
-        cdnBase = cdnBase.substring(8); // 移除 'https://'
-    } else if (cdnBase.startsWith('http://')) {
-        cdnBase = cdnBase.substring(7); // 移除 'http://'
-    }
-
-    // 返回CDN路径，确保使用https协议
-    return `https://${cdnBase}${normalizedPath}`;
+    // 直接返回完整URL
+    return `${CDN_URL}${normalizedPath}`;
 }
 
-// 调试函数，用于检查CDN URL是否正确
+/**
+ * 调试函数，用于检查CDN URL是否正确
+ * 在控制台输出详细信息，帮助排查问题
+ */
 export function debugCdnUrl(path: string): string {
-    console.log(`原始路径: ${path}`);
-    console.log(`CDN_URL环境变量: ${import.meta.env.PUBLIC_CDN_URL}`);
-
     const result = cdnUrl(path);
-    console.log(`处理后的CDN路径: ${result}`);
-
+    console.log(`[CDN调试] 原始路径: ${path} => CDN路径: ${result}`);
     return result;
 }

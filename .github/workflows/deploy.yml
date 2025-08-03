@@ -54,8 +54,20 @@ jobs:
         
     - name: 构建项目
       env:
-        PUBLIC_CDN_URL: cdn.dongboge.cn
-      run: npm run build
+        PUBLIC_CDN_URL: https://cdn.dongboge.cn
+        SITE_URL: https://dongboge.cn
+      run: |
+        echo "使用的CDN URL: $PUBLIC_CDN_URL"
+        npm run build
+        
+    - name: 检查构建输出
+      run: |
+        echo "检查构建输出文件..."
+        ls -la dist/
+        echo "检查CSS文件..."
+        find dist -name "*.css" | xargs ls -la
+        echo "检查HTML文件中的资源引用..."
+        grep -r "cdn.dongboge.cn" dist/index.html || echo "未找到CDN引用"
       
     - name: 设置腾讯云COS存储桶CORS规则
       run: |
