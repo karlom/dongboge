@@ -26,10 +26,7 @@ const COS = require('cos-nodejs-sdk-v5');
 // 配置
 const cos = new COS({
     SecretId: process.env.TENCENT_SECRET_ID,
-    SecretKey: process.env.TENCENT_SECRET_KEY,
-    // 禁用自动检测，避免依赖问题
-    ForcePathStyle: true,
-    CompatibilityMode: true
+    SecretKey: process.env.TENCENT_SECRET_KEY
 });
 
 // 路径配置
