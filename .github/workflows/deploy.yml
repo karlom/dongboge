@@ -33,6 +33,7 @@ jobs:
         echo "USERNAME: ${{ secrets.USERNAME }} 已设置: ${{ secrets.USERNAME != '' }}"
         echo "SSH_PRIVATE_KEY 已设置: ${{ secrets.SSH_PRIVATE_KEY != '' }}"
         echo "PORT 已设置: ${{ secrets.PORT != '' }}"
+        echo "CDN_DOMAIN 已设置: ${{ secrets.CDN_DOMAIN != '' }}"
         
     - name: 上传静态资源到腾讯云COS
       run: |
