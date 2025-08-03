@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
+import { cdnUrl } from "../cdnConfig";
+import OptimizedImage from "../components/OptimizedImage.astro";
 
 // SEO关键词
 const keywords = "企业AI培训,人工智能培训,AI技能培训,ChatGPT培训,Dify培训,智能体开发,机器学习培训,深度学习培训,企业数字化转型,AI内训,人工智能咨询,AI技术培训,企业AI应用,AI工具培训,广州AI培训";
@@ -186,15 +188,15 @@ const stats = {
   <meta slot="head" property="og:title" content="企业AI培训案例_专业人工智能培训服务 - 东波哥" />
   <meta slot="head" property="og:description" content="专业企业AI培训服务，已为13+企业提供AI培训，500+学员，98%满意度。涵盖ChatGPT、Dify、智能体开发等实战培训。" />
   <meta slot="head" property="og:type" content="website" />
-  <meta slot="head" property="og:url" content="https://yoursite.com/training-cases" />
-  <meta slot="head" property="og:image" content="https://yoursite.com/images/training/og-image.jpg" />
+  <meta slot="head" property="og:url" content="https://www.dongboge.cn/training-cases" />
+  <meta slot="head" property="og:image" content={cdnUrl("/images/training/og-image.jpg")} />
   <meta slot="head" property="og:locale" content="zh_CN" />
   
   <!-- Twitter Card Tags -->
   <meta slot="head" name="twitter:card" content="summary_large_image" />
   <meta slot="head" name="twitter:title" content="企业AI培训案例_专业人工智能培训服务" />
   <meta slot="head" name="twitter:description" content="专业企业AI培训服务，已为13+企业提供AI培训，500+学员，98%满意度" />
-  <meta slot="head" name="twitter:image" content="https://yoursite.com/images/training/twitter-card.jpg" />
+  <meta slot="head" name="twitter:image" content={cdnUrl("/images/training/twitter-card.jpg")} />
   
   <!-- Structured Data -->
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(structuredData)} />
@@ -309,8 +311,8 @@ const stats = {
               <div class="grid grid-cols-2 gap-3">
                 {case_.images.slice(0, 4).map((image, index) => (
                   <div class="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
-                    <img 
-                      src={image} 
+                    <OptimizedImage 
+                      src={cdnUrl(image)}
                       alt={`${case_.name}AI培训现场图片${index + 1}_企业人工智能培训_AI技能培训实景`}
                       title={`${case_.name}AI培训现场_专业企业AI培训服务`}
                       class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"

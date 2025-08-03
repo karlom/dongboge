@@ -8,9 +8,19 @@ interface Props {
     class?: string;
     width?: number;
     height?: number;
+    title?: string;
+    loading?: string;
 }
 
-const { src, alt, class: className, width, height } = Astro.props;
+const {
+    src,
+    alt,
+    class: className,
+    width,
+    height,
+    title,
+    loading,
+} = Astro.props;
 
 // 检查src是否为字符串
 const isStringPath = typeof src === "string";
@@ -26,6 +36,8 @@ const optimizedSrc = isStringPath ? processImagePath(src) : src;
                 class={className}
                 width={width}
                 height={height}
+                title={title}
+                loading={loading}
                 style="display: block; margin: 0 auto; max-width: 100%;"
             />
         ) : (
@@ -35,6 +47,7 @@ const optimizedSrc = isStringPath ? processImagePath(src) : src;
                 class={className}
                 width={width || 800}
                 height={height || 600}
+                title={title}
                 style="display: block; margin: 0 auto; max-width: 100%;"
             />
         )
