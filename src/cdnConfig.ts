@@ -6,5 +6,8 @@ export const CDN_URL = import.meta.env.PUBLIC_CDN_URL || '';
 export function cdnUrl(path: string): string {
     // 确保路径以/开头
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-    return `${CDN_URL}${normalizedPath}`;
+
+    // 如果CDN_URL为空（本地开发环境），则使用相对路径
+    // 否则（生产环境）使用CDN URL
+    return CDN_URL ? `${CDN_URL}${normalizedPath}` : normalizedPath;
 }

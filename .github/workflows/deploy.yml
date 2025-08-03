@@ -48,6 +48,8 @@ jobs:
       run: npm install cos-nodejs-sdk-v5 tencentcloud-sdk-nodejs-cdn
         
     - name: 构建项目
+      env:
+        PUBLIC_CDN_URL: https://${{ secrets.CDN_DOMAIN }}
       run: npm run build
       
     - name: 上传静态资源到腾讯云COS

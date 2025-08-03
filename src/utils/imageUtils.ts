@@ -19,10 +19,22 @@ export function processImagePath(imagePath: string): string {
         const normalizedPath = imagePath.replace('../../assets/', '/assets/');
         return cdnUrl(normalizedPath);
     }
+    
+    // 处理 '../assets/' 格式的路径
+    if (imagePath.includes('../assets/')) {
+        // 将 '../assets/' 替换为 '/assets/'
+        const normalizedPath = imagePath.replace('../assets/', '/assets/');
+        return cdnUrl(normalizedPath);
+    }
 
     // 处理以 / 开头的路径
     if (imagePath.startsWith('/')) {
         return cdnUrl(imagePath);
+    }
+
+    // 处理 'assets/' 开头的路径
+    if (imagePath.startsWith('assets/')) {
+        return cdnUrl(`/${imagePath}`);
     }
 
     // 其他情况，假设是相对于根目录的路径
