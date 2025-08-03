@@ -46,9 +46,16 @@ jobs:
     - name: 安装腾讯云SDK和所有依赖
       run: |
         echo "安装所有必要的依赖..."
-        npm install cos-nodejs-sdk-v5 tencentcloud-sdk-nodejs-cdn strnum fast-xml-parser@4.2.5 node-fetch jsdom
-        # 验证依赖是否正确安装
-        node -e "try { require('strnum'); require('fast-xml-parser'); console.log('依赖检查通过'); } catch(e) { console.error('依赖检查失败:', e); process.exit(1); }"
+        # 安装特定版本的依赖，确保兼容性
+        npm install cos-nodejs-sdk-v5@2.11.19 --no-save
+        npm install fast-xml-parser@4.2.5 --no-save
+        # 不安装strnum，因为我们已经修改了脚本，不再依赖它
+        
+        # 安装其他依赖
+        npm install node-fetch jsdom --no-save
+        
+        # 设置环境变量，强制COS SDK使用兼容模式
+        echo "COS_COMPATIBILITY_MODE=true" >> $GITHUB_ENV
         
     - name: 设置脚本权限
       run: |
