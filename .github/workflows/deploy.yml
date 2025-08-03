@@ -60,7 +60,7 @@ jobs:
     - name: 设置脚本权限
       run: |
         chmod +x scripts/incremental-upload.js
-        chmod +x scripts/setup-cos-cors.js
+        chmod +x scripts/setup-cos-cors.cjs
         
     - name: 构建项目
       env:
@@ -89,7 +89,7 @@ jobs:
         export TENCENT_COS_REGION=ap-guangzhou
         
         # 运行CORS设置脚本
-        node scripts/setup-cos-cors.js
+        node scripts/setup-cos-cors.cjs
         
     - name: 增量上传静态资源到腾讯云COS
       run: |
