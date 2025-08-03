@@ -31,20 +31,6 @@ const { title, description, image = FallbackImage } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
-<!-- 字体预加载 - 移除crossorigin属性避免CORS问题 -->
-<link
-	rel="preload"
-	href="https://cdn.dongboge.cn/fonts/atkinson-regular.woff"
-	as="font"
-	type="font/woff"
-/>
-<link
-	rel="preload"
-	href="https://cdn.dongboge.cn/fonts/atkinson-bold.woff"
-	as="font"
-	type="font/woff"
-/>
-
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
