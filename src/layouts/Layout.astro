@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { cdnUrl } from "../cdnConfig";
 
 export interface Props {
 	title: string;
@@ -15,7 +16,7 @@ const { title, description } = Astro.props;
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/png" href="/Favicon.png" />
+		<link rel="icon" type="image/png" href={cdnUrl("/Favicon.png")} />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#3B82F6" />
 		<meta name="robots" content="index, follow" />
@@ -44,4 +45,3 @@ const { title, description } = Astro.props;
 		padding: 0.125rem 0.25rem;
 	}
 </style>
-

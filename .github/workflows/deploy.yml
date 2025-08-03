@@ -1,4 +1,4 @@
-name: 部署到腾讯云服务器
+name: 部署到腾讯云服务器和CDN
 
 on:
   push:
@@ -21,6 +21,13 @@ jobs:
     - name: 安装依赖
       run: npm ci
       
+    - name: 安装腾讯云CLI
+      run: |
+        pip install tccli
+        tccli configure set secretId ${{ secrets.TENCENT_SECRET_ID }}
+        tccli configure set secretKey ${{ secrets.TENCENT_SECRET_KEY }}
+        tccli configure set region ap-guangzhou
+        
     - name: 构建项目
       run: npm run build
       
@@ -32,7 +39,18 @@ jobs:
         echo "SSH_PRIVATE_KEY 已设置: ${{ secrets.SSH_PRIVATE_KEY != '' }}"
         echo "PORT 已设置: ${{ secrets.PORT != '' }}"
         
-    - name: 部署到服务器
+    - name: 上传静态资源到腾讯云COS
+      run: |
+        echo "上传静态资源到腾讯云COS..."
+        # 上传静态资源文件夹（如CSS、JS、图片等）
+        tccli cos sync dist/assets cos://${{ secrets.TENCENT_COS_BUCKET }}/assets --delete
+        tccli cos sync dist/fonts cos://${{ secrets.TENCENT_COS_BUCKET }}/fonts --delete
+        
+        # 刷新CDN缓存
+        echo "刷新CDN缓存..."
+        tccli cdn PurgePathCache --cli-unfold-argument --Paths https://${{ secrets.CDN_DOMAIN }}/assets/ https://${{ secrets.CDN_DOMAIN }}/fonts/ --FlushType flush
+        
+    - name: 部署HTML和其他文件到服务器
       uses: burnett01/rsync-deployments@6.0.0
       with:
         switches: -avzr --delete

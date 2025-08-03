@@ -1,0 +1,42 @@
+---
+import { processImagePath } from "../utils/imageUtils";
+import { Image } from "astro:assets";
+
+interface Props {
+    src: any; // 可以是字符串路径或图像对象
+    alt: string;
+    class?: string;
+    width?: number;
+    height?: number;
+}
+
+const { src, alt, class: className, width, height } = Astro.props;
+
+// 检查src是否为字符串
+const isStringPath = typeof src === "string";
+const optimizedSrc = isStringPath ? processImagePath(src) : src;
+---
+
+<div class="image-wrapper" style="text-align: center; margin: 0 auto;">
+    {
+        isStringPath ? (
+            <img
+                src={optimizedSrc}
+                alt={alt}
+                class={className}
+                width={width}
+                height={height}
+                style="display: block; margin: 0 auto; max-width: 100%;"
+            />
+        ) : (
+            <Image
+                src={optimizedSrc}
+                alt={alt}
+                class={className}
+                width={width || 800}
+                height={height || 600}
+                style="display: block; margin: 0 auto; max-width: 100%;"
+            />
+        )
+    }
+</div>
