@@ -1,9 +1,10 @@
-// CDN配置 - 硬编码CDN URL，避免环境变量问题
+// CDN配置 - 根据环境返回不同的URL
 export const CDN_URL = 'https://cdn.dongboge.cn';
 
 /**
- * 生成CDN路径的辅助函数
- * 简化版本，直接使用硬编码的CDN URL
+ * 生成路径的辅助函数
+ * 本地开发：返回本地路径
+ * 远程部署：返回CDN路径
  */
 export function cdnUrl(path: string): string {
     // 如果路径是完整的URL，直接返回
@@ -14,8 +15,24 @@ export function cdnUrl(path: string): string {
     // 确保路径以/开头
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
-    // 直接返回完整URL
-    return `${CDN_URL}${normalizedPath}`;
+    // 检查是否为开发环境
+    const isDev = import.meta.env.DEV || process.env.NODE_ENV === 'development';
+
+    if (isDev) {
+        // 本地开发环境：返回本地路径
+        // 对于assets目录下的文件，需要使用/src/assets/路径
+        if (normalizedPath.startsWith('/assets/')) {
+            return normalizedPath.replace('/assets/', '/src/assets/');
+        }
+        // 对于public目录下的文件（如/images/），直接返回路径
+        if (normalizedPath.startsWith('/images/')) {
+            return normalizedPath;
+        }
+        return normalizedPath;
+    } else {
+        // 生产环境：返回CDN路径
+        return `${CDN_URL}${normalizedPath}`;
+    }
 }
 
 /**

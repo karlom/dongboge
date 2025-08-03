@@ -1,0 +1,1120 @@
+---
+export interface DropdownOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
+export interface Props {
+  id: string;
+  name: string;
+  label: string;
+  options: DropdownOption[];
+  placeholder?: string;
+  required?: boolean;
+  value?: string;
+  class?: string;
+}
+
+const {
+  id,
+  name,
+  label,
+  options,
+  placeholder = "请选择",
+  required = false,
+  value = "",
+  class: className = "",
+} = Astro.props;
+---
+
+<div class={`custom-dropdown ${className}`} data-dropdown-id={id}>
+  <!-- 标签 -->
+  <label for={id} class="block text-sm font-medium text-gray-700 mb-2">
+    {label}
+    {required && <span class="text-red-500 ml-1">*</span>}
+  </label>
+
+  <!-- 原生 select 作为后备方案 -->
+  <select
+    id={id}
+    name={name}
+    required={required}
+    class={`native-select w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+    data-value={value}
+  >
+    <option value="">{placeholder}</option>
+    {
+      options.map((option) => (
+        <option
+          value={option.value}
+          disabled={option.disabled}
+          selected={option.value === value}
+        >
+          {option.label}
+        </option>
+      ))
+    }
+  </select>
+
+  <!-- 自定义触发按钮 (隐藏，将通过 JavaScript 显示) -->
+  <button
+    type="button"
+    class="custom-trigger hidden w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-left flex items-center justify-between"
+    aria-haspopup="listbox"
+    aria-expanded="false"
+    data-trigger
+  >
+    <span class="selected-text text-gray-500">{placeholder}</span>
+    <svg
+      class="dropdown-arrow w-4 h-4 text-gray-400 transition-transform duration-200"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  <!-- 移动端模态框 (隐藏，将通过 JavaScript 显示) -->
+  <div
+    class="dropdown-modal hidden fixed inset-0 z-50"
+    data-modal
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby={`${id}-modal-title`}
+    aria-describedby={`${id}-modal-desc`}
+  >
+    <!-- 背景遮罩 -->
+    <div
+      class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 opacity-0"
+      data-backdrop
+      aria-hidden="true"
+    >
+    </div>
+
+    <!-- 模态框内容 -->
+    <div
+      class="modal-content fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] transform translate-y-full transition-transform duration-300 shadow-2xl"
+    >
+      <!-- 模态框头部 -->
+      <div
+        class="modal-header flex items-center justify-between p-4 sm:p-6 border-b border-gray-200"
+      >
+        <div>
+          <h3
+            id={`${id}-modal-title`}
+            class="text-lg sm:text-xl font-semibold text-gray-900"
+          >
+            {label}
+          </h3>
+          <p id={`${id}-modal-desc`} class="text-sm text-gray-500 mt-1 sr-only">
+            选择一个选项
+          </p>
+        </div>
+        <button
+          type="button"
+          class="close-btn p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          data-close
+          aria-label="关闭选择框"
+        >
+          <svg
+            class="w-5 h-5 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 选项列表 -->
+      <div
+        class="options-list overflow-y-auto max-h-[calc(70vh-100px)] py-2"
+        role="listbox"
+        aria-labelledby={`${id}-modal-title`}
+        tabindex="-1"
+      >
+        {
+          options.map((option, index) => (
+            <button
+              type="button"
+              id={`${id}-mobile-option-${index}`}
+              class="dropdown-option w-full px-4 sm:px-6 py-4 text-left hover:bg-blue-50 active:bg-blue-100 transition-colors duration-200 border-b border-gray-100 last:border-b-0 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:bg-blue-50 focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              role="option"
+              data-value={option.value}
+              data-index={index}
+              disabled={option.disabled}
+              aria-selected="false"
+              tabindex="-1"
+            >
+              <span class="text-base sm:text-lg text-gray-900 leading-relaxed">
+                {option.label}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- 桌面端下拉面板 (隐藏，将通过 JavaScript 显示) -->
+  <div
+    class="dropdown-panel hidden absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-64 overflow-y-auto transform opacity-0 scale-95 transition-all duration-200 origin-top"
+    data-panel
+    role="listbox"
+    aria-labelledby={id}
+    aria-hidden="true"
+    tabindex="-1"
+  >
+    <!-- 面板内容容器 -->
+    <div class="panel-content py-1">
+      {
+        options.map((option, index) => (
+          <button
+            type="button"
+            id={`${id}-desktop-option-${index}`}
+            class="dropdown-option w-full px-4 py-3 text-left hover:bg-blue-50 focus:bg-blue-50 active:bg-blue-100 transition-colors duration-150 border-b border-gray-50 last:border-b-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 group"
+            role="option"
+            data-value={option.value}
+            data-index={index}
+            disabled={option.disabled}
+            aria-selected="false"
+            tabindex="-1"
+          >
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-900 group-hover:text-gray-700 transition-colors duration-150">
+                {option.label}
+              </span>
+              <!-- 选中指示器 (隐藏，将通过 JavaScript 显示) -->
+              <svg
+                class="check-icon hidden w-4 h-4 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
+              </svg>
+            </div>
+          </button>
+        ))
+      }
+    </div>
+
+    <!-- 面板底部阴影 (视觉增强) -->
+    <div class="panel-shadow absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+  </div>
+</div>
+
+<style>
+  /* 基础样式 */
+  .custom-dropdown {
+    position: relative;
+  }
+
+  /* 移动端模态框样式 */
+  .dropdown-modal {
+    /* 确保模态框在最顶层 */
+    z-index: 9999;
+  }
+
+  /* 背景遮罩动画 */
+  .dropdown-modal .modal-backdrop {
+    opacity: 0;
+    transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dropdown-modal.open .modal-backdrop {
+    opacity: 1;
+  }
+
+  /* 模态框内容滑动动画 */
+  .dropdown-modal .modal-content {
+    transform: translateY(100%);
+    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    /* 添加安全区域支持 */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .dropdown-modal.open .modal-content {
+    transform: translateY(0);
+  }
+
+  /* 移动端触摸目标和字体大小 */
+  .dropdown-option {
+    min-height: 44px;
+    font-size: 16px;
+    /* 防止iOS缩放 */
+    -webkit-text-size-adjust: 100%;
+    /* 改善触摸反馈 */
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+  }
+
+  /* 移动端选项悬停效果 */
+  @media (hover: none) and (pointer: coarse) {
+    .dropdown-option:hover {
+      background-color: transparent;
+    }
+
+    .dropdown-option:active {
+      background-color: rgb(239, 246, 255);
+    }
+  }
+
+  /* 模态框头部样式增强 */
+  .modal-header {
+    /* 添加顶部安全区域 */
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  /* 选项列表滚动样式 */
+  .options-list {
+    /* 自定义滚动条 */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  }
+
+  .options-list::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .options-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .options-list::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 2px;
+  }
+
+  /* 平板端样式调整 */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .dropdown-option {
+      min-height: 48px;
+      font-size: 16px;
+      padding: 1rem 1.5rem;
+    }
+
+    .modal-header {
+      padding: 1.5rem;
+    }
+  }
+
+  /* 桌面端下拉面板样式 */
+  .dropdown-panel {
+    /* 面板定位和层级 */
+    z-index: 1000;
+    /* 面板动画 */
+    transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1),
+                transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* 面板显示状态 */
+  .dropdown-panel.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* 面板滚动条样式 */
+  .dropdown-panel {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+  }
+
+  .dropdown-panel::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .dropdown-panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dropdown-panel::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.3);
+    border-radius: 3px;
+  }
+
+  .dropdown-panel::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.5);
+  }
+
+  /* 面板阴影增强 */
+  .dropdown-panel {
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+
+  /* 选中指示器动画 */
+  .check-icon {
+    transition: opacity 150ms ease-in-out;
+  }
+
+  .dropdown-option[aria-selected="true"] .check-icon {
+    display: block;
+  }
+
+  /* 桌面端样式 */
+  @media (min-width: 1024px) {
+    .dropdown-option {
+      min-height: auto;
+      font-size: 14px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 桌面端悬停效果增强 */
+    .dropdown-option:hover {
+      background-color: rgb(239, 246, 255);
+    }
+
+    .dropdown-option:hover .check-icon {
+      opacity: 0.7;
+    }
+
+    /* 面板定位优化 */
+    .dropdown-panel {
+      /* 确保面板不会超出视口 */
+      max-height: min(16rem, calc(100vh - 200px));
+    }
+  }
+
+  /* 箭头旋转动画 */
+  .custom-trigger[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-arrow {
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* 增强的焦点指示器 */
+  .custom-trigger:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  .dropdown-option:focus,
+  .dropdown-option.focused {
+    outline: none;
+    background-color: rgb(239, 246, 255);
+    box-shadow: inset 0 0 0 2px #3b82f6;
+  }
+
+  /* 桌面端键盘导航增强 */
+  @media (min-width: 1024px) {
+    .dropdown-option.focused {
+      background-color: rgb(219, 234, 254);
+      transform: translateX(2px);
+      transition: all 150ms ease-in-out;
+    }
+
+    .dropdown-option.focused:not([aria-selected="true"]) {
+      background-color: rgb(239, 246, 255);
+    }
+  }
+
+  /* 关闭按钮焦点样式 */
+  .close-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3b82f6;
+  }
+
+  /* 隐藏原生 select 当自定义组件激活时 */
+  .custom-dropdown.enhanced .native-select {
+    display: none;
+  }
+
+  .custom-dropdown.enhanced .custom-trigger {
+    display: flex;
+  }
+
+  /* 禁用状态样式 */
+  .dropdown-option:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: transparent !important;
+  }
+
+  /* 选中状态样式 */
+  .dropdown-option[aria-selected="true"] {
+    background-color: rgb(219, 234, 254);
+    color: rgb(30, 64, 175);
+    font-weight: 500;
+  }
+
+  .dropdown-option[aria-selected="true"]::after {
+    content: "✓";
+    float: right;
+    color: rgb(59, 130, 246);
+    font-weight: bold;
+  }
+
+  /* 高对比度模式支持 */
+  @media (prefers-contrast: high) {
+    .dropdown-option:focus {
+      box-shadow: inset 0 0 0 3px currentColor;
+    }
+
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  /* 减少动画模式支持 */
+  @media (prefers-reduced-motion: reduce) {
+    .dropdown-modal .modal-content,
+    .dropdown-modal .modal-backdrop,
+    .dropdown-arrow {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+import id from "zod/v4/locales/id.cjs";
+
+import id from "zod/v4/locales/id.cjs";
+
+  // 渐进增强：仅在支持的浏览器中初始化自定义下拉框
+  if ("querySelector" in document && "addEventListener" in window) {
+    document.addEventListener("DOMContentLoaded", function () {
+      initializeCustomDropdowns();
+    });
+  }
+
+  function initializeCustomDropdowns() {
+    try {
+      const dropdowns = document.querySelectorAll(".custom-dropdown");
+
+      dropdowns.forEach((dropdown) => {
+        const dropdownId = dropdown.getAttribute("data-dropdown-id");
+        if (!dropdownId) return;
+
+        // 获取元素
+        const nativeSelect = dropdown.querySelector(
+          ".native-select"
+        ) as HTMLSelectElement;
+        const customTrigger = dropdown.querySelector(
+          ".custom-trigger"
+        ) as HTMLButtonElement;
+        const selectedText = dropdown.querySelector(
+          ".selected-text"
+        ) as HTMLSpanElement;
+        const modal = dropdown.querySelector(".dropdown-modal") as HTMLElement;
+        const panel = dropdown.querySelector(".dropdown-panel") as HTMLElement;
+        const backdrop = dropdown.querySelector(
+          ".modal-backdrop"
+        ) as HTMLElement;
+        const closeBtn = dropdown.querySelector(
+          ".close-btn"
+        ) as HTMLButtonElement;
+        const options = dropdown.querySelectorAll(
+          ".dropdown-option"
+        ) as NodeListOf<HTMLButtonElement>;
+        const optionsList = dropdown.querySelector(
+          ".options-list"
+        ) as HTMLElement;
+
+        if (!nativeSelect || !customTrigger || !selectedText) return;
+
+        // 激活自定义组件
+        dropdown.classList.add("enhanced");
+
+        // 状态管理
+        let focusedIndex = -1;
+        let isOpen = false;
+        let originalBodyOverflow = "";
+
+        // 设置初始值和选中状态
+        function updateSelectedState() {
+          const currentValue = nativeSelect.value;
+
+          // 更新所有选项的选中状态
+          options.forEach((option, index) => {
+            const optionValue = option.getAttribute("data-value") || "";
+            const isSelected = optionValue === currentValue;
+            option.setAttribute("aria-selected", isSelected.toString());
+
+            if (isSelected) {
+              focusedIndex = index;
+              const label = option.textContent?.trim() || "";
+              selectedText.textContent = label;
+              selectedText.classList.remove("text-gray-500");
+              selectedText.classList.add("text-gray-900");
+            }
+          });
+
+          // 如果没有选中值，重置显示
+          if (!currentValue) {
+            selectedText.textContent =
+              nativeSelect.querySelector('option[value=""]')?.textContent ||
+              "请选择";
+            selectedText.classList.add("text-gray-500");
+            selectedText.classList.remove("text-gray-900");
+          }
+        }
+
+        // 初始化选中状态
+        updateSelectedState();
+
+        // 检测设备类型
+        function isMobile() {
+          return window.innerWidth < 768;
+        }
+
+        // 桌面端面板定位逻辑
+        function positionPanel() {
+          if (!panel || isMobile()) return;
+
+          const triggerRect = customTrigger.getBoundingClientRect();
+          const viewportHeight = window.innerHeight;
+          const viewportWidth = window.innerWidth;
+          
+          // 重置面板样式
+          panel.style.top = "";
+          panel.style.bottom = "";
+          panel.style.left = "";
+          panel.style.right = "";
+          panel.style.maxHeight = "";
+          
+          // 计算可用空间
+          const spaceBelow = viewportHeight - triggerRect.bottom - 10;
+          const spaceAbove = triggerRect.top - 10;
+          const maxHeight = Math.max(spaceBelow, spaceAbove, 200);
+          
+          // 设置最大高度
+          panel.style.maxHeight = `${Math.min(maxHeight, 256)}px`;
+          
+          // 决定面板显示位置（上方或下方）
+          if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+            // 显示在下方
+            panel.style.top = "100%";
+            panel.style.transformOrigin = "top";
+          } else {
+            // 显示在上方
+            panel.style.bottom = "100%";
+            panel.style.top = "auto";
+            panel.style.transformOrigin = "bottom";
+            panel.style.marginBottom = "4px";
+            panel.style.marginTop = "0";
+          }
+          
+          // 水平定位（确保不超出视口）
+          const dropdownRect = dropdown.getBoundingClientRect();
+          if (dropdownRect.right > viewportWidth - 20) {
+            panel.style.right = "0";
+            panel.style.left = "auto";
+          } else {
+            panel.style.left = "0";
+            panel.style.right = "auto";
+          }
+        }
+
+        // 增强的焦点管理
+        function setFocusedOption(index: number) {
+          // 移除之前的焦点
+          options.forEach((opt, i) => {
+            opt.setAttribute("tabindex", "-1");
+            opt.classList.remove("focused");
+          });
+
+          if (index >= 0 && index < options.length && !options[index].disabled) {
+            focusedIndex = index;
+            const focusedOption = options[index];
+
+            // 设置焦点属性
+            focusedOption.setAttribute("tabindex", "0");
+            focusedOption.classList.add("focused");
+
+            // 在桌面端设置实际焦点
+            if (!isMobile()) {
+              focusedOption.focus();
+            }
+
+            // 确保选项在视图中
+            focusedOption.scrollIntoView({
+              block: "nearest",
+              behavior: "smooth",
+            });
+
+            // 更新ARIA活动后代
+            const container = isMobile() ? optionsList : panel;
+            if (container) {
+              const optionId = isMobile() ? `${id}-mobile-option-${index}` : `${id}-desktop-option-${index}`;
+              container.setAttribute("aria-activedescendant", optionId);
+            }
+          }
+        }
+
+        // 打开下拉框
+        function openDropdown() {
+          if (isOpen) return;
+
+          isOpen = true;
+          customTrigger.setAttribute("aria-expanded", "true");
+
+          if (isMobile()) {
+            // 移动端：显示模态框
+            if (modal) {
+              // 保存原始body overflow状态
+              originalBodyOverflow = document.body.style.overflow;
+
+              modal.classList.remove("hidden");
+              modal.setAttribute("aria-hidden", "false");
+
+              // 强制重绘后添加 open 类以触发动画
+              requestAnimationFrame(() => {
+                modal.classList.add("open");
+              });
+
+              // 阻止背景滚动
+              document.body.style.overflow = "hidden";
+
+              // 设置焦点到选项列表或当前选中项
+              setTimeout(() => {
+                if (focusedIndex >= 0) {
+                  setFocusedOption(focusedIndex);
+                } else if (optionsList) {
+                  optionsList.focus();
+                }
+              }, 100);
+            }
+          } else {
+            // 桌面端：显示下拉面板
+            if (panel) {
+              // 计算面板位置
+              positionPanel();
+              
+              panel.classList.remove("hidden");
+              panel.setAttribute("aria-hidden", "false");
+              
+              // 触发动画
+              requestAnimationFrame(() => {
+                panel.classList.add("show");
+              });
+
+              // 设置焦点到当前选中项或第一项
+              setTimeout(() => {
+                const targetIndex = focusedIndex >= 0 ? focusedIndex : 0;
+                setFocusedOption(targetIndex);
+              }, 10);
+            }
+          }
+        }
+
+        // 关闭下拉框
+        function closeDropdown() {
+          if (!isOpen) return;
+
+          isOpen = false;
+          customTrigger.setAttribute("aria-expanded", "false");
+
+          if (modal) {
+            modal.classList.remove("open");
+            modal.setAttribute("aria-hidden", "true");
+
+            setTimeout(() => {
+              modal.classList.add("hidden");
+            }, 300); // 等待动画完成
+
+            // 恢复背景滚动
+            document.body.style.overflow = originalBodyOverflow;
+          }
+
+          if (panel) {
+            panel.classList.remove("show");
+            panel.setAttribute("aria-hidden", "true");
+            
+            setTimeout(() => {
+              panel.classList.add("hidden");
+            }, 200); // 等待动画完成
+          }
+
+          // 返回焦点到触发按钮
+          customTrigger.focus();
+        }
+
+        // 选择选项
+        function selectOption(
+          value: string,
+          label: string,
+          optionIndex: number
+        ) {
+          nativeSelect.value = value;
+          focusedIndex = optionIndex;
+
+          // 更新选中状态
+          updateSelectedState();
+
+          // 触发 change 事件
+          const changeEvent = new Event("change", { bubbles: true });
+          nativeSelect.dispatchEvent(changeEvent);
+
+          closeDropdown();
+        }
+
+        // 增强的键盘导航处理
+        function handleKeyNavigation(e: KeyboardEvent) {
+          if (!isOpen) return;
+
+          switch (e.key) {
+            case "ArrowDown":
+              e.preventDefault();
+              navigateToNextOption();
+              break;
+
+            case "ArrowUp":
+              e.preventDefault();
+              navigateToPrevOption();
+              break;
+
+            case "Home":
+              e.preventDefault();
+              navigateToFirstOption();
+              break;
+
+            case "End":
+              e.preventDefault();
+              navigateToLastOption();
+              break;
+
+            case "Enter":
+            case " ":
+              e.preventDefault();
+              selectCurrentOption();
+              break;
+
+            case "Escape":
+              e.preventDefault();
+              closeDropdown();
+              break;
+
+            case "Tab":
+              // Tab键关闭下拉框并继续正常的Tab导航
+              closeDropdown();
+              break;
+
+            // 字母数字键快速搜索
+            default:
+              if (e.key.length === 1 && /[a-zA-Z0-9\u4e00-\u9fa5]/.test(e.key)) {
+                e.preventDefault();
+                handleTypeAhead(e.key);
+              }
+              break;
+          }
+        }
+
+        // 导航到下一个可用选项
+        function navigateToNextOption() {
+          let nextIndex = focusedIndex + 1;
+          
+          // 跳过禁用的选项
+          while (nextIndex < options.length && options[nextIndex].disabled) {
+            nextIndex++;
+          }
+          
+          if (nextIndex < options.length) {
+            setFocusedOption(nextIndex);
+          } else {
+            // 循环到第一个可用选项
+            navigateToFirstOption();
+          }
+        }
+
+        // 导航到上一个可用选项
+        function navigateToPrevOption() {
+          let prevIndex = focusedIndex - 1;
+          
+          // 跳过禁用的选项
+          while (prevIndex >= 0 && options[prevIndex].disabled) {
+            prevIndex--;
+          }
+          
+          if (prevIndex >= 0) {
+            setFocusedOption(prevIndex);
+          } else {
+            // 循环到最后一个可用选项
+            navigateToLastOption();
+          }
+        }
+
+        // 导航到第一个可用选项
+        function navigateToFirstOption() {
+          for (let i = 0; i < options.length; i++) {
+            if (!options[i].disabled) {
+              setFocusedOption(i);
+              break;
+            }
+          }
+        }
+
+        // 导航到最后一个可用选项
+        function navigateToLastOption() {
+          for (let i = options.length - 1; i >= 0; i--) {
+            if (!options[i].disabled) {
+              setFocusedOption(i);
+              break;
+            }
+          }
+        }
+
+        // 选择当前焦点选项
+        function selectCurrentOption() {
+          if (focusedIndex >= 0 && focusedIndex < options.length) {
+            const option = options[focusedIndex];
+            if (!option.disabled) {
+              const value = option.getAttribute("data-value") || "";
+              const label = option.textContent?.trim() || "";
+              selectOption(value, label, focusedIndex);
+            }
+          }
+        }
+
+        // 字母数字键快速搜索
+        let typeAheadString = "";
+        let typeAheadTimeout: number;
+
+        function handleTypeAhead(char: string) {
+          // 清除之前的超时
+          clearTimeout(typeAheadTimeout);
+          
+          // 添加字符到搜索字符串
+          typeAheadString += char.toLowerCase();
+          
+          // 查找匹配的选项
+          const matchingIndex = findMatchingOption(typeAheadString);
+          if (matchingIndex >= 0) {
+            setFocusedOption(matchingIndex);
+          }
+          
+          // 设置超时清除搜索字符串
+          typeAheadTimeout = setTimeout(() => {
+            typeAheadString = "";
+          }, 1000);
+        }
+
+        // 查找匹配的选项
+        function findMatchingOption(searchString: string): number {
+          // 首先尝试从当前位置之后查找
+          for (let i = focusedIndex + 1; i < options.length; i++) {
+            if (!options[i].disabled) {
+              const optionText = options[i].textContent?.trim().toLowerCase() || "";
+              if (optionText.startsWith(searchString)) {
+                return i;
+              }
+            }
+          }
+          
+          // 如果没找到，从头开始查找
+          for (let i = 0; i <= focusedIndex; i++) {
+            if (!options[i].disabled) {
+              const optionText = options[i].textContent?.trim().toLowerCase() || "";
+              if (optionText.startsWith(searchString)) {
+                return i;
+              }
+            }
+          }
+          
+          return -1;
+        }
+
+        // 触摸事件处理（移动端）
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        function handleTouchStart(e: TouchEvent) {
+          touchStartY = e.touches[0].clientY;
+        }
+
+        function handleTouchMove(e: TouchEvent) {
+          // 阻止模态框外的滚动
+          if (modal && modal.classList.contains("open")) {
+            const target = e.target as Element;
+            if (!optionsList?.contains(target)) {
+              e.preventDefault();
+            }
+          }
+        }
+
+        function handleTouchEnd(e: TouchEvent) {
+          touchEndY = e.changedTouches[0].clientY;
+
+          // 检测向下滑动手势关闭模态框
+          const swipeDistance = touchEndY - touchStartY;
+          if (
+            swipeDistance > 100 &&
+            modal &&
+            modal.classList.contains("open")
+          ) {
+            closeDropdown();
+          }
+        }
+
+        // 事件监听器
+        customTrigger.addEventListener("click", () => {
+          if (isOpen) {
+            closeDropdown();
+          } else {
+            openDropdown();
+          }
+        });
+
+        // 增强的触发按钮键盘导航
+        customTrigger.addEventListener("keydown", (e) => {
+          if (isOpen) {
+            // 如果下拉框已打开，将键盘事件传递给导航处理器
+            handleKeyNavigation(e);
+            return;
+          }
+
+          switch (e.key) {
+            case "Enter":
+            case " ":
+              e.preventDefault();
+              openDropdown();
+              break;
+              
+            case "ArrowDown":
+              e.preventDefault();
+              openDropdown();
+              setTimeout(() => navigateToFirstOption(), 10);
+              break;
+              
+            case "ArrowUp":
+              e.preventDefault();
+              openDropdown();
+              setTimeout(() => navigateToLastOption(), 10);
+              break;
+              
+            case "Home":
+              if (!isMobile()) {
+                e.preventDefault();
+                openDropdown();
+                setTimeout(() => navigateToFirstOption(), 10);
+              }
+              break;
+              
+            case "End":
+              if (!isMobile()) {
+                e.preventDefault();
+                openDropdown();
+                setTimeout(() => navigateToLastOption(), 10);
+              }
+              break;
+              
+            // 字母数字键快速搜索（桌面端）
+            default:
+              if (!isMobile() && e.key.length === 1 && /[a-zA-Z0-9\u4e00-\u9fa5]/.test(e.key)) {
+                e.preventDefault();
+                openDropdown();
+                setTimeout(() => handleTypeAhead(e.key), 10);
+              }
+              break;
+          }
+        });
+
+        // 选项点击
+        options.forEach((option, index) => {
+          option.addEventListener("click", () => {
+            const value = option.getAttribute("data-value") || "";
+            const label = option.textContent?.trim() || "";
+            selectOption(value, label, index);
+          });
+        });
+
+        // 选项键盘导航
+        if (optionsList) {
+          optionsList.addEventListener("keydown", handleKeyNavigation);
+        }
+
+        // 桌面端面板键盘导航
+        if (panel) {
+          panel.addEventListener("keydown", handleKeyNavigation);
+          
+          // 面板失去焦点时关闭（桌面端）
+          panel.addEventListener("blur", (e) => {
+            if (!isMobile() && isOpen) {
+              // 检查焦点是否移到了面板外部
+              setTimeout(() => {
+                const activeElement = document.activeElement;
+                if (!panel.contains(activeElement) && activeElement !== customTrigger) {
+                  closeDropdown();
+                }
+              }, 10);
+            }
+          });
+        }
+
+        // 背景点击关闭
+        if (backdrop) {
+          backdrop.addEventListener("click", closeDropdown);
+        }
+
+        // 关闭按钮
+        if (closeBtn) {
+          closeBtn.addEventListener("click", closeDropdown);
+        }
+
+        // 全局ESC键关闭
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && isOpen) {
+            closeDropdown();
+          }
+        });
+
+        // 移动端触摸事件
+        if (modal) {
+          modal.addEventListener("touchstart", handleTouchStart, {
+            passive: true,
+          });
+          modal.addEventListener("touchmove", handleTouchMove, {
+            passive: false,
+          });
+          modal.addEventListener("touchend", handleTouchEnd, { passive: true });
+        }
+
+        // 窗口大小变化时重新检测设备类型和重新定位
+        let resizeTimeout: number;
+        window.addEventListener("resize", () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            if (isOpen) {
+              if (isMobile()) {
+                // 如果切换到移动端，关闭并重新打开
+                closeDropdown();
+              } else {
+                // 桌面端重新定位面板
+                positionPanel();
+              }
+            }
+          }, 150);
+        });
+
+        // 页面失去焦点时关闭下拉框
+        window.addEventListener("blur", () => {
+          if (isOpen) {
+            closeDropdown();
+          }
+        });
+      });
+    } catch (error) {
+      console.warn("自定义下拉框初始化失败，使用原生 select:", error);
+    }
+  }
+</script>

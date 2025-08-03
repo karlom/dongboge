@@ -1,55 +1,78 @@
 ---
 import { processImagePath } from "../utils/imageUtils";
-import { Image } from "astro:assets";
 
 interface Props {
-    src: any; // 可以是字符串路径或图像对象
-    alt: string;
-    class?: string;
-    width?: number;
-    height?: number;
-    title?: string;
-    loading?: "lazy" | "eager" | null | undefined;
+  src: any; // 可以是字符串路径或图像对象
+  alt: string;
+  class?: string;
+  width?: number;
+  height?: number;
+  title?: string;
+  loading?: "lazy" | "eager" | null | undefined;
 }
 
 const {
-    src,
-    alt,
-    class: className,
-    width,
-    height,
-    title,
-    loading,
+  src,
+  alt,
+  class: className,
+  width,
+  height,
+  title,
+  loading,
 } = Astro.props;
 
-// 检查src是否为字符串
-const isStringPath = typeof src === "string";
-const optimizedSrc = isStringPath ? processImagePath(src) : src;
+// 统一处理所有类型的src为字符串路径
+let finalSrc: string;
+
+if (typeof src === "string") {
+  // 如果是字符串路径
+  // 检查是否已经是完整的URL或已经处理过的路径
+  if (
+    src.startsWith("http") ||
+    src.startsWith("/images/") ||
+    src.startsWith("/src/assets/")
+  ) {
+    // 已经是完整URL或已经处理过的路径，直接使用
+    finalSrc = src;
+  } else {
+    // 需要处理的相对路径
+    finalSrc = processImagePath(src);
+  }
+} else if (src && typeof src === "object" && "src" in src) {
+  // 如果是Astro图像对象，需要特殊处理
+  // Astro图像对象的src可能包含@fs等内部路径，我们需要提取实际的文件名
+  let astroSrc = src.src;
+
+  // 如果包含@fs路径，提取文件名
+  if (astroSrc.includes("@fs")) {
+    // 从路径中提取文件名
+    const matches = astroSrc.match(
+      /([^\/]+\.(jpg|jpeg|png|gif|webp|svg))(\?|$)/i
+    );
+    if (matches) {
+      finalSrc = processImagePath(matches[1]);
+    } else {
+      // 如果无法提取文件名，使用默认图片
+      finalSrc = processImagePath("default.png");
+    }
+  } else {
+    finalSrc = processImagePath(astroSrc);
+  }
+} else {
+  // 其他情况，转换为字符串后处理
+  finalSrc = processImagePath(String(src));
+}
 ---
 
 <div class="image-wrapper" style="text-align: center; margin: 0 auto;">
-    {
-        isStringPath ? (
-            <img
-                src={optimizedSrc}
-                alt={alt}
-                class={className}
-                width={width}
-                height={height}
-                title={title}
-                loading={loading}
-                style="display: block; margin: 0 auto; max-width: 100%;"
-            />
-        ) : (
-            <Image
-                src={optimizedSrc}
-                alt={alt}
-                class={className}
-                width={width || 800}
-                height={height || 600}
-                title={title}
-                style="display: block; margin: 0 auto; max-width: 100%;"
-            />
-        )
-    }
+  <img
+    src={finalSrc}
+    alt={alt}
+    class={className}
+    width={width}
+    height={height}
+    title={title}
+    loading={loading}
+    style="display: block; margin: 0 auto; max-width: 100%;"
+  />
 </div>

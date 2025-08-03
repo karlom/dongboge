@@ -11,18 +11,28 @@ import { cdnUrl } from "../cdnConfig";
         <img
           src={cdnUrl("/images/index-logo.png")}
           alt="东波哥"
-          class="w-[180px] h-[95px]"
+          class="logo-img"
         />
       </a>
     </h2>
-    <div class="internal-links">
+
+    <!-- 桌面端导航 -->
+    <div class="internal-links desktop-nav">
       <HeaderLink href="/">首页</HeaderLink>
       <HeaderLink href="/blog">博客文章</HeaderLink>
       <HeaderLink href="/training-cases">培训案例</HeaderLink>
       <HeaderLink href="/services">我的服务</HeaderLink>
       <HeaderLink href="/about">关于我</HeaderLink>
     </div>
-    <div class="social-links">
+
+    <!-- 移动端汉堡菜单按钮 -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="打开菜单">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    <div class="social-links desktop-social">
       <!-- 公众号图标 -->
       <div class="social-icon-container">
         <img
@@ -60,16 +70,261 @@ import { cdnUrl } from "../cdnConfig";
       </div>
     </div>
   </nav>
+
+  <!-- 移动端侧边栏菜单 -->
+  <div class="mobile-sidebar" id="mobileSidebar">
+    <div class="mobile-sidebar-content">
+      <div class="mobile-nav-links">
+        <a href="/" class="mobile-nav-link">首页</a>
+        <a href="/blog" class="mobile-nav-link">博客文章</a>
+        <a href="/training-cases" class="mobile-nav-link">培训案例</a>
+        <a href="/services" class="mobile-nav-link">我的服务</a>
+        <a href="/about" class="mobile-nav-link">关于我</a>
+      </div>
+
+      <div class="mobile-social-links">
+        <div class="mobile-social-title">关注我</div>
+        <div class="mobile-social-icons">
+          <div class="mobile-social-item" data-social="gongzhonghao">
+            <img
+              src={cdnUrl("/images/gongzhonghao_logo.png")}
+              alt="公众号"
+              class="mobile-social-icon"
+            />
+            <span>公众号</span>
+          </div>
+          <div class="mobile-social-item" data-social="shipinhao">
+            <img
+              src={cdnUrl("/images/shipinhao_logo.png")}
+              alt="视频号"
+              class="mobile-social-icon"
+            />
+            <span>视频号</span>
+          </div>
+          <div class="mobile-social-item" data-social="douyin">
+            <img
+              src={cdnUrl("/images/douyin_logo.png")}
+              alt="抖音"
+              class="mobile-social-icon"
+            />
+            <span>抖音</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 移动端遮罩层 -->
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <!-- 二维码弹窗 -->
+  <div class="qr-modal" id="qrModal">
+    <div class="qr-modal-content">
+      <div class="qr-modal-header">
+        <h3 id="qrModalTitle">扫码关注</h3>
+        <button class="qr-modal-close" id="qrModalClose">&times;</button>
+      </div>
+      <div class="qr-modal-body">
+        <img id="qrModalImage" src="" alt="二维码" />
+        <p id="qrModalDesc">请使用微信扫描二维码</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 二维码弹窗遮罩层 -->
+  <div class="qr-modal-overlay" id="qrModalOverlay"></div>
 </header>
+
+<script>
+  // 移动端菜单交互
+  const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+  const mobileSidebar = document.getElementById("mobileSidebar");
+  const mobileOverlay = document.getElementById("mobileOverlay");
+
+  function toggleMobileMenu() {
+    if (!mobileSidebar) return;
+    const isOpen = mobileSidebar.classList.contains("active");
+
+    if (isOpen) {
+      closeMobileMenu();
+    } else {
+      openMobileMenu();
+    }
+  }
+
+  function openMobileMenu() {
+    if (!mobileSidebar || !mobileOverlay || !mobileMenuBtn) return;
+    mobileSidebar.classList.add("active");
+    mobileOverlay.classList.add("active");
+    mobileMenuBtn.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeMobileMenu() {
+    if (!mobileSidebar || !mobileOverlay || !mobileMenuBtn) return;
+    mobileSidebar.classList.remove("active");
+    mobileOverlay.classList.remove("active");
+    mobileMenuBtn.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  // 事件监听
+  mobileMenuBtn?.addEventListener("click", toggleMobileMenu);
+  mobileOverlay?.addEventListener("click", closeMobileMenu);
+
+  // 点击导航链接时关闭菜单
+  const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
+  mobileNavLinks.forEach((link) => {
+    link.addEventListener("click", closeMobileMenu);
+  });
+
+  // 二维码弹窗相关元素
+  const qrModal = document.getElementById("qrModal") as HTMLElement | null;
+  const qrModalOverlay = document.getElementById(
+    "qrModalOverlay",
+  ) as HTMLElement | null;
+  const qrModalClose = document.getElementById(
+    "qrModalClose",
+  ) as HTMLElement | null;
+  const qrModalTitle = document.getElementById(
+    "qrModalTitle",
+  ) as HTMLElement | null;
+  const qrModalImage = document.getElementById(
+    "qrModalImage",
+  ) as HTMLImageElement | null;
+  const qrModalDesc = document.getElementById(
+    "qrModalDesc",
+  ) as HTMLElement | null;
+
+  // 导入cdnUrl函数
+  import { cdnUrl } from "../cdnConfig";
+
+  // 二维码数据配置
+  const qrData: Record<string, { title: string; image: string; desc: string }> =
+    {
+      gongzhonghao: {
+        title: "关注公众号",
+        image: cdnUrl("/images/gongzhonghao.png"),
+        desc: "请使用微信扫描二维码关注公众号",
+      },
+      shipinhao: {
+        title: "关注视频号",
+        image: cdnUrl("/images/shipinhao.png"),
+        desc: "请使用微信扫描二维码关注视频号",
+      },
+      douyin: {
+        title: "关注抖音",
+        image: cdnUrl("/images/douyin.png"),
+        desc: "请使用抖音扫描二维码关注我",
+      },
+    };
+
+  // 显示二维码弹窗
+  function showQRModal(socialType: string) {
+    const data = qrData[socialType];
+    if (
+      !data ||
+      !qrModal ||
+      !qrModalTitle ||
+      !qrModalImage ||
+      !qrModalDesc ||
+      !qrModalOverlay
+    )
+      return;
+
+    console.log("显示二维码弹窗:", socialType, data);
+
+    qrModalTitle.textContent = data.title;
+    qrModalDesc.textContent = data.desc;
+
+    // 设置图片并添加加载事件监听
+    qrModalImage.onload = function () {
+      console.log("二维码图片加载成功:", data.image);
+    };
+
+    qrModalImage.onerror = function () {
+      console.error("二维码图片加载失败:", data.image);
+    };
+
+    qrModalImage.src = data.image;
+    qrModalImage.alt = data.title;
+
+    qrModal.classList.add("active");
+    qrModalOverlay.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  // 关闭二维码弹窗
+  function closeQRModal() {
+    if (!qrModal || !qrModalOverlay) return;
+    qrModal.classList.remove("active");
+    qrModalOverlay.classList.remove("active");
+    document.body.style.overflow = "";
+    console.log("二维码弹窗已关闭");
+  }
+
+  // 移动端社交图标点击事件
+  const mobileSocialItems = document.querySelectorAll(".mobile-social-item");
+  mobileSocialItems.forEach((item) => {
+    item.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const socialType = item.getAttribute("data-social");
+      console.log("点击了社交图标:", socialType);
+      if (socialType && qrData[socialType]) {
+        showQRModal(socialType);
+      }
+    });
+  });
+
+  // 二维码弹窗关闭事件
+  if (qrModalClose) {
+    qrModalClose.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("点击了关闭按钮");
+      closeQRModal();
+    });
+  }
+
+  if (qrModalOverlay) {
+    qrModalOverlay.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("点击了遮罩层");
+      closeQRModal();
+    });
+  }
+
+  // ESC键关闭菜单和弹窗
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (qrModal?.classList.contains("active")) {
+        console.log("ESC键关闭二维码弹窗");
+        closeQRModal();
+      } else if (mobileSidebar?.classList.contains("active")) {
+        closeMobileMenu();
+      }
+    }
+  });
+</script>
+
 <style>
   header {
     margin: 0;
     padding: 0 1em;
     background: white;
     box-shadow: 0 2px 8px rgba(var(--black), 5%);
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    box-sizing: border-box;
     overflow: visible;
+    z-index: 100;
   }
+
   h2 {
     margin: 0;
     font-size: 1em;
@@ -79,6 +334,12 @@ import { cdnUrl } from "../cdnConfig";
   h2 a.active {
     text-decoration: none;
   }
+
+  .logo-img {
+    width: 180px;
+    height: 95px;
+  }
+
   nav {
     display: flex;
     align-items: center;
@@ -86,17 +347,25 @@ import { cdnUrl } from "../cdnConfig";
     position: relative;
     overflow: visible;
   }
+
   nav a {
     padding: 1em 0.5em;
     color: var(--black);
     border-bottom: 4px solid transparent;
     text-decoration: none;
   }
+
   nav a.active {
     text-decoration: none;
     border-bottom-color: var(--accent);
   }
-  .social-links {
+
+  /* 桌面端导航 */
+  .desktop-nav {
+    display: flex;
+  }
+
+  .desktop-social {
     display: flex;
     gap: 2rem;
     align-items: center;
@@ -159,9 +428,354 @@ import { cdnUrl } from "../cdnConfig";
     visibility: visible;
   }
 
+  /* 移动端汉堡菜单按钮 */
+  .mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+  }
+
+  .hamburger-line {
+    width: 24px;
+    height: 2px;
+    background-color: rgb(var(--black));
+    margin: 3px 0;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+  }
+
+  .mobile-menu-btn.active .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .mobile-menu-btn.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .mobile-menu-btn.active .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+  }
+
+  /* 移动端侧边栏 */
+  .mobile-sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 320px;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+  }
+
+  .mobile-sidebar.active {
+    right: 0;
+  }
+
+  .mobile-sidebar-content {
+    padding: 80px 0 40px 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-nav-links {
+    flex: 1;
+    padding: 0 30px;
+  }
+
+  .mobile-nav-link {
+    display: block;
+    padding: 20px 0;
+    color: rgb(var(--black));
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    border-bottom: 1px solid rgb(var(--gray-light));
+    transition: color 0.2s ease;
+  }
+
+  .mobile-nav-link:hover {
+    color: var(--accent);
+  }
+
+  .mobile-nav-link:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-social-links {
+    padding: 25px 20px 35px;
+    border-top: 1px solid rgb(var(--gray-light));
+    background: rgba(var(--gray-light), 0.3);
+    margin-top: auto;
+  }
+
+  .mobile-social-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgb(var(--black));
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .mobile-social-icons {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .mobile-social-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 12px 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    min-height: 70px;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mobile-social-item:hover {
+    background-color: rgba(var(--accent), 0.1);
+    transform: translateY(-2px);
+  }
+
+  .mobile-social-item:active {
+    transform: translateY(0) scale(0.95);
+  }
+
+  .mobile-social-icon {
+    width: 36px;
+    height: 36px;
+    transition: transform 0.2s ease;
+  }
+
+  .mobile-social-item:hover .mobile-social-icon {
+    transform: scale(1.1);
+  }
+
+  .mobile-social-item span {
+    font-size: 12px;
+    color: rgb(var(--gray));
+    font-weight: 500;
+    text-align: center;
+    transition: color 0.2s ease;
+  }
+
+  .mobile-social-item:hover span {
+    color: var(--accent);
+  }
+
+  /* 移动端遮罩层 */
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 999;
+  }
+
+  .mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* 二维码弹窗样式 */
+  .qr-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .qr-modal.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .qr-modal-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    width: 320px;
+    max-width: 100%;
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .qr-modal.active .qr-modal-content {
+    transform: scale(1);
+  }
+
+  .qr-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgb(var(--gray-light));
+  }
+
+  .qr-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: rgb(var(--black));
+  }
+
+  .qr-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: rgb(var(--gray));
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+
+  .qr-modal-close:hover {
+    background-color: rgba(var(--gray-light), 0.5);
+    color: rgb(var(--black));
+  }
+
+  .qr-modal-body {
+    padding: 24px;
+    text-align: center;
+  }
+
+  .qr-modal-body img {
+    width: 200px;
+    height: 200px;
+    border-radius: 8px;
+    margin: 0 auto 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    object-fit: contain;
+    background: #f8f9fa;
+    display: block;
+    border: 1px solid #e9ecef;
+  }
+
+  .qr-modal-body img:not([src]),
+  .qr-modal-body img[src=""] {
+    display: none;
+  }
+
+  .qr-modal-body p {
+    margin: 0;
+    font-size: 14px;
+    color: rgb(var(--gray));
+    line-height: 1.5;
+  }
+
+  /* 二维码弹窗遮罩层 */
+  .qr-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 9998;
+    pointer-events: none;
+  }
+
+  .qr-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* 响应式设计 */
   @media (max-width: 720px) {
-    .social-links {
+    .logo-img {
+      width: 120px;
+      height: 63px;
+    }
+
+    .desktop-nav,
+    .desktop-social {
       display: none;
+    }
+
+    .mobile-menu-btn {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 480px) {
+    header {
+      padding: 0 0.5em;
+    }
+
+    .logo-img {
+      width: 100px;
+      height: 53px;
+    }
+
+    .mobile-sidebar {
+      width: 280px;
+      right: -280px;
+    }
+
+    .mobile-sidebar-content {
+      padding: 70px 0 30px 0;
+    }
+
+    .mobile-nav-links {
+      padding: 0 20px;
+    }
+
+    .mobile-social-links {
+      padding: 20px;
+    }
+
+    .qr-modal-content {
+      width: 280px;
+    }
+
+    .qr-modal-body img {
+      width: 180px;
+      height: 180px;
     }
   }
 </style>

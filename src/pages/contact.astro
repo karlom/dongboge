@@ -1,6 +1,31 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
+import CustomDropdown from "../components/CustomDropdown.astro";
+
+// 行业选项
+const industryOptions = [
+  { value: "制造业", label: "制造业" },
+  { value: "金融服务", label: "金融服务" },
+  { value: "电商零售", label: "电商零售" },
+  { value: "教育培训", label: "教育培训" },
+  { value: "医疗健康", label: "医疗健康" },
+  { value: "房地产", label: "房地产" },
+  { value: "互联网科技", label: "互联网科技" },
+  { value: "其他", label: "其他" },
+];
+
+// 预算选项
+const budgetOptions = [
+  { value: "5000-1万", label: "5000-1万" },
+  { value: "1-3万", label: "1-3万" },
+  { value: "3-5万", label: "3-5万" },
+  { value: "5-10万", label: "5-10万" },
+  { value: "10-20万", label: "10-20万" },
+  { value: "20-30万", label: "20-30万" },
+  { value: "30-50万", label: "30-50万" },
+  { value: "50万以上", label: "50万以上" },
+];
 ---
 
 <Layout
@@ -14,9 +39,25 @@ import Header from "../components/Header.astro";
     <Header />
   </div>
 
+  <!-- Breadcrumb Navigation -->
+  <nav
+    class="bg-white border-b border-gray-200 pt-20 pb-4"
+    aria-label="面包屑导航"
+  >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <ol class="flex items-center space-x-2 text-sm text-gray-500">
+        <li><a href="/" class="hover:text-blue-600">首页</a></li>
+        <li><span class="mx-2">/</span></li>
+        <li><a href="/services" class="hover:text-blue-600">我的服务</a></li>
+        <li><span class="mx-2">/</span></li>
+        <li class="text-gray-900 font-medium">预约咨询</li>
+      </ol>
+    </div>
+  </nav>
+
   <!-- Contact Section -->
   <section
-    class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 pt-20 pb-12"
+    class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 pt-12 pb-12"
   >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- 页面标题 -->
@@ -24,13 +65,84 @@ import Header from "../components/Header.astro";
         <h1
           class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4"
         >
-          预约企业AI咨询
+          预约30分钟免费咨询
         </h1>
         <p
           class="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed px-4"
         >
-          获得专业的AI技术咨询服务，让我为您的企业提供定制化的AI解决方案和技术指导
+          填写下方表单，我将在24小时内与您联系，为您提供专业的AI技术咨询和解决方案建议
         </p>
+
+        <!-- 咨询价值说明 -->
+        <div class="mt-6 bg-blue-50 rounded-lg p-4 sm:p-6 max-w-4xl mx-auto">
+          <h2 class="text-lg font-semibold text-blue-900 mb-3">
+            30分钟免费咨询您将获得：
+          </h2>
+          <div
+            class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-blue-800"
+          >
+            <div class="flex items-center">
+              <svg
+                class="w-4 h-4 mr-2 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"></path>
+              </svg>
+              AI应用场景分析
+            </div>
+            <div class="flex items-center">
+              <svg
+                class="w-4 h-4 mr-2 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"></path>
+              </svg>
+              技术方案建议
+            </div>
+            <div class="flex items-center">
+              <svg
+                class="w-4 h-4 mr-2 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"></path>
+              </svg>
+              实施路径规划
+            </div>
+            <div class="flex items-center">
+              <svg
+                class="w-4 h-4 mr-2 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"></path>
+              </svg>
+              成本预算评估
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 响应式布局：手机单列，平板及以上双列 -->
@@ -71,27 +183,13 @@ import Header from "../components/Header.astro";
                 />
               </div>
               <div>
-                <label
-                  for="industry"
-                  class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  所属行业
-                </label>
-                <select
+                <CustomDropdown
                   id="industry"
                   name="industry"
-                  class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                >
-                  <option value="">请选择行业</option>
-                  <option value="制造业">制造业</option>
-                  <option value="金融服务">金融服务</option>
-                  <option value="电商零售">电商零售</option>
-                  <option value="教育培训">教育培训</option>
-                  <option value="医疗健康">医疗健康</option>
-                  <option value="房地产">房地产</option>
-                  <option value="互联网科技">互联网科技</option>
-                  <option value="其他">其他</option>
-                </select>
+                  label="所属行业"
+                  options={industryOptions}
+                  placeholder="请选择行业"
+                />
               </div>
             </div>
 
@@ -245,27 +343,13 @@ import Header from "../components/Header.astro";
 
             <!-- 预算范围 -->
             <div>
-              <label
-                for="budget"
-                class="block text-sm font-medium text-gray-700 mb-2"
-              >
-                预算范围
-              </label>
-              <select
+              <CustomDropdown
                 id="budget"
                 name="budget"
-                class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              >
-                <option value="">请选择预算范围</option>
-                <option value="5000-1万">5000-1万</option>
-                <option value="1-3万">1-3万</option>
-                <option value="3-5万">3-5万</option>
-                <option value="5-10万">5-10万</option>
-                <option value="10-20万">10-20万</option>
-                <option value="20-30万">20-30万</option>
-                <option value="30-50万">30-50万</option>
-                <option value="50万以上">50万以上</option>
-              </select>
+                label="预算范围"
+                options={budgetOptions}
+                placeholder="请选择预算范围"
+              />
             </div>
 
             <!-- 提交按钮 -->
