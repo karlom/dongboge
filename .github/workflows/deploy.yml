@@ -46,8 +46,8 @@ jobs:
         export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
         export TENCENT_COS_REGION=ap-guangzhou
         
-        # 运行上传脚本
-        node scripts/upload-to-cos.js
+        # 运行上传脚本（使用--experimental-modules标志支持ES模块）
+        node --experimental-modules scripts/upload-to-cos.js
         
         # 安装腾讯云CLI（仅用于CDN刷新）
         pip install tccli

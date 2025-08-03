@@ -1,8 +1,12 @@
 // 测试CDN配置的脚本
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const { promisify } = require('util');
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const readFile = promisify(fs.readFile);
 
 // 从.env.production文件中读取CDN_URL
