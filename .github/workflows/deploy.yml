@@ -31,8 +31,14 @@ jobs:
           ${{ runner.os }}-npm-
         
     - name: 安装依赖
-      if: steps.npm-cache.outputs.cache-hit != 'true'
-      run: npm install
+      run: |
+        echo "安装项目依赖..."
+        npm install
+        
+    - name: 确保COS SDK依赖
+      run: |
+        chmod +x scripts/ensure-dependencies.cjs
+        node scripts/ensure-dependencies.cjs
       
     - name: 缓存构建产物
       uses: actions/cache@v3
