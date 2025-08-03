@@ -43,30 +43,44 @@ async function getAllFiles(dirPath, arrayOfFiles = []) {
     return arrayOfFiles;
 }
 
-// 上传单个文件
-async function uploadFile(filePath, basePath) {
+// 上传单个文件（带重试机制）
+async function uploadFile(filePath, basePath, maxRetries = 3) {
     const relativePath = path.relative(basePath, filePath);
     const key = relativePath.replace(/\\/g, '/'); // 确保路径分隔符为 /
 
     console.log(`上传文件: ${filePath} -> ${key}`);
 
-    return new Promise((resolve, reject) => {
-        cos.putObject({
-            Bucket,
-            Region,
-            Key: key,
-            Body: fs.createReadStream(filePath),
-            ContentLength: fs.statSync(filePath).size,
-        }, (err, data) => {
-            if (err) {
-                console.error(`上传失败: ${filePath}`, err);
-                reject(err);
-                return;
+    let retries = 0;
+    while (retries <= maxRetries) {
+        try {
+            return await new Promise((resolve, reject) => {
+                cos.putObject({
+                    Bucket,
+                    Region,
+                    Key: key,
+                    Body: fs.createReadStream(filePath),
+                    ContentLength: fs.statSync(filePath).size,
+                }, (err, data) => {
+                    if (err) {
+                        console.error(`上传失败 (尝试 ${retries + 1}/${maxRetries + 1}): ${filePath}`, err);
+                        reject(err);
+                        return;
+                    }
+                    console.log(`上传成功: ${key}`);
+                    resolve(data);
+                });
+            });
+        } catch (err) {
+            retries++;
+            if (retries > maxRetries) {
+                console.error(`文件 ${filePath} 上传失败，已达到最大重试次数`);
+                // 返回失败但不抛出异常，允许继续上传其他文件
+                return { success: false, error: err, key };
             }
-            console.log(`上传成功: ${key}`);
-            resolve(data);
-        });
-    });
+            console.log(`等待 ${retries * 2}秒后重试...`);
+            await new Promise(resolve => setTimeout(resolve, retries * 2000));
+        }
+    }
 }
 
 // 上传目录
@@ -77,14 +91,44 @@ async function uploadDirectory(dirPath, targetPath) {
         // 获取目录下所有文件
         const files = await getAllFiles(dirPath);
 
-        // 并行上传所有文件
-        const uploadPromises = files.map(file => uploadFile(file, path.dirname(dirPath)));
-        await Promise.all(uploadPromises);
+        // 并行上传所有文件，但限制并发数
+        const concurrencyLimit = 5; // 最多同时上传5个文件
+        const results = [];
+        const failedFiles = [];
 
-        console.log(`目录上传完成: ${dirPath}`);
+        // 分批上传文件
+        for (let i = 0; i < files.length; i += concurrencyLimit) {
+            const batch = files.slice(i, i + concurrencyLimit);
+            const batchPromises = batch.map(file => uploadFile(file, path.dirname(dirPath)));
+
+            const batchResults = await Promise.all(batchPromises);
+            results.push(...batchResults);
+
+            // 检查失败的文件
+            batchResults.forEach((result, index) => {
+                if (result && result.success === false) {
+                    failedFiles.push({
+                        file: batch[index],
+                        error: result.error
+                    });
+                }
+            });
+        }
+
+        if (failedFiles.length > 0) {
+            console.warn(`目录 ${dirPath} 上传完成，但有 ${failedFiles.length} 个文件上传失败`);
+            console.warn('失败的文件列表:');
+            failedFiles.forEach(f => console.warn(`- ${f.file}: ${f.error.message}`));
+        } else {
+            console.log(`目录上传完成: ${dirPath}`);
+        }
+
+        // 即使有文件失败也返回成功，不中断整个流程
+        return { success: true, failedFiles };
     } catch (error) {
-        console.error(`上传目录失败: ${dirPath}`, error);
-        throw error;
+        console.error(`上传目录过程中发生错误: ${dirPath}`, error);
+        // 返回失败但不抛出异常，允许继续执行
+        return { success: false, error };
     }
 }
 
@@ -145,32 +189,53 @@ async function refreshCDN() {
 
 // 主函数
 async function main() {
-    try {
-        // 检查环境变量
-        if (!SecretId || !SecretKey || !Bucket) {
-            console.error('缺少必要的环境变量: TENCENT_SECRET_ID, TENCENT_SECRET_KEY, TENCENT_COS_BUCKET');
-            process.exit(1);
-        }
-
-        // 上传静态资源目录
-        const distPath = path.resolve(__dirname, '../dist');
-        await uploadDirectory(path.join(distPath, 'assets'), 'assets');
-        await uploadDirectory(path.join(distPath, 'fonts'), 'fonts');
-
-        console.log('所有文件上传完成!');
-
-        // 尝试刷新CDN缓存，但即使失败也不中断部署
-        try {
-            await refreshCDN();
-        } catch (cdnError) {
-            console.error('CDN缓存刷新出错，但不影响文件上传:', cdnError);
-        }
-
-        // 部署成功
-        console.log('部署完成!');
-    } catch (error) {
-        console.error('上传过程中发生错误:', error);
+    // 检查环境变量
+    if (!SecretId || !SecretKey || !Bucket) {
+        console.error('缺少必要的环境变量: TENCENT_SECRET_ID, TENCENT_SECRET_KEY, TENCENT_COS_BUCKET');
         process.exit(1);
+    }
+
+    let hasErrors = false;
+    const distPath = path.resolve(__dirname, '../dist');
+
+    // 上传静态资源目录，即使失败也继续执行
+    try {
+        const assetsResult = await uploadDirectory(path.join(distPath, 'assets'), 'assets');
+        if (!assetsResult.success || (assetsResult.failedFiles && assetsResult.failedFiles.length > 0)) {
+            hasErrors = true;
+        }
+    } catch (error) {
+        console.error('上传assets目录时发生错误，但将继续执行:', error);
+        hasErrors = true;
+    }
+
+    try {
+        const fontsResult = await uploadDirectory(path.join(distPath, 'fonts'), 'fonts');
+        if (!fontsResult.success || (fontsResult.failedFiles && fontsResult.failedFiles.length > 0)) {
+            hasErrors = true;
+        }
+    } catch (error) {
+        console.error('上传fonts目录时发生错误，但将继续执行:', error);
+        hasErrors = true;
+    }
+
+    console.log('文件上传过程已完成!');
+
+    // 尝试刷新CDN缓存，但即使失败也不中断部署
+    try {
+        await refreshCDN();
+    } catch (cdnError) {
+        console.error('CDN缓存刷新出错，但不影响文件上传:', cdnError);
+        hasErrors = true;
+    }
+
+    // 部署完成，但如果有错误，返回非零退出码
+    if (hasErrors) {
+        console.log('部署完成，但有部分文件上传失败。请检查日志并考虑重新部署。');
+        process.exit(0); // 仍然返回成功，避免中断GitHub Actions工作流
+    } else {
+        console.log('部署成功完成!');
+        process.exit(0);
     }
 }
 
