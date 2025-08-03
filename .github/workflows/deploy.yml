@@ -88,7 +88,7 @@ jobs:
     - name: 部署HTML和其他文件到服务器
       uses: burnett01/rsync-deployments@6.0.0
       with:
-        switches: -avzr --delete --exclude="assets/" --exclude="fonts/" --exclude="images/"
+        switches: -avzr --delete --exclude="fonts/" --exclude="images/"
         path: dist/
         remote_path: /var/www/dongboge
         remote_host: ${{ secrets.HOST }}
