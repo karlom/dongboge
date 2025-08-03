@@ -43,9 +43,12 @@ jobs:
           **/node_modules/tencentcloud-sdk-nodejs-cdn
         key: ${{ runner.os }}-tencent-sdk-${{ hashFiles('scripts/upload-to-cos.js') }}
         
-    - name: 安装腾讯云SDK
-      if: steps.sdk-cache.outputs.cache-hit != 'true'
-      run: npm install cos-nodejs-sdk-v5 tencentcloud-sdk-nodejs-cdn
+    - name: 安装腾讯云SDK和所有依赖
+      run: |
+        echo "安装所有必要的依赖..."
+        npm install cos-nodejs-sdk-v5 tencentcloud-sdk-nodejs-cdn strnum fast-xml-parser@4.2.5 node-fetch jsdom
+        # 验证依赖是否正确安装
+        node -e "try { require('strnum'); require('fast-xml-parser'); console.log('依赖检查通过'); } catch(e) { console.error('依赖检查失败:', e); process.exit(1); }"
         
     - name: 设置脚本权限
       run: |

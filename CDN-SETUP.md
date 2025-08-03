@@ -1,143 +1,147 @@
-# 腾讯云CDN配置指南
+# 腾讯云CDN设置指南
 
-本文档详细说明如何将东波哥的个人网站与腾讯云CDN集成，以提高网站性能和访问速度。
+本文档提供了将Astro博客与腾讯云CDN集成的详细步骤和常见问题解决方案。
 
 ## 目录
 
-1. [前提条件](#前提条件)
-2. [腾讯云COS配置](#腾讯云cos配置)
-3. [腾讯云CDN配置](#腾讯云cdn配置)
-4. [GitHub Actions配置](#github-actions配置)
-5. [本地开发配置](#本地开发配置)
-6. [测试CDN配置](#测试cdn配置)
-7. [常见问题](#常见问题)
+1. [基本架构](#基本架构)
+2. [前置准备](#前置准备)
+3. [CDN配置步骤](#cdn配置步骤)
+4. [常见问题与解决方案](#常见问题与解决方案)
+5. [性能优化建议](#性能优化建议)
+6. [费用优化策略](#费用优化策略)
 
-## 前提条件
+## 基本架构
 
-- 腾讯云账号
-- 已购买域名（用于CDN加速）
-- 基本的命令行操作知识
+我们的网站部署架构如下：
 
-## 腾讯云COS配置
+- **静态资源**：存储在腾讯云COS中，通过CDN分发
+  - 字体文件
+  - 图片资源
+  - CSS和JavaScript文件
+- **HTML文件**：部署在服务器上，直接通过服务器提供
 
-1. **创建存储桶**
+这种分离式架构可以充分利用CDN的优势加速静态资源的加载，同时保持HTML内容的动态更新能力。
 
-   登录[腾讯云控制台](https://console.cloud.tencent.com/)，进入对象存储COS服务。
+## 前置准备
 
-   - 点击"创建存储桶"
-   - 填写存储桶名称（例如：`dongboge-static-1234567890`）
-   - 选择所属地域（建议选择与服务器相同的地域，如"广州"）
-   - 访问权限选择"公有读私有写"
-   - 其他选项保持默认
-   - 点击"确定"创建存储桶
+在开始配置前，请确保您已经：
 
-2. **获取访问密钥**
+1. 注册了腾讯云账号
+2. 创建了COS存储桶
+3. 开通了CDN服务
+4. 获取了访问密钥（SecretId和SecretKey）
 
-   - 访问[访问密钥](https://console.cloud.tencent.com/cam/capi)页面
-   - 创建或查看你的SecretId和SecretKey
-   - **注意**：建议创建子用户并授予最小权限，遵循最小权限原则
+## CDN配置步骤
 
-## 腾讯云CDN配置
+### 1. 环境变量设置
 
-1. **添加CDN加速域名**
+在项目根目录创建`.env.production`文件，添加以下内容：
 
-   进入[CDN控制台](https://console.cloud.tencent.com/cdn)。
+```
+PUBLIC_CDN_URL=https://cdn.yourdomain.com
+```
 
-   - 点击"域名管理" > "添加域名"
-   - 域名填写你的CDN域名（例如：`cdn.dongboge.cn`）
-   - 源站类型选择"对象存储（COS）"
-   - 选择之前创建的COS存储桶
-   - 加速区域根据需求选择
-   - 点击"确定"提交
+在GitHub Actions中，设置以下密钥：
 
-2. **配置CNAME**
+- `TENCENT_SECRET_ID`：腾讯云API密钥ID
+- `TENCENT_SECRET_KEY`：腾讯云API密钥Key
+- `TENCENT_COS_BUCKET`：COS存储桶名称
+- `CDN_DOMAIN`：CDN域名（不含协议前缀）
 
-   - 在域名提供商处添加CNAME记录
-   - 记录类型：CNAME
-   - 主机记录：cdn（或你设置的二级域名前缀）
-   - 记录值：CDN控制台提供的CNAME地址
-   - TTL：建议设置为600秒
+### 2. 配置CORS规则
 
-3. **配置缓存规则**
+我们的部署流程会自动设置CORS规则，确保字体文件可以正确加载。CORS规则包括：
 
-   在CDN域名管理页面：
+- 允许所有域名访问（AllowedOrigins: ['*']）
+- 允许GET、HEAD、PUT、POST、DELETE方法
+- 允许所有请求头
+- 预检请求有效期为86400秒（1天）
 
-   - 点击"缓存配置"
-   - 添加缓存规则：
-     - 对于静态资源（如CSS、JS、图片等），设置较长的缓存时间（如7天）
-     - 对于字体文件，设置较长的缓存时间（如30天）
-   - 点击"保存"应用规则
+### 3. 增量上传脚本
 
-## GitHub Actions配置
+我们使用增量上传脚本，只上传新增或修改的文件，减少CDN费用：
 
-1. **添加GitHub Secrets**
+```bash
+node scripts/incremental-upload.js
+```
 
-   在GitHub仓库中添加以下Secrets：
+该脚本会：
+- 计算文件MD5哈希值
+- 与上次上传的文件比较
+- 只上传发生变化的文件
+- 设置合适的缓存控制头
 
-   - `TENCENT_SECRET_ID`：腾讯云API密钥ID
-   - `TENCENT_SECRET_KEY`：腾讯云API密钥
-   - `TENCENT_COS_BUCKET`：腾讯云对象存储桶名称（不包含`-1234567890`部分）
-   - `CDN_DOMAIN`：CDN域名（例如：`cdn.dongboge.cn`）
+## 常见问题与解决方案
 
-2. **部署脚本已配置**
+### 依赖问题
 
-   `.github/workflows/deploy.yml`文件已配置为：
-   - 构建项目
-   - 使用Node.js SDK上传静态资源到腾讯云COS
-   - 刷新CDN缓存
-   - 部署HTML文件到服务器
+**问题**：部署时出现`Error: Cannot find module 'strnum'`等依赖错误
 
-## 本地开发配置
-
-1. **环境变量配置**
-
-   - 复制`.env.example`文件为`.env.local`
-   - 在`.env.local`中设置`PUBLIC_CDN_URL=''`（本地开发不使用CDN）
-   - 确保`.env.production`中设置了正确的CDN域名
-
-2. **本地开发命令**
-
+**解决方案**：
+1. 确保安装了所有必要的依赖：
    ```bash
-   npm run dev
+   npm install cos-nodejs-sdk-v5 tencentcloud-sdk-nodejs-cdn strnum fast-xml-parser@4.2.5
+   ```
+2. 在GitHub Actions中，我们已经配置了自动安装这些依赖
+
+### CORS错误
+
+**问题**：字体文件加载时出现CORS错误
+
+**解决方案**：
+1. 确保`setup-cos-cors.js`脚本正确执行
+2. 检查字体文件的URL是否使用了CDN域名
+3. 确保在HTML中使用了`crossorigin`属性：
+   ```html
+   <link rel="preload" href="https://cdn.domain.com/fonts/font.woff" as="font" type="font/woff" crossorigin />
    ```
 
-   本地开发时不会使用CDN，所有资源都从本地加载。
+### 样式错乱问题
 
-## 测试CDN配置
+**问题**：部署后网站样式错乱
 
-1. **使用测试脚本**
-
+**解决方案**：
+1. 检查CSS文件是否正确加载（使用浏览器开发者工具）
+2. 确保`astro.config.mjs`中的配置正确
+3. 验证`cdnConfig.ts`中的URL处理逻辑
+4. 运行验证脚本检查资源加载情况：
    ```bash
-   node scripts/test-cdn.js
+   node scripts/verify-deployment.js
    ```
 
-   此脚本会测试CDN是否正常工作，检查常用资源是否可以通过CDN访问。
+## 性能优化建议
 
-2. **手动测试**
+1. **使用长期缓存**：
+   - 静态资源设置`Cache-Control: max-age=31536000`（1年）
+   - HTML文件设置较短的缓存时间
 
-   - 访问你的网站
-   - 打开浏览器开发者工具
-   - 检查网络请求，确认静态资源是否从CDN加载
+2. **预加载关键资源**：
+   - 使用`<link rel="preload">`预加载字体和关键CSS
+   - 考虑使用资源提示（如`prefetch`）优化导航
 
-## 常见问题
+3. **图片优化**：
+   - 使用WebP格式替代JPEG/PNG
+   - 实现响应式图片，根据设备提供不同分辨率的图片
 
-1. **CDN资源404错误**
-   - 检查COS存储桶中是否有对应文件
-   - 确认CNAME记录是否正确配置
-   - 检查CDN域名状态是否为"已启动"
+## 费用优化策略
 
-2. **CDN缓存未更新**
-   - 手动刷新CDN缓存
-   - 在CDN控制台中选择"刷新预热" > "URL刷新"
-   - 输入需要刷新的URL路径
+1. **增量上传**：
+   - 只上传新增或修改的文件，减少存储和请求费用
+   - 维护上传清单文件`.upload-manifest.json`
 
-3. **上传到COS失败**
-   - 检查SecretId和SecretKey是否正确
-   - 确认存储桶名称是否正确
-   - 检查是否有足够的权限
+2. **合理设置缓存**：
+   - 长缓存时间减少回源请求
+   - 使用版本化URL避免缓存问题
 
-4. **本地开发时图片显示异常**
-   - 确认`.env.local`中设置了`PUBLIC_CDN_URL=''`
-   - 重启开发服务器
+3. **定期清理**：
+   - 定期清理长时间未使用的资源
+   - 监控CDN使用情况，及时发现异常
 
-如有其他问题，请参考[腾讯云COS文档](https://cloud.tencent.com/document/product/436)和[腾讯云CDN文档](https://cloud.tencent.com/document/product/228)。
+4. **资源压缩**：
+   - 启用Gzip/Brotli压缩
+   - 压缩图片和其他媒体文件
+
+---
+
+如有任何问题，请参考[腾讯云CDN文档](https://cloud.tencent.com/document/product/228)或联系技术支持。

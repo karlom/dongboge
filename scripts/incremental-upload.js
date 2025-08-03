@@ -7,20 +7,17 @@
  * 通过比较文件的哈希值来判断文件是否发生变化
  */
 
-import fs from 'fs';
-import path from 'path';
-import crypto from 'crypto';
-import COS from 'cos-nodejs-sdk-v5';
-import { promisify } from 'util';
-import { fileURLToPath } from 'url';
+// 使用CommonJS语法，避免ES模块的兼容性问题
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+const COS = require('cos-nodejs-sdk-v5');
+const { promisify } = require('util');
 
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
 const readFile = promisify(fs.readFile);
-
-// 获取当前文件的目录路径
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const writeFile = promisify(fs.writeFile);
 
 // 配置
 const cos = new COS({
@@ -56,7 +53,7 @@ async function loadManifest() {
 
 // 保存上传清单
 async function saveManifest(manifest) {
-    await fs.promises.writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
+    await writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
     console.log('上传清单已保存');
 }
 
@@ -66,18 +63,27 @@ async function uploadFile(localPath, cosPath) {
 
     while (attempts < maxRetries) {
         try {
-            await cos.putObject({
-                Bucket: process.env.TENCENT_COS_BUCKET,
-                Region: 'ap-guangzhou',
-                Key: cosPath,
-                Body: fs.createReadStream(localPath),
-                Headers: {
-                    // 设置CORS头，特别是对字体文件
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, HEAD',
-                    'Cache-Control': 'max-age=31536000', // 1年缓存
-                }
+            await new Promise((resolve, reject) => {
+                cos.putObject({
+                    Bucket: process.env.TENCENT_COS_BUCKET,
+                    Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
+                    Key: cosPath,
+                    Body: fs.createReadStream(localPath),
+                    Headers: {
+                        // 设置CORS头，特别是对字体文件
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'GET, HEAD',
+                        'Cache-Control': 'max-age=31536000', // 1年缓存
+                    }
+                }, (err, data) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(data);
+                    }
+                });
             });
+
             console.log(`上传成功: ${cosPath}`);
             return true;
         } catch (err) {
@@ -177,19 +183,28 @@ async function refreshCDN() {
 
     try {
         // 刷新整个站点
-        await cos.request({
-            Method: 'POST',
-            Key: 'cdn/refresh',
-            Pathname: '/cdn/refresh',
-            Body: JSON.stringify({
-                "Paths": [
-                    `https://${cdnDomain}/assets/`,
-                    `https://${cdnDomain}/fonts/`,
-                    `https://${cdnDomain}/images/`
-                ],
-                "FlushType": "flush"
-            })
+        await new Promise((resolve, reject) => {
+            cos.request({
+                Method: 'POST',
+                Key: 'cdn/refresh',
+                Pathname: '/cdn/refresh',
+                Body: JSON.stringify({
+                    "Paths": [
+                        `https://${cdnDomain}/assets/`,
+                        `https://${cdnDomain}/fonts/`,
+                        `https://${cdnDomain}/images/`
+                    ],
+                    "FlushType": "flush"
+                })
+            }, (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(data);
+                }
+            });
         });
+
         console.log('CDN缓存刷新请求已发送');
     } catch (error) {
         console.error('刷新CDN缓存失败:', error);
