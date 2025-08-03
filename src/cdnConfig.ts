@@ -27,3 +27,14 @@ export function cdnUrl(path: string): string {
     // 返回CDN路径，确保使用https协议
     return `https://${cdnBase}${normalizedPath}`;
 }
+
+// 调试函数，用于检查CDN URL是否正确
+export function debugCdnUrl(path: string): string {
+    console.log(`原始路径: ${path}`);
+    console.log(`CDN_URL环境变量: ${import.meta.env.PUBLIC_CDN_URL}`);
+
+    const result = cdnUrl(path);
+    console.log(`处理后的CDN路径: ${result}`);
+
+    return result;
+}

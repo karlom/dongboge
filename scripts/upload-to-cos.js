@@ -218,42 +218,29 @@ async function main() {
     let hasErrors = false;
     const distPath = path.resolve(__dirname, '../dist');
 
+    // 需要上传的目录列表
+    const directoriesToUpload = ['assets', 'fonts', 'images'];
+
+    // 排除的目录列表
+    const excludedDirectories = ['src'];
+
     // 上传静态资源目录，即使失败也继续执行
-    try {
-        const assetsResult = await uploadDirectory(path.join(distPath, 'assets'), 'assets');
-        if (!assetsResult.success || (assetsResult.failedFiles && assetsResult.failedFiles.length > 0)) {
-            hasErrors = true;
-        }
-    } catch (error) {
-        console.error('上传assets目录时发生错误，但将继续执行:', error);
-        hasErrors = true;
-    }
-
-    try {
-        const fontsResult = await uploadDirectory(path.join(distPath, 'fonts'), 'fonts');
-        if (!fontsResult.success || (fontsResult.failedFiles && fontsResult.failedFiles.length > 0)) {
-            hasErrors = true;
-        }
-    } catch (error) {
-        console.error('上传fonts目录时发生错误，但将继续执行:', error);
-        hasErrors = true;
-    }
-
-    // 上传images目录（如果存在）
-    try {
-        const imagesPath = path.join(distPath, 'images');
-        if (fs.existsSync(imagesPath)) {
-            console.log('发现images目录，开始上传...');
-            const imagesResult = await uploadDirectory(imagesPath, 'images');
-            if (!imagesResult.success || (imagesResult.failedFiles && imagesResult.failedFiles.length > 0)) {
-                hasErrors = true;
+    for (const dir of directoriesToUpload) {
+        try {
+            const dirPath = path.join(distPath, dir);
+            if (fs.existsSync(dirPath)) {
+                console.log(`发现${dir}目录，开始上传...`);
+                const result = await uploadDirectory(dirPath, dir);
+                if (!result.success || (result.failedFiles && result.failedFiles.length > 0)) {
+                    hasErrors = true;
+                }
+            } else {
+                console.log(`未找到${dir}目录，跳过上传`);
             }
-        } else {
-            console.log('未找到images目录，跳过上传');
+        } catch (error) {
+            console.error(`上传${dir}目录时发生错误，但将继续执行:`, error);
+            hasErrors = true;
         }
-    } catch (error) {
-        console.error('上传images目录时发生错误，但将继续执行:', error);
-        hasErrors = true;
     }
 
     console.log('文件上传过程已完成!');

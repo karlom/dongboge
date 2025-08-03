@@ -23,7 +23,7 @@ export default defineConfig({
 	vite: {
 		// 定义环境变量，确保在构建时可用
 		define: {
-			'import.meta.env.PUBLIC_CDN_URL': JSON.stringify(process.env.PUBLIC_CDN_URL || 'https://cdn.dongboge.cn'),
+			'import.meta.env.PUBLIC_CDN_URL': JSON.stringify(process.env.PUBLIC_CDN_URL || ''),
 		},
 		build: {
 			// 启用CSS代码分割
@@ -40,7 +40,7 @@ export default defineConfig({
 				},
 			},
 		},
-		// 添加CDN基础路径
-		base: process.env.PUBLIC_CDN_URL || 'https://cdn.dongboge.cn',
+		// 移除CDN基础路径，由cdnUrl函数处理
+		// base: process.env.PUBLIC_CDN_URL || 'https://cdn.dongboge.cn',
 	},
 });

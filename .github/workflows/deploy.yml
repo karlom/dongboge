@@ -49,7 +49,7 @@ jobs:
         
     - name: 构建项目
       env:
-        PUBLIC_CDN_URL: ${{ secrets.CDN_DOMAIN }}
+        PUBLIC_CDN_URL: cdn.dongboge.cn
       run: npm run build
       
     - name: 设置腾讯云COS存储桶CORS规则
@@ -64,9 +64,9 @@ jobs:
         # 运行CORS设置脚本
         node scripts/setup-cos-cors.js
         
-    - name: 上传静态资源到腾讯云COS
+    - name: 增量上传静态资源到腾讯云COS
       run: |
-        echo "上传静态资源到腾讯云COS..."
+        echo "增量上传静态资源到腾讯云COS..."
         # 设置环境变量
         export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
         export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
@@ -75,8 +75,8 @@ jobs:
         # 确保CDN_DOMAIN不包含协议前缀
         export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
         
-        # 运行上传脚本
-        node scripts/upload-to-cos.js
+        # 运行增量上传脚本
+        node scripts/incremental-upload.js
         
     - name: 部署HTML和其他文件到服务器
       uses: burnett01/rsync-deployments@6.0.0

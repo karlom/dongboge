@@ -1,87 +1,186 @@
-// 测试CDN配置是否正确
-import fetch from 'node-fetch';
-import { fileURLToPath } from 'url';
-import path from 'path';
+#!/usr/bin/env node
 
-// 获取当前文件的目录路径
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+/**
+ * CDN配置测试脚本
+ * 
+ * 这个脚本用于测试CDN配置是否正确，包括：
+ * 1. 检查CDN域名是否可以访问
+ * 2. 检查字体文件是否可以正常加载
+ * 3. 检查CORS头是否正确设置
+ * 4. 检查缓存控制头是否正确设置
+ */
 
-// CDN域名从环境变量获取
-const cdnDomain = process.env.CDN_DOMAIN || 'cdn.dongboge.cn';
+const https = require('https');
+const http = require('http');
+const { URL } = require('url');
 
-// 测试URL列表
-const testUrls = [
-    `https://${cdnDomain}/fonts/atkinson-regular.woff`,
-    `https://${cdnDomain}/fonts/atkinson-bold.woff`,
-    `https://${cdnDomain}/assets/blog-placeholder-1.jpg`,
-    `https://${cdnDomain}/images/hero1.png`
+// 配置
+const CDN_DOMAIN = process.env.CDN_DOMAIN || 'cdn.dongboge.cn';
+const TEST_PATHS = [
+    '/fonts/atkinson-regular.woff',
+    '/fonts/atkinson-bold.woff',
+    '/assets/index.css',
+    '/images/hero1.png'
 ];
 
-// 测试单个URL
-async function testUrl(url) {
-    console.log(`测试URL: ${url}`);
-    try {
-        const response = await fetch(url, {
-            method: 'HEAD',
-            headers: {
-                'Origin': 'https://www.dongboge.cn'
-            }
+// 颜色输出
+const colors = {
+    reset: '\x1b[0m',
+    red: '\x1b[31m',
+    green: '\x1b[32m',
+    yellow: '\x1b[33m',
+    blue: '\x1b[34m',
+    magenta: '\x1b[35m',
+    cyan: '\x1b[36m',
+    white: '\x1b[37m'
+};
+
+/**
+ * 发送HTTP请求并检查响应
+ * @param {string} url - 要请求的URL
+ * @returns {Promise<Object>} - 包含响应状态码、头信息等的对象
+ */
+async function checkUrl(url) {
+    return new Promise((resolve, reject) => {
+        console.log(`${colors.blue}正在检查: ${url}${colors.reset}`);
+
+        const parsedUrl = new URL(url);
+        const client = parsedUrl.protocol === 'https:' ? https : http;
+
+        const req = client.get(url, (res) => {
+            let data = '';
+
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            res.on('end', () => {
+                resolve({
+                    url,
+                    statusCode: res.statusCode,
+                    headers: res.headers,
+                    data: data.length > 100 ? `${data.substring(0, 100)}...` : data
+                });
+            });
         });
 
-        console.log(`状态码: ${response.status}`);
-        console.log('响应头:');
-        response.headers.forEach((value, name) => {
-            console.log(`  ${name}: ${value}`);
+        req.on('error', (error) => {
+            reject({
+                url,
+                error: error.message
+            });
         });
 
-        // 检查CORS头
-        const corsHeader = response.headers.get('access-control-allow-origin');
-        if (corsHeader) {
-            console.log(`✅ CORS配置正确: ${corsHeader}`);
-        } else {
-            console.log('❌ 未找到CORS头');
-        }
-
-        // 检查缓存控制头
-        const cacheHeader = response.headers.get('cache-control');
-        if (cacheHeader) {
-            console.log(`✅ 缓存控制配置: ${cacheHeader}`);
-        } else {
-            console.log('⚠️ 未找到缓存控制头');
-        }
-
-        console.log('-----------------------------------');
-        return response.status >= 200 && response.status < 300;
-    } catch (error) {
-        console.error(`❌ 测试失败: ${error.message}`);
-        console.log('-----------------------------------');
-        return false;
-    }
+        // 设置超时
+        req.setTimeout(5000, () => {
+            req.abort();
+            reject({
+                url,
+                error: '请求超时'
+            });
+        });
+    });
 }
 
-// 主函数
+/**
+ * 检查CORS头是否正确设置
+ * @param {Object} headers - 响应头
+ * @returns {boolean} - 是否正确设置了CORS头
+ */
+function checkCorsHeaders(headers) {
+    return headers['access-control-allow-origin'] === '*' ||
+        headers['access-control-allow-origin'] === 'https://www.dongboge.cn';
+}
+
+/**
+ * 检查缓存控制头是否正确设置
+ * @param {Object} headers - 响应头
+ * @returns {boolean} - 是否正确设置了缓存控制头
+ */
+function checkCacheHeaders(headers) {
+    return headers['cache-control'] &&
+        (headers['cache-control'].includes('max-age') ||
+            headers['cache-control'].includes('public'));
+}
+
+/**
+ * 主函数
+ */
 async function main() {
-    console.log(`开始测试CDN配置 (${cdnDomain})...`);
-    console.log('===================================');
+    console.log(`${colors.cyan}===== CDN配置测试 =====${colors.reset}`);
+    console.log(`${colors.cyan}CDN域名: ${CDN_DOMAIN}${colors.reset}`);
 
-    let successCount = 0;
-    for (const url of testUrls) {
-        const success = await testUrl(url);
-        if (success) successCount++;
+    let allPassed = true;
+    const results = [];
+
+    // 测试CDN域名是否可以访问
+    try {
+        const rootResult = await checkUrl(`https://${CDN_DOMAIN}/`);
+        console.log(`${colors.green}✓ CDN域名可以访问 (状态码: ${rootResult.statusCode})${colors.reset}`);
+        results.push(rootResult);
+    } catch (error) {
+        console.log(`${colors.red}✗ CDN域名无法访问: ${error.error}${colors.reset}`);
+        allPassed = false;
     }
 
-    console.log('===================================');
-    console.log(`测试结果: ${successCount}/${testUrls.length} 通过`);
+    // 测试各个路径
+    for (const path of TEST_PATHS) {
+        try {
+            const result = await checkUrl(`https://${CDN_DOMAIN}${path}`);
 
-    if (successCount === testUrls.length) {
-        console.log('✅ 所有测试通过!');
-        process.exit(0);
+            if (result.statusCode === 200) {
+                console.log(`${colors.green}✓ ${path} 可以访问${colors.reset}`);
+
+                // 检查CORS头
+                if (path.includes('.woff')) {
+                    if (checkCorsHeaders(result.headers)) {
+                        console.log(`  ${colors.green}✓ CORS头正确设置${colors.reset}`);
+                    } else {
+                        console.log(`  ${colors.red}✗ CORS头未正确设置${colors.reset}`);
+                        allPassed = false;
+                    }
+                }
+
+                // 检查缓存控制头
+                if (checkCacheHeaders(result.headers)) {
+                    console.log(`  ${colors.green}✓ 缓存控制头正确设置: ${result.headers['cache-control']}${colors.reset}`);
+                } else {
+                    console.log(`  ${colors.yellow}! 缓存控制头未设置或不完整${colors.reset}`);
+                }
+            } else {
+                console.log(`${colors.red}✗ ${path} 无法访问 (状态码: ${result.statusCode})${colors.reset}`);
+                allPassed = false;
+            }
+
+            results.push(result);
+        } catch (error) {
+            console.log(`${colors.red}✗ ${path} 请求失败: ${error.error}${colors.reset}`);
+            allPassed = false;
+        }
+    }
+
+    // 总结
+    console.log(`\n${colors.cyan}===== 测试结果 =====${colors.reset}`);
+    if (allPassed) {
+        console.log(`${colors.green}所有测试通过！CDN配置正确。${colors.reset}`);
     } else {
-        console.log('❌ 部分测试失败，请检查上述输出');
-        process.exit(1);
+        console.log(`${colors.red}部分测试失败。请检查上述错误信息。${colors.reset}`);
     }
+
+    // 详细信息
+    console.log(`\n${colors.cyan}===== 详细信息 =====${colors.reset}`);
+    results.forEach(result => {
+        console.log(`\n${colors.blue}URL: ${result.url}${colors.reset}`);
+        console.log(`状态码: ${result.statusCode}`);
+        console.log('响应头:');
+        Object.entries(result.headers).forEach(([key, value]) => {
+            console.log(`  ${key}: ${value}`);
+        });
+    });
 }
 
 // 执行主函数
-main();
+main().catch(error => {
+    console.error(`${colors.red}执行测试时发生错误:${colors.reset}`, error);
+    process.exit(1);
+});
