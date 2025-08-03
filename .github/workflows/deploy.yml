@@ -49,7 +49,7 @@ jobs:
         
     - name: 构建项目
       env:
-        PUBLIC_CDN_URL: https://${{ secrets.CDN_DOMAIN }}
+        PUBLIC_CDN_URL: ${{ secrets.CDN_DOMAIN }}
       run: npm run build
       
     - name: 上传静态资源到腾讯云COS
@@ -69,7 +69,7 @@ jobs:
     - name: 部署HTML和其他文件到服务器
       uses: burnett01/rsync-deployments@6.0.0
       with:
-        switches: -avzr --delete --exclude="assets/" --exclude="fonts/"
+        switches: -avzr --delete --exclude="assets/" --exclude="fonts/" --exclude="images/"
         path: dist/
         remote_path: /var/www/dongboge
         remote_host: ${{ secrets.HOST }}

@@ -50,6 +50,24 @@ async function uploadFile(filePath, basePath, maxRetries = 3) {
 
     console.log(`上传文件: ${filePath} -> ${key}`);
 
+    // 设置CORS头和缓存控制
+    const headers = {
+        // 允许所有域名访问
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, HEAD',
+        'Access-Control-Allow-Headers': 'Range, Origin, Content-Type',
+        'Access-Control-Expose-Headers': 'Content-Length, Content-Range',
+        'Access-Control-Max-Age': '600', // 10分钟
+        // 设置缓存时间
+        'Cache-Control': 'max-age=31536000' // 1年
+    };
+
+    // 为字体文件添加特殊的CORS头
+    if (key.endsWith('.woff') || key.endsWith('.woff2') || key.endsWith('.ttf') || key.endsWith('.otf')) {
+        console.log(`检测到字体文件: ${key}，添加特殊CORS头`);
+        headers['Access-Control-Allow-Origin'] = '*'; // 确保允许所有域名访问字体
+    }
+
     let retries = 0;
     while (retries <= maxRetries) {
         try {
@@ -60,6 +78,7 @@ async function uploadFile(filePath, basePath, maxRetries = 3) {
                     Key: key,
                     Body: fs.createReadStream(filePath),
                     ContentLength: fs.statSync(filePath).size,
+                    Headers: headers
                 }, (err, data) => {
                     if (err) {
                         console.error(`上传失败 (尝试 ${retries + 1}/${maxRetries + 1}): ${filePath}`, err);
@@ -168,7 +187,8 @@ async function refreshCDN() {
         const params = {
             "Paths": [
                 `https://${cdnDomain}/assets/`,
-                `https://${cdnDomain}/fonts/`
+                `https://${cdnDomain}/fonts/`,
+                `https://${cdnDomain}/images/`
             ],
             "FlushType": "flush"
         };
@@ -216,6 +236,23 @@ async function main() {
         }
     } catch (error) {
         console.error('上传fonts目录时发生错误，但将继续执行:', error);
+        hasErrors = true;
+    }
+
+    // 上传images目录（如果存在）
+    try {
+        const imagesPath = path.join(distPath, 'images');
+        if (fs.existsSync(imagesPath)) {
+            console.log('发现images目录，开始上传...');
+            const imagesResult = await uploadDirectory(imagesPath, 'images');
+            if (!imagesResult.success || (imagesResult.failedFiles && imagesResult.failedFiles.length > 0)) {
+                hasErrors = true;
+            }
+        } else {
+            console.log('未找到images目录，跳过上传');
+        }
+    } catch (error) {
+        console.error('上传images目录时发生错误，但将继续执行:', error);
         hasErrors = true;
     }
 
