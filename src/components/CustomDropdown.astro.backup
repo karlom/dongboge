@@ -1,0 +1,64 @@
+---
+export interface DropdownOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
+export interface Props {
+  id: string;
+  name: string;
+  label: string;
+  options: DropdownOption[];
+  placeholder?: string;
+  required?: boolean;
+  value?: string;
+  class?: string;
+}
+
+const {
+  id,
+  name,
+  label,
+  options,
+  placeholder = "请选择",
+  required = false,
+  value = "",
+  class: className = "",
+} = Astro.props;
+---
+
+<div class={`custom-dropdown ${className}`} data-dropdown-id={id}>
+  <!-- 标签 -->
+  <label for={id} class="block text-sm font-medium text-gray-700 mb-2">
+    {label}
+    {required && <span class="text-red-500 ml-1">*</span>}
+  </label>
+
+  <!-- 原生 select 作为后备方案 -->
+  <select
+    id={id}
+    name={name}
+    required={required}
+    class={`native-select w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+    data-value={value}
+  >
+    <option value="">{placeholder}</option>
+    {
+      options.map((option) => (
+        <option
+          value={option.value}
+          disabled={option.disabled}
+          selected={option.value === value}
+        >
+          {option.label}
+        </option>
+      ))
+    }
+  </select>
+</div>
+
+<script>
+  // 简化版本，只保留基本功能
+  console.log("CustomDropdown loaded");
+</script>

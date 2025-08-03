@@ -884,7 +884,7 @@ const {
 
         // 字母数字键快速搜索
         let typeAheadString = "";
-        let typeAheadTimeout: ReturnType<typeof setTimeout>;
+        let typeAheadTimeout: number;
 
         function handleTypeAhead(char: string) {
           // 清除之前的超时
@@ -1086,7 +1086,7 @@ const {
         }
 
         // 窗口大小变化时重新检测设备类型和重新定位
-        let resizeTimeout: ReturnType<typeof setTimeout>;
+        let resizeTimeout: number;
         window.addEventListener("resize", () => {
           clearTimeout(resizeTimeout);
           resizeTimeout = setTimeout(() => {
