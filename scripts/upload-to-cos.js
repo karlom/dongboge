@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 import { fileURLToPath } from 'url';
+import tencentcloud from 'tencentcloud-sdk-nodejs-cdn';
 
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
@@ -87,6 +88,50 @@ async function uploadDirectory(dirPath, targetPath) {
     }
 }
 
+// 刷新CDN缓存
+async function refreshCDN() {
+    console.log('刷新CDN缓存...');
+    
+    const cdnDomain = process.env.CDN_DOMAIN;
+    if (!cdnDomain) {
+        console.error('缺少必要的环境变量: CDN_DOMAIN');
+        process.exit(1);
+    }
+    
+    try {
+        // 初始化CDN客户端
+        const CdnClient = tencentcloud.cdn.v20180606.Client;
+        const clientConfig = {
+            credential: {
+                secretId: SecretId,
+                secretKey: SecretKey,
+            },
+            region: Region,
+            profile: {
+                httpProfile: {
+                    endpoint: "cdn.tencentcloudapi.com",
+                },
+            },
+        };
+        
+        const client = new CdnClient(clientConfig);
+        const params = {
+            "Paths": [
+                `https://${cdnDomain}/assets/`,
+                `https://${cdnDomain}/fonts/`
+            ],
+            "FlushType": "flush"
+        };
+        
+        const result = await client.PurgePathCache(params);
+        console.log('CDN缓存刷新成功:', JSON.stringify(result));
+        return result;
+    } catch (error) {
+        console.error('CDN缓存刷新失败:', error);
+        throw error;
+    }
+}
+
 // 主函数
 async function main() {
     try {
@@ -102,6 +147,9 @@ async function main() {
         await uploadDirectory(path.join(distPath, 'fonts'), 'fonts');
 
         console.log('所有文件上传完成!');
+        
+        // 刷新CDN缓存
+        await refreshCDN();
     } catch (error) {
         console.error('上传过程中发生错误:', error);
         process.exit(1);
