@@ -31,7 +31,7 @@ const cos = new COS({
 
 // 路径配置
 const distPath = path.join(process.cwd(), 'dist');
-const manifestPath = path.join(process.cwd(), '.upload-manifest.json');
+const manifestKey = '.upload-manifest.json'; // 保存在COS中的清单文件路径
 const maxRetries = 3;
 const retryDelay = 1000;
 const batchSize = 5;
@@ -42,23 +42,69 @@ async function calculateFileHash(filePath) {
     return crypto.createHash('md5').update(content).digest('hex');
 }
 
-// 加载上一次上传的文件清单
-async function loadManifest() {
+// 从COS下载上传清单
+async function loadManifestFromCOS() {
     try {
-        if (fs.existsSync(manifestPath)) {
-            const content = await readFile(manifestPath, 'utf8');
-            return JSON.parse(content);
-        }
+        console.log('🔍 从COS下载上传清单...');
+        const result = await new Promise((resolve, reject) => {
+            cos.getObject({
+                Bucket: process.env.TENCENT_COS_BUCKET,
+                Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
+                Key: manifestKey
+            }, (err, data) => {
+                if (err) {
+                    if (err.statusCode === 404) {
+                        console.log('📝 清单文件不存在，将创建新的清单');
+                        resolve({});
+                    } else {
+                        reject(err);
+                    }
+                } else {
+                    try {
+                        const manifest = JSON.parse(data.Body.toString());
+                        console.log(`✅ 成功加载清单，包含 ${Object.keys(manifest).length} 个文件记录`);
+                        resolve(manifest);
+                    } catch (parseError) {
+                        console.warn('⚠️  清单文件格式错误，创建新的清单');
+                        resolve({});
+                    }
+                }
+            });
+        });
+        return result;
     } catch (error) {
-        console.warn('无法加载上传清单，将创建新的清单:', error.message);
+        console.warn('⚠️  无法从COS加载清单，创建新的清单:', error.message);
+        return {};
     }
-    return {};
 }
 
-// 保存上传清单
-async function saveManifest(manifest) {
-    await writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
-    console.log('上传清单已保存');
+// 将上传清单保存到COS
+async function saveManifestToCOS(manifest) {
+    try {
+        console.log('💾 保存清单到COS...');
+        await new Promise((resolve, reject) => {
+            cos.putObject({
+                Bucket: process.env.TENCENT_COS_BUCKET,
+                Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
+                Key: manifestKey,
+                Body: JSON.stringify(manifest, null, 2),
+                Headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            }, (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    console.log('✅ 清单已保存到COS');
+                    resolve(data);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('❌ 保存清单到COS失败:', error.message);
+        // 不抛出错误，避免中断部署
+    }
 }
 
 // 上传单个文件（带重试）
@@ -170,8 +216,8 @@ async function uploadBatch(files, manifest) {
             }
         });
 
-        // 每批次完成后保存清单
-        await saveManifest(newManifest);
+        // 每批次完成后保存清单到COS
+        await saveManifestToCOS(newManifest);
     }
 
     return { failedFiles, newManifest };
@@ -207,9 +253,8 @@ async function main() {
     console.log('开始增量上传静态资源到腾讯云COS...');
 
     try {
-        // 加载上一次上传的文件清单
-        const manifest = await loadManifest();
-        console.log(`已加载上传清单，包含 ${Object.keys(manifest).length} 个文件记录`);
+        // 从COS加载上一次上传的文件清单
+        const manifest = await loadManifestFromCOS();
 
         // 获取所有需要上传的文件
         let assetsFiles = [];
