@@ -1,6 +1,7 @@
 ---
 import { SITE_TITLE } from "../consts";
 import HeaderLink from "./HeaderLink.astro";
+import { cdnUrl } from "../cdnConfig";
 ---
 
 <header>
@@ -8,7 +9,7 @@ import HeaderLink from "./HeaderLink.astro";
     <h2>
       <a href="/" class="flex items-center">
         <img
-          src="/images/index-logo.png"
+          src={cdnUrl("/images/index-logo.png")}
           alt="东波哥"
           class="w-[180px] h-[95px]"
         />
@@ -25,32 +26,36 @@ import HeaderLink from "./HeaderLink.astro";
       <!-- 公众号图标 -->
       <div class="social-icon-container">
         <img
-          src="/images/gongzhonghao_logo.png"
+          src={cdnUrl("/images/gongzhonghao_logo.png")}
           alt="公众号"
           class="social-icon"
         />
         <div class="hover-image hover-image-left">
-          <img src="/images/gongzhonghao.png" alt="公众号二维码" />
+          <img src={cdnUrl("/images/gongzhonghao.png")} alt="公众号二维码" />
         </div>
       </div>
 
       <!-- 视频号图标 -->
       <div class="social-icon-container">
         <img
-          src="/images/shipinhao_logo.png"
+          src={cdnUrl("/images/shipinhao_logo.png")}
           alt="视频号"
           class="social-icon"
         />
         <div class="hover-image hover-image-center">
-          <img src="/images/shipinhao.png" alt="视频号二维码" />
+          <img src={cdnUrl("/images/shipinhao.png")} alt="视频号二维码" />
         </div>
       </div>
 
       <!-- 抖音图标 -->
       <div class="social-icon-container">
-        <img src="/images/douyin_logo.png" alt="抖音" class="social-icon" />
+        <img
+          src={cdnUrl("/images/douyin_logo.png")}
+          alt="抖音"
+          class="social-icon"
+        />
         <div class="hover-image hover-image-right">
-          <img src="/images/douyin.png" alt="抖音二维码" />
+          <img src={cdnUrl("/images/douyin.png")} alt="抖音二维码" />
         </div>
       </div>
     </div>
