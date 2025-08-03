@@ -1,122 +1,276 @@
-# 腾讯云CDN集成总结
+# CDN集成总结
 
-## 项目概述
+本文档总结了将网站与腾讯云CDN集成的所有更改和配置步骤。
 
-我们已经成功将东波哥的个人网站与腾讯云CDN集成，以提高网站性能和访问速度。本文档总结了所有相关的更改和配置。
+## 1. 配置文件和环境变量
 
-## 完成的工作
+### CDN配置文件
+我们创建了`src/cdnConfig.ts`文件，用于处理CDN URL：
+```typescript
+// CDN配置
+export const CDN_URL = import.meta.env.PUBLIC_CDN_URL || '';
 
-1. **CDN配置文件**
-   - 创建了`src/cdnConfig.ts`，用于管理CDN URL
-   - 添加了环境变量配置文件`.env.example`和`.env.production`
+// 生成CDN路径的辅助函数
+export function cdnUrl(path: string): string {
+    // 如果路径是完整的URL，直接返回
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
 
-2. **图片和静态资源处理**
-   - 创建了`OptimizedImage.astro`组件，支持字符串路径和图像对象
-   - 创建了`imageUtils.ts`工具函数，用于处理图片路径
-   - 创建了`contentUtils.ts`工具函数，用于处理博客内容
+    // 确保路径以/开头
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
-3. **组件修改**
-   - 修改了`BaseHead.astro`组件，使其使用CDN路径加载字体和图标
-   - 修改了`BlogPost.astro`布局，增加了图片和标题之间的间距
-   - 修改了`blog/index.astro`页面，增加了图片和标题之间的间距
-   - 修改了`index.astro`首页，使其使用OptimizedImage组件和CDN路径
+    // 如果CDN_URL为空，返回相对路径
+    if (!CDN_URL) {
+        return normalizedPath;
+    }
 
-4. **部署脚本**
-   - 创建了`scripts/upload-to-cos.js`，使用腾讯云Node.js SDK上传静态资源
-   - 修改了`.github/workflows/deploy.yml`，配置了自动部署流程
-   - 创建了`scripts/test-cdn.js`，用于测试CDN配置
+    // 确保CDN_URL不包含协议前缀，避免双重协议问题
+    let cdnBase = CDN_URL;
+    if (cdnBase.startsWith('https://')) {
+        cdnBase = cdnBase.substring(8); // 移除 'https://'
+    } else if (cdnBase.startsWith('http://')) {
+        cdnBase = cdnBase.substring(7); // 移除 'http://'
+    }
 
-5. **文档**
-   - 创建了`CDN-SETUP.md`，详细说明如何配置腾讯云CDN
-   - 更新了`README.md`，添加了CDN相关信息
+    // 返回CDN路径，确保使用https协议
+    return `https://${cdnBase}${normalizedPath}`;
+}
+```
 
-## 技术实现细节
+### 环境变量
+在`.env.production`文件中设置CDN URL：
+```
+PUBLIC_CDN_URL=cdn.dongboge.cn
+```
 
-### CDN配置
+## 2. 组件修改
 
-我们使用了腾讯云对象存储（COS）和内容分发网络（CDN）来加速静态资源的加载。具体实现如下：
+### BaseHead.astro
+修改了`BaseHead.astro`组件，使用`cdnUrl`函数加载字体文件和图标：
+```astro
+<link rel="icon" type="image/png" href={cdnUrl("/Favicon.png")} />
 
-1. **环境变量**
-   - 开发环境：不使用CDN，直接从本地加载资源
-   - 生产环境：使用CDN加载资源
+<!-- Font preloads -->
+<link
+    rel="preload"
+    href={cdnUrl("/fonts/atkinson-regular.woff")}
+    as="font"
+    type="font/woff"
+    crossorigin
+/>
+<link
+    rel="preload"
+    href={cdnUrl("/fonts/atkinson-bold.woff")}
+    as="font"
+    type="font/woff"
+    crossorigin
+/>
+```
 
-2. **资源路径处理**
-   - 使用`cdnUrl`函数将本地路径转换为CDN路径
-   - 处理不同类型的图片资源（字符串路径和图像对象）
+### OptimizedImage.astro
+创建了`OptimizedImage.astro`组件，用于优化图片加载：
+```astro
+---
+import { processImagePath } from "../utils/imageUtils";
+import { Image } from "astro:assets";
 
-3. **自动部署**
-   - 构建项目后，将静态资源上传到腾讯云COS
-   - 刷新CDN缓存，确保最新版本的资源可用
-   - 将HTML文件部署到服务器
+interface Props {
+    src: any; // 可以是字符串路径或图像对象
+    alt: string;
+    class?: string;
+    width?: number;
+    height?: number;
+    title?: string;
+    loading?: "lazy" | "eager" | null | undefined;
+}
 
-### 优化效果
+const {
+    src,
+    alt,
+    class: className,
+    width,
+    height,
+    title,
+    loading,
+} = Astro.props;
 
-通过使用腾讯云CDN，我们实现了以下优化：
+// 检查src是否为字符串
+const isStringPath = typeof src === "string";
+const optimizedSrc = isStringPath ? processImagePath(src) : src;
+---
 
-1. **加载速度提升**
-   - 静态资源通过CDN加速，减少了服务器负载
-   - 用户可以从最近的CDN节点获取资源，减少了网络延迟
+<div class="image-wrapper" style="text-align: center; margin: 0 auto;">
+    {
+        isStringPath ? (
+            <img
+                src={optimizedSrc}
+                alt={alt}
+                class={className}
+                width={width}
+                height={height}
+                title={title}
+                loading={loading}
+                style="display: block; margin: 0 auto; max-width: 100%;"
+            />
+        ) : (
+            <Image
+                src={optimizedSrc}
+                alt={alt}
+                class={className}
+                width={width || 800}
+                height={height || 600}
+                title={title}
+                style="display: block; margin: 0 auto; max-width: 100%;"
+            />
+        )
+    }
+</div>
+```
 
-2. **用户体验改善**
-   - 图片和样式文件加载更快，提高了页面渲染速度
-   - 增加了图片和标题之间的间距，改善了排版和阅读体验
+## 3. 样式修改
 
-3. **服务器负载减轻**
-   - 静态资源由CDN提供，减轻了原服务器的负担
-   - 只有HTML文件需要从原服务器加载
+### global.css
+修改了`global.css`文件，使用相对路径加载字体文件：
+```css
+/* 字体文件使用相对路径加载，CDN会通过BaseHead.astro中的预加载处理 */
+@font-face {
+  font-family: "Atkinson";
+  src: url("/fonts/atkinson-regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
-## 使用指南
+@font-face {
+  font-family: "Atkinson";
+  src: url("/fonts/atkinson-bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+```
 
-### 本地开发
+## 4. 部署脚本
 
-1. 复制`.env.example`文件为`.env.local`
-2. 在`.env.local`中设置`PUBLIC_CDN_URL=''`
-3. 运行`npm run dev`启动开发服务器
+### upload-to-cos.js
+创建了`scripts/upload-to-cos.js`脚本，用于将静态资源上传到腾讯云COS：
+- 支持上传`assets`、`fonts`和`images`目录
+- 添加了重试机制和错误处理
+- 为上传的文件设置了CORS头和缓存控制
+- 上传完成后刷新CDN缓存
 
-### 测试CDN配置
+### setup-cos-cors.js
+创建了`scripts/setup-cos-cors.js`脚本，用于设置腾讯云COS存储桶的CORS规则：
+```javascript
+// 设置CORS规则
+await new Promise((resolve, reject) => {
+    cos.putBucketCors({
+        Bucket,
+        Region,
+        CORSRules: [
+            {
+                AllowedOrigins: ['*'], // 允许所有域名访问
+                AllowedMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'], // 允许的HTTP方法
+                AllowedHeaders: ['*'], // 允许所有请求头
+                ExposeHeaders: ['ETag', 'Content-Length', 'Content-Type', 'Content-Disposition', 'x-cos-request-id'], // 暴露的响应头
+                MaxAgeSeconds: 86400 // 预检请求的有效期，单位为秒
+            }
+        ]
+    }, (err, data) => {
+        // ...
+    });
+});
+```
 
-运行`node scripts/test-cdn.js`测试CDN是否正常工作。
+### test-cdn.js
+创建了`scripts/test-cdn.js`脚本，用于测试CDN配置是否正确：
+- 测试字体文件、图片等资源是否可以正常访问
+- 检查CORS头和缓存控制头是否正确设置
 
-### 部署
+## 5. GitHub Actions工作流
 
-1. 确保在GitHub仓库的Secrets中设置了以下密钥：
-   - `TENCENT_SECRET_ID`
-   - `TENCENT_SECRET_KEY`
-   - `TENCENT_COS_BUCKET`
-   - `CDN_DOMAIN`
+修改了`.github/workflows/deploy.yml`文件，添加了以下步骤：
+1. 设置腾讯云COS存储桶CORS规则
+2. 上传静态资源到腾讯云COS
+3. 部署HTML和其他文件到服务器（排除assets、fonts和images目录）
 
-2. 推送代码到`main`或`master`分支，GitHub Actions将自动部署网站。
+```yaml
+- name: 设置腾讯云COS存储桶CORS规则
+  run: |
+    echo "设置腾讯云COS存储桶CORS规则..."
+    # 设置环境变量
+    export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
+    export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
+    export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
+    export TENCENT_COS_REGION=ap-guangzhou
+    
+    # 运行CORS设置脚本
+    node scripts/setup-cos-cors.js
+    
+- name: 上传静态资源到腾讯云COS
+  run: |
+    echo "上传静态资源到腾讯云COS..."
+    # 设置环境变量
+    export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
+    export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
+    export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
+    export TENCENT_COS_REGION=ap-guangzhou
+    # 确保CDN_DOMAIN不包含协议前缀
+    export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
+    
+    # 运行上传脚本
+    node scripts/upload-to-cos.js
+    
+- name: 部署HTML和其他文件到服务器
+  uses: burnett01/rsync-deployments@6.0.0
+  with:
+    switches: -avzr --delete --exclude="assets/" --exclude="fonts/" --exclude="images/"
+    path: dist/
+    remote_path: /var/www/dongboge
+    remote_host: ${{ secrets.HOST }}
+    remote_user: ${{ secrets.USERNAME }}
+    remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+    remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+```
 
-## 注意事项
+## 6. 腾讯云配置
 
-1. **安全性**
-   - 使用子用户的API密钥，并授予最小权限
-   - 不要在代码中硬编码API密钥
+### 对象存储（COS）
+1. 创建存储桶，设置为公共读私有写
+2. 配置CORS规则，允许所有域名访问
+3. 设置缓存控制，提高资源加载速度
 
-2. **缓存控制**
-   - 在腾讯云CDN控制台中配置适当的缓存规则
-   - 对于频繁更新的资源，设置较短的缓存时间
+### CDN
+1. 添加加速域名（如`cdn.dongboge.cn`）
+2. 设置源站为腾讯云COS存储桶
+3. 配置缓存规则，提高资源加载速度
+4. 配置HTTPS证书，确保安全访问
 
-3. **成本控制**
-   - 监控CDN流量和存储使用情况
-   - 根据需要调整CDN配置，避免不必要的费用
+## 7. GitHub Secrets配置
 
-## 后续优化建议
+在GitHub仓库的Secrets中设置以下变量：
+- `TENCENT_SECRET_ID`：腾讯云API密钥ID
+- `TENCENT_SECRET_KEY`：腾讯云API密钥
+- `TENCENT_COS_BUCKET`：腾讯云COS存储桶名称
+- `CDN_DOMAIN`：CDN域名（如`cdn.dongboge.cn`）
 
-1. **图片优化**
-   - 实现自动图片压缩和格式转换（如WebP）
-   - 添加响应式图片支持，根据设备提供不同尺寸的图片
+## 8. 测试和验证
 
-2. **预加载关键资源**
-   - 使用`<link rel="preload">`预加载关键CSS和字体文件
-   - 实现关键CSS内联，减少渲染阻塞
+使用`scripts/test-cdn.js`脚本测试CDN配置是否正确：
+```bash
+export CDN_DOMAIN=cdn.dongboge.cn
+node scripts/test-cdn.js
+```
 
-3. **监控和分析**
-   - 添加CDN性能监控
-   - 分析用户访问模式，优化资源分发
+## 9. 故障排除
 
-## 结论
+如果遇到CORS错误，请检查：
+1. 腾讯云COS存储桶的CORS规则是否正确设置
+2. 上传脚本中是否正确设置了CORS头
+3. CDN是否正确配置了CORS规则
 
-通过与腾讯云CDN的集成，东波哥的个人网站现在可以提供更快的访问速度和更好的用户体验。静态资源通过CDN加速，减少了服务器负载，提高了网站性能。
-
-详细的配置步骤和使用说明可以在`CDN-SETUP.md`文档中找到。
+如果遇到资源加载错误，请检查：
+1. CDN域名是否正确解析
+2. 资源是否已正确上传到腾讯云COS
+3. CDN缓存是否已刷新

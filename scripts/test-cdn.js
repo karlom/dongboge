@@ -1,100 +1,84 @@
-// 测试CDN配置的脚本
-import http from 'http';
-import fs from 'fs';
-import path from 'path';
-import { promisify } from 'util';
+// 测试CDN配置是否正确
+import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
+import path from 'path';
 
+// 获取当前文件的目录路径
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const readFile = promisify(fs.readFile);
 
-// 从.env.production文件中读取CDN_URL
-async function getCdnUrl() {
+// CDN域名从环境变量获取
+const cdnDomain = process.env.CDN_DOMAIN || 'cdn.dongboge.cn';
+
+// 测试URL列表
+const testUrls = [
+    `https://${cdnDomain}/fonts/atkinson-regular.woff`,
+    `https://${cdnDomain}/fonts/atkinson-bold.woff`,
+    `https://${cdnDomain}/assets/blog-placeholder-1.jpg`,
+    `https://${cdnDomain}/images/hero1.png`
+];
+
+// 测试单个URL
+async function testUrl(url) {
+    console.log(`测试URL: ${url}`);
     try {
-        const envContent = await readFile(path.resolve(__dirname, '../.env.production'), 'utf8');
-        const match = envContent.match(/PUBLIC_CDN_URL=['"]([^'"]+)['"]/);
-        return match ? match[1] : null;
-    } catch (error) {
-        console.error('读取.env.production文件失败:', error);
-        return null;
-    }
-}
-
-// 测试CDN资源是否可访问
-async function testCdnResource(url) {
-    return new Promise((resolve) => {
-        http.get(url, (res) => {
-            const { statusCode } = res;
-            let error;
-
-            if (statusCode !== 200) {
-                error = new Error(`请求失败，状态码: ${statusCode}`);
+        const response = await fetch(url, {
+            method: 'HEAD',
+            headers: {
+                'Origin': 'https://www.dongboge.cn'
             }
-
-            if (error) {
-                console.error(`测试 ${url} 失败:`, error.message);
-                res.resume(); // 消费响应数据以释放内存
-                resolve(false);
-                return;
-            }
-
-            res.setEncoding('utf8');
-            let rawData = '';
-            res.on('data', (chunk) => { rawData += chunk; });
-            res.on('end', () => {
-                try {
-                    console.log(`测试 ${url} 成功!`);
-                    resolve(true);
-                } catch (e) {
-                    console.error(`测试 ${url} 失败:`, e.message);
-                    resolve(false);
-                }
-            });
-        }).on('error', (e) => {
-            console.error(`测试 ${url} 失败:`, e.message);
-            resolve(false);
         });
-    });
+
+        console.log(`状态码: ${response.status}`);
+        console.log('响应头:');
+        response.headers.forEach((value, name) => {
+            console.log(`  ${name}: ${value}`);
+        });
+
+        // 检查CORS头
+        const corsHeader = response.headers.get('access-control-allow-origin');
+        if (corsHeader) {
+            console.log(`✅ CORS配置正确: ${corsHeader}`);
+        } else {
+            console.log('❌ 未找到CORS头');
+        }
+
+        // 检查缓存控制头
+        const cacheHeader = response.headers.get('cache-control');
+        if (cacheHeader) {
+            console.log(`✅ 缓存控制配置: ${cacheHeader}`);
+        } else {
+            console.log('⚠️ 未找到缓存控制头');
+        }
+
+        console.log('-----------------------------------');
+        return response.status >= 200 && response.status < 300;
+    } catch (error) {
+        console.error(`❌ 测试失败: ${error.message}`);
+        console.log('-----------------------------------');
+        return false;
+    }
 }
 
 // 主函数
 async function main() {
-    try {
-        // 获取CDN URL
-        const cdnUrl = await getCdnUrl();
-        if (!cdnUrl) {
-            console.error('无法获取CDN URL，请检查.env.production文件');
-            process.exit(1);
-        }
+    console.log(`开始测试CDN配置 (${cdnDomain})...`);
+    console.log('===================================');
 
-        console.log(`使用CDN URL: ${cdnUrl}`);
+    let successCount = 0;
+    for (const url of testUrls) {
+        const success = await testUrl(url);
+        if (success) successCount++;
+    }
 
-        // 测试几个常用资源
-        const resourcesToTest = [
-            '/assets/styles.css',
-            '/fonts/atkinson-regular.woff',
-            '/assets/blog-placeholder-1.jpg'
-        ];
+    console.log('===================================');
+    console.log(`测试结果: ${successCount}/${testUrls.length} 通过`);
 
-        let allSuccess = true;
-
-        for (const resource of resourcesToTest) {
-            const url = `${cdnUrl}${resource}`;
-            const success = await testCdnResource(url);
-            if (!success) {
-                allSuccess = false;
-            }
-        }
-
-        if (allSuccess) {
-            console.log('✅ 所有CDN资源测试通过!');
-        } else {
-            console.error('❌ 部分CDN资源测试失败，请检查配置');
-            process.exit(1);
-        }
-    } catch (error) {
-        console.error('测试过程中发生错误:', error);
+    if (successCount === testUrls.length) {
+        console.log('✅ 所有测试通过!');
+        process.exit(0);
+    } else {
+        console.log('❌ 部分测试失败，请检查上述输出');
         process.exit(1);
     }
 }

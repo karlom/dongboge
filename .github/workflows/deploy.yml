@@ -52,6 +52,18 @@ jobs:
         PUBLIC_CDN_URL: ${{ secrets.CDN_DOMAIN }}
       run: npm run build
       
+    - name: 设置腾讯云COS存储桶CORS规则
+      run: |
+        echo "设置腾讯云COS存储桶CORS规则..."
+        # 设置环境变量
+        export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
+        export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
+        export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
+        export TENCENT_COS_REGION=ap-guangzhou
+        
+        # 运行CORS设置脚本
+        node scripts/setup-cos-cors.js
+        
     - name: 上传静态资源到腾讯云COS
       run: |
         echo "上传静态资源到腾讯云COS..."
