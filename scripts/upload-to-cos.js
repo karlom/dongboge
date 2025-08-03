@@ -91,13 +91,19 @@ async function uploadDirectory(dirPath, targetPath) {
 // 刷新CDN缓存
 async function refreshCDN() {
     console.log('刷新CDN缓存...');
-    
+
     const cdnDomain = process.env.CDN_DOMAIN;
     if (!cdnDomain) {
         console.error('缺少必要的环境变量: CDN_DOMAIN');
-        process.exit(1);
+        return false;
     }
-    
+
+    // 验证CDN域名格式
+    if (cdnDomain.includes('http://') || cdnDomain.includes('https://')) {
+        console.error('CDN_DOMAIN 不应包含协议前缀 (http:// 或 https://)，请移除');
+        return false;
+    }
+
     try {
         // 初始化CDN客户端
         const CdnClient = tencentcloud.cdn.v20180606.Client;
@@ -113,7 +119,7 @@ async function refreshCDN() {
                 },
             },
         };
-        
+
         const client = new CdnClient(clientConfig);
         const params = {
             "Paths": [
@@ -122,13 +128,18 @@ async function refreshCDN() {
             ],
             "FlushType": "flush"
         };
-        
+
+        console.log(`尝试刷新CDN路径: ${params.Paths.join(', ')}`);
+
         const result = await client.PurgePathCache(params);
         console.log('CDN缓存刷新成功:', JSON.stringify(result));
-        return result;
+        return true;
     } catch (error) {
         console.error('CDN缓存刷新失败:', error);
-        throw error;
+        console.log('注意: 如果您尚未在腾讯云CDN控制台添加此域名，请先完成域名添加');
+        console.log('CDN域名添加教程: https://cloud.tencent.com/document/product/228/41215');
+        // 不要因为CDN刷新失败而中断整个部署流程
+        return false;
     }
 }
 
@@ -147,9 +158,16 @@ async function main() {
         await uploadDirectory(path.join(distPath, 'fonts'), 'fonts');
 
         console.log('所有文件上传完成!');
-        
-        // 刷新CDN缓存
-        await refreshCDN();
+
+        // 尝试刷新CDN缓存，但即使失败也不中断部署
+        try {
+            await refreshCDN();
+        } catch (cdnError) {
+            console.error('CDN缓存刷新出错，但不影响文件上传:', cdnError);
+        }
+
+        // 部署成功
+        console.log('部署完成!');
     } catch (error) {
         console.error('上传过程中发生错误:', error);
         process.exit(1);

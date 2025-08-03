@@ -3,6 +3,7 @@ name: 部署到腾讯云服务器和CDN
 on:
   push:
     branches: [ main, master ]
+  workflow_dispatch:  # 允许手动触发工作流
 
 jobs:
   deploy:
@@ -18,35 +19,47 @@ jobs:
         node-version: '18'
         cache: 'npm'
         
+    - name: 缓存依赖
+      uses: actions/cache@v3
+      id: npm-cache
+      with:
+        path: |
+          **/node_modules
+          ~/.npm
+        key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-
+        
     - name: 安装依赖
+      if: steps.npm-cache.outputs.cache-hit != 'true'
       run: npm ci
       
-    # 不需要单独安装腾讯云COS工具，我们将使用Node.js SDK
+    - name: 缓存腾讯云SDK
+      uses: actions/cache@v3
+      id: sdk-cache
+      with:
+        path: |
+          **/node_modules/cos-nodejs-sdk-v5
+          **/node_modules/tencentcloud-sdk-nodejs-cdn
+        key: ${{ runner.os }}-tencent-sdk-${{ hashFiles('scripts/upload-to-cos.js') }}
+        
+    - name: 安装腾讯云SDK
+      if: steps.sdk-cache.outputs.cache-hit != 'true'
+      run: npm install cos-nodejs-sdk-v5 tencentcloud-sdk-nodejs-cdn
         
     - name: 构建项目
       run: npm run build
       
-    - name: 调试SSH连接信息
-      run: |
-        echo "正在调试SSH连接..."
-        echo "HOST: ${{ secrets.HOST }} 已设置: ${{ secrets.HOST != '' }}"
-        echo "USERNAME: ${{ secrets.USERNAME }} 已设置: ${{ secrets.USERNAME != '' }}"
-        echo "SSH_PRIVATE_KEY 已设置: ${{ secrets.SSH_PRIVATE_KEY != '' }}"
-        echo "PORT 已设置: ${{ secrets.PORT != '' }}"
-        echo "CDN_DOMAIN 已设置: ${{ secrets.CDN_DOMAIN != '' }}"
-        
     - name: 上传静态资源到腾讯云COS
       run: |
         echo "上传静态资源到腾讯云COS..."
-        # 安装腾讯云COS SDK和CDN SDK
-        npm install cos-nodejs-sdk-v5 tencentcloud-sdk-nodejs-cdn
-        
         # 设置环境变量
         export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
         export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
         export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
         export TENCENT_COS_REGION=ap-guangzhou
-        export CDN_DOMAIN=${{ secrets.CDN_DOMAIN }}
+        # 确保CDN_DOMAIN不包含协议前缀
+        export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
         
         # 运行上传脚本
         node scripts/upload-to-cos.js
@@ -54,7 +67,7 @@ jobs:
     - name: 部署HTML和其他文件到服务器
       uses: burnett01/rsync-deployments@6.0.0
       with:
-        switches: -avzr --delete
+        switches: -avzr --delete --exclude="assets/" --exclude="fonts/"
         path: dist/
         remote_path: /var/www/dongboge
         remote_host: ${{ secrets.HOST }}
