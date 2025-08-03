@@ -1,102 +1,99 @@
-/**
- * 腾讯云CDN测试脚本
- * 
- * 此脚本用于测试CDN配置是否正确
- * 使用方法: node scripts/test-cdn.js
- */
-
-const https = require('https');
+// 测试CDN配置的脚本
+const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { promisify } = require('util');
+const readFile = promisify(fs.readFile);
 
-// 从.env.production文件中读取CDN URL
-function getCdnUrl() {
+// 从.env.production文件中读取CDN_URL
+async function getCdnUrl() {
     try {
-        const envContent = fs.readFileSync(path.join(process.cwd(), '.env.production'), 'utf8');
+        const envContent = await readFile(path.resolve(__dirname, '../.env.production'), 'utf8');
         const match = envContent.match(/PUBLIC_CDN_URL=['"]([^'"]+)['"]/);
         return match ? match[1] : null;
     } catch (error) {
-        console.error('无法读取.env.production文件:', error.message);
+        console.error('读取.env.production文件失败:', error);
         return null;
     }
 }
 
-// 测试CDN URL是否可访问
-async function testCdnUrl(url) {
+// 测试CDN资源是否可访问
+async function testCdnResource(url) {
     return new Promise((resolve) => {
-        https.get(url, (res) => {
-            console.log(`状态码: ${res.statusCode}`);
-            if (res.statusCode === 200) {
-                console.log('✅ CDN URL可以正常访问');
-                resolve(true);
-            } else {
-                console.log('❌ CDN URL无法正常访问');
-                resolve(false);
+        http.get(url, (res) => {
+            const { statusCode } = res;
+            let error;
+
+            if (statusCode !== 200) {
+                error = new Error(`请求失败，状态码: ${statusCode}`);
             }
+
+            if (error) {
+                console.error(`测试 ${url} 失败:`, error.message);
+                res.resume(); // 消费响应数据以释放内存
+                resolve(false);
+                return;
+            }
+
+            res.setEncoding('utf8');
+            let rawData = '';
+            res.on('data', (chunk) => { rawData += chunk; });
+            res.on('end', () => {
+                try {
+                    console.log(`测试 ${url} 成功!`);
+                    resolve(true);
+                } catch (e) {
+                    console.error(`测试 ${url} 失败:`, e.message);
+                    resolve(false);
+                }
+            });
         }).on('error', (e) => {
-            console.error(`❌ 请求出错: ${e.message}`);
+            console.error(`测试 ${url} 失败:`, e.message);
             resolve(false);
         });
     });
 }
 
-// 测试常见静态资源路径
-async function testCommonPaths(cdnUrl) {
-    const paths = [
-        '/assets/',
-        '/fonts/',
-        '/fonts/atkinson-regular.woff',
-        '/Favicon.png'
-    ];
-
-    console.log('\n测试常见静态资源路径:');
-
-    for (const path of paths) {
-        const url = `${cdnUrl}${path}`;
-        process.stdout.write(`测试 ${url} ... `);
-
-        try {
-            const result = await new Promise((resolve) => {
-                https.get(url, (res) => {
-                    if (res.statusCode === 200) {
-                        process.stdout.write('✅ 成功\n');
-                        resolve(true);
-                    } else {
-                        process.stdout.write(`❌ 失败 (状态码: ${res.statusCode})\n`);
-                        resolve(false);
-                    }
-                }).on('error', (e) => {
-                    process.stdout.write(`❌ 失败 (${e.message})\n`);
-                    resolve(false);
-                });
-            });
-        } catch (error) {
-            process.stdout.write(`❌ 失败 (${error.message})\n`);
-        }
-    }
-}
-
 // 主函数
 async function main() {
-    console.log('🔍 腾讯云CDN配置测试\n');
+    try {
+        // 获取CDN URL
+        const cdnUrl = await getCdnUrl();
+        if (!cdnUrl) {
+            console.error('无法获取CDN URL，请检查.env.production文件');
+            process.exit(1);
+        }
 
-    const cdnUrl = getCdnUrl();
-    if (!cdnUrl) {
-        console.error('❌ 未找到CDN URL配置，请检查.env.production文件');
+        console.log(`使用CDN URL: ${cdnUrl}`);
+
+        // 测试几个常用资源
+        const resourcesToTest = [
+            '/assets/styles.css',
+            '/fonts/atkinson-regular.woff',
+            '/assets/blog-placeholder-1.jpg'
+        ];
+
+        let allSuccess = true;
+
+        for (const resource of resourcesToTest) {
+            const url = `${cdnUrl}${resource}`;
+            const success = await testCdnResource(url);
+            if (!success) {
+                allSuccess = false;
+            }
+        }
+
+        if (allSuccess) {
+            console.log('✅ 所有CDN资源测试通过!');
+        } else {
+            console.error('❌ 部分CDN资源测试失败，请检查配置');
+            process.exit(1);
+        }
+    } catch (error) {
+        console.error('测试过程中发生错误:', error);
         process.exit(1);
     }
-
-    console.log(`📡 CDN URL: ${cdnUrl}`);
-
-    const isAccessible = await testCdnUrl(cdnUrl);
-    if (!isAccessible) {
-        console.error('\n❌ CDN URL无法访问，请检查配置或网络连接');
-        process.exit(1);
-    }
-
-    await testCommonPaths(cdnUrl);
-
-    console.log('\n✨ 测试完成');
 }
 
-main().catch(console.error);
+// 执行主函数
+main();

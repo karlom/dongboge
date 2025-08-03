@@ -21,12 +21,7 @@ jobs:
     - name: 安装依赖
       run: npm ci
       
-    - name: 安装腾讯云CLI
-      run: |
-        pip install tccli
-        tccli configure set secretId ${{ secrets.TENCENT_SECRET_ID }}
-        tccli configure set secretKey ${{ secrets.TENCENT_SECRET_KEY }}
-        tccli configure set region ap-guangzhou
+    # 不需要单独安装腾讯云COS工具，我们将使用Node.js SDK
         
     - name: 构建项目
       run: npm run build
@@ -42,9 +37,23 @@ jobs:
     - name: 上传静态资源到腾讯云COS
       run: |
         echo "上传静态资源到腾讯云COS..."
-        # 上传静态资源文件夹（如CSS、JS、图片等）
-        tccli cos sync dist/assets cos://${{ secrets.TENCENT_COS_BUCKET }}/assets --delete
-        tccli cos sync dist/fonts cos://${{ secrets.TENCENT_COS_BUCKET }}/fonts --delete
+        # 安装腾讯云COS SDK
+        npm install cos-nodejs-sdk-v5
+        
+        # 设置环境变量
+        export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
+        export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
+        export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
+        export TENCENT_COS_REGION=ap-guangzhou
+        
+        # 运行上传脚本
+        node scripts/upload-to-cos.js
+        
+        # 安装腾讯云CLI（仅用于CDN刷新）
+        pip install tccli
+        tccli configure set secretId ${{ secrets.TENCENT_SECRET_ID }}
+        tccli configure set secretKey ${{ secrets.TENCENT_SECRET_KEY }}
+        tccli configure set region ap-guangzhou
         
         # 刷新CDN缓存
         echo "刷新CDN缓存..."
