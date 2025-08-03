@@ -47,6 +47,11 @@ jobs:
       if: steps.sdk-cache.outputs.cache-hit != 'true'
       run: npm install cos-nodejs-sdk-v5 tencentcloud-sdk-nodejs-cdn
         
+    - name: 设置脚本权限
+      run: |
+        chmod +x scripts/incremental-upload.js
+        chmod +x scripts/setup-cos-cors.js
+        
     - name: 构建项目
       env:
         PUBLIC_CDN_URL: cdn.dongboge.cn
