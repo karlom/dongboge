@@ -31,20 +31,18 @@ const { title, description, image = FallbackImage } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
-<!-- 字体预加载 - 使用绝对URL确保在任何环境下都能正确加载 -->
+<!-- 字体预加载 - 移除crossorigin属性避免CORS问题 -->
 <link
 	rel="preload"
 	href="https://cdn.dongboge.cn/fonts/atkinson-regular.woff"
 	as="font"
 	type="font/woff"
-	crossorigin
 />
 <link
 	rel="preload"
 	href="https://cdn.dongboge.cn/fonts/atkinson-bold.woff"
 	as="font"
 	type="font/woff"
-	crossorigin
 />
 
 <!-- Canonical URL -->
