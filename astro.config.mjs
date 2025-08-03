@@ -40,7 +40,6 @@ export default defineConfig({
 				},
 			},
 		},
-		// 设置CDN基础路径，确保以斜杠结尾
-		base: 'https://cdn.dongboge.cn/',
+		// 移除base配置，让页面资源从服务器加载，只有通过cdnUrl()函数的资源才使用CDN
 	},
 });
