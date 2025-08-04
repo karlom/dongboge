@@ -1,4 +1,4 @@
-name: 智能混合部署策略 - 解决rsync和404错误
+name: 博客快速部署
 
 on:
   push:
@@ -8,23 +8,23 @@ on:
       deploy_type:
         description: '部署类型'
         required: true
-        default: 'full'
+        default: 'auto'
         type: choice
         options:
+        - auto        # 自动检测
         - full        # 完整部署
-        - incremental # 增量部署
         - blog_only   # 仅博客内容
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
 
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2  # 获取最近两次提交，用于比较变更
+          fetch-depth: 2
 
       - name: 设置Node.js环境
         uses: actions/setup-node@v4
@@ -32,29 +32,8 @@ jobs:
           node-version: "18"
           cache: "npm"
 
-      - name: 缓存依赖
-        uses: actions/cache@v3
-        id: npm-cache
-        with:
-          path: |
-            **/node_modules
-            ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
       - name: 安装依赖
-        run: |
-          echo "📦 开始安装项目依赖..."
-          npm ci --prefer-offline --no-audit --silent --no-fund
-          echo "✅ 依赖安装完成"
-
-      - name: 确保COS SDK依赖
-        run: |
-          echo "🔍 检查COS SDK依赖..."
-          chmod +x scripts/ensure-dependencies.cjs
-          node scripts/ensure-dependencies.cjs
-          echo "✅ COS SDK检查完成"
+        run: npm ci --prefer-offline --no-audit --silent
 
       - name: 构建项目
         env:
@@ -63,83 +42,45 @@ jobs:
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
           NODE_ENV: production
-        run: |
-          echo "🔨 开始构建项目..."
-          echo "使用的CDN URL: $PUBLIC_CDN_URL"
-          npm run build
-          echo "✅ 项目构建完成"
+        run: npm run build
 
-      - name: 检查构建输出
+      - name: 检测部署策略
+        id: strategy
         run: |
-          echo "🔍 检查构建输出文件..."
-          ls -la dist/
-          echo "📁 检查服务端文件..."
-          ls -la dist/server/ || echo "没有server目录"
-          echo "📁 检查服务端pages文件..."
-          find dist/server -name "*.mjs" | head -10 || echo "未找到.mjs文件"
-          echo "📁 检查客户端文件..."
-          ls -la dist/client/ || echo "没有client目录"
-
-      - name: 确定部署策略
-        id: deploy_strategy
-        run: |
-          echo "🤔 分析部署策略..."
-          
-          if [[ "${{ github.event.inputs.deploy_type }}" == "incremental" ]]; then
-            echo "strategy=incremental" >> $GITHUB_OUTPUT
-            echo "📝 手动选择：增量部署"
+          if [[ "${{ github.event.inputs.deploy_type }}" == "full" ]]; then
+            echo "type=full" >> $GITHUB_OUTPUT
+            echo "🔄 手动选择：完整部署"
           elif [[ "${{ github.event.inputs.deploy_type }}" == "blog_only" ]]; then
-            echo "strategy=blog_only" >> $GITHUB_OUTPUT
+            echo "type=blog_only" >> $GITHUB_OUTPUT
             echo "📝 手动选择：仅博客部署"
-          elif [[ "${{ github.event.inputs.deploy_type }}" == "full" ]]; then
-            echo "strategy=full" >> $GITHUB_OUTPUT
-            echo "📝 手动选择：完整部署"
           else
-            # 自动检测变更文件
-            if git diff --name-only HEAD~1 HEAD > /dev/null 2>&1; then
-              CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
-              echo "📋 变更的文件："
-              echo "$CHANGED_FILES"
-              
-              # 检查是否只有博客文件变更
-              if echo "$CHANGED_FILES" | grep -E "^src/content/blog/" && ! echo "$CHANGED_FILES" | grep -v -E "^src/content/blog/|^README\.md$|\.md$"; then
-                echo "strategy=blog_only" >> $GITHUB_OUTPUT
-                echo "🎯 自动检测：仅博客内容变更，使用增量部署"
-              else
-                echo "strategy=full" >> $GITHUB_OUTPUT
-                echo "🎯 自动检测：核心代码变更，使用完整部署"
-              fi
+            # 自动检测变更
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD || echo "")
+            echo "变更文件: $CHANGED_FILES"
+            
+            if echo "$CHANGED_FILES" | grep -E "^src/content/blog/" && ! echo "$CHANGED_FILES" | grep -v -E "^src/content/blog/|\.md$"; then
+              echo "type=blog_only" >> $GITHUB_OUTPUT
+              echo "📝 自动检测：仅博客内容变更"
             else
-              echo "strategy=full" >> $GITHUB_OUTPUT
-              echo "🎯 默认：使用完整部署"
+              echo "type=full" >> $GITHUB_OUTPUT
+              echo "🔄 自动检测：代码变更，完整部署"
             fi
           fi
 
-      - name: 上传静态资源到腾讯云COS
-        timeout-minutes: 15
+      - name: CDN增量更新
         run: |
-          echo "☁️ 上传静态资源到腾讯云COS..."
+          echo "☁️ 更新CDN资源..."
           export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
           export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
           export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
           export TENCENT_COS_REGION=ap-guangzhou
-          export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
+          export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||')
           
-          chmod +x scripts/incremental-upload.cjs
           node scripts/incremental-upload.cjs
 
-      # ==================== 完整部署流程 ====================
-      - name: 完整部署 - 创建部署包
-        if: steps.deploy_strategy.outputs.strategy == 'full'
-        run: |
-          echo "📦 创建完整部署包..."
-          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          tar -czf deploy-${TIMESTAMP}.tar.gz -C dist .
-          ls -la deploy-*.tar.gz
-          echo "✅ 部署包创建完成"
-
-      - name: 完整部署 - 服务器准备
-        if: steps.deploy_strategy.outputs.strategy == 'full'
+      # 仅博客部署 - 快速更新
+      - name: 博客快速部署
+        if: steps.strategy.outputs.type == 'blog_only'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -148,47 +89,26 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
           script: |
-            set -e
-            echo "🚀 开始完整部署准备..."
+            echo "📝 博客快速更新..."
+            cd /var/www/dongboge
             
-            # 1. 创建完整目录结构
-            echo "📁 创建目录结构..."
-            mkdir -p /var/www/dongboge/{server/pages/{admin,api,blog},client,logs,backup}
+            # 只更新博客相关的静态文件
+            rsync -av --delete /tmp/blog-update/ ./blog/ 2>/dev/null || echo "博客文件同步跳过"
             
-            # 2. 设置权限
-            echo "🔐 设置目录权限..."
-            sudo chown -R $USER:$USER /var/www/dongboge
-            chmod -R 755 /var/www/dongboge
-            
-            # 3. 备份现有部署
-            echo "💾 备份现有部署..."
-            cd /var/www
-            if [ -d "dongboge/server" ]; then
-              tar -czf dongboge/backup/backup-$(date +%Y%m%d-%H%M%S).tar.gz dongboge/ 2>/dev/null || echo "⚠️ 备份跳过"
-              # 只保留最近5个备份
-              cd dongboge/backup && ls -t backup-*.tar.gz | tail -n +6 | xargs rm -f 2>/dev/null || true
-            fi
-            
-            # 4. 停止现有服务
-            echo "🛑 停止现有服务..."
-            # 尝试使用PM2停止
+            # 重启服务以更新内容
             if command -v pm2 >/dev/null 2>&1; then
-              pm2 stop dongboge 2>/dev/null || echo "PM2服务未运行"
-              pm2 delete dongboge 2>/dev/null || echo "PM2应用不存在"
+              pm2 restart dongboge
+              echo "✅ PM2服务已重启"
+            else
+              pkill -f "node.*server/entry.mjs" 2>/dev/null || true
+              nohup node server/entry.mjs > logs/server.log 2>&1 &
+              echo "✅ 服务已重启"
             fi
             
-            # 强制停止Node.js进程
-            for pid in $(ps aux | grep 'node.*server/entry.mjs' | grep -v grep | awk '{print $2}'); do
-              echo "停止进程 $pid"
-              kill -15 $pid 2>/dev/null || true
-              sleep 2
-              kill -9 $pid 2>/dev/null || true
-            done
-            
-            echo "✅ 服务器准备完成"
+            echo "📝 博客更新完成！"
 
-      - name: 完整部署 - 上传部署包
-        if: steps.deploy_strategy.outputs.strategy == 'full'
+      - name: 上传博客文件
+        if: steps.strategy.outputs.type == 'blog_only'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HOST }}
@@ -196,11 +116,25 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
-          source: "deploy-*.tar.gz"
-          target: "/tmp/"
+          source: "dist/blog/"
+          target: "/var/www/dongboge/"
+          strip_components: 1
 
-      - name: 完整部署 - 解压和启动
-        if: steps.deploy_strategy.outputs.strategy == 'full'
+      # 完整部署 - 全量更新
+      - name: 完整部署
+        if: steps.strategy.outputs.type == 'full'
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avz --delete --exclude=logs --exclude=node_modules --exclude=.env
+          path: dist/
+          remote_path: /var/www/dongboge
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 重启服务
+        if: steps.strategy.outputs.type == 'full'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -208,46 +142,13 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
-          command_timeout: 10m
           script: |
-            set -e
-            echo "📦 解压和部署..."
+            echo "🚀 重启服务..."
             cd /var/www/dongboge
             
-            # 解压部署包
-            echo "📂 解压部署包..."
-            tar -xzf /tmp/deploy-*.tar.gz
-            rm /tmp/deploy-*.tar.gz
-            
-            # 验证文件完整性
-            echo "🔍 验证文件完整性..."
-            echo "=== 目录结构 ==="
-            ls -la
-            echo "=== 服务端文件 ==="
-            ls -la server/ || echo "server目录不存在"
-            echo "=== Pages文件 ==="
-            ls -la server/pages/ || echo "pages目录不存在"
-            echo "=== .mjs文件数量 ==="
-            find server -name "*.mjs" | wc -l || echo "0"
-            
-            # 检查关键文件
-            REQUIRED_FILES=("server/entry.mjs" "package.json")
-            for file in "${REQUIRED_FILES[@]}"; do
-              if [ ! -f "$file" ]; then
-                echo "❌ 关键文件缺失: $file"
-                exit 1
-              else
-                echo "✅ 关键文件存在: $file"
-              fi
-            done
-            
-            # 安装生产依赖
-            echo "📦 安装生产依赖..."
-            npm install --production --silent
-            
-            # 设置环境变量
-            echo "🔧 设置环境变量..."
-            cat > .env << EOF
+            # 设置环境变量（如果不存在）
+            if [ ! -f ".env" ]; then
+              cat > .env << EOF
             PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
             PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
             PUBLIC_CDN_URL=https://cdn.dongboge.cn
@@ -256,200 +157,20 @@ jobs:
             HOST=127.0.0.1
             PORT=3000
             EOF
-            
-            # 启动服务
-            echo "🚀 启动服务..."
-            mkdir -p logs
-            
-            # 检查entry.mjs文件是否存在
-            if [ ! -f "server/entry.mjs" ]; then
-              echo "❌ server/entry.mjs 文件不存在！"
-              echo "当前目录内容："
-              ls -la
-              echo "server目录内容："
-              ls -la server/ || echo "server目录不存在"
-              exit 1
             fi
-            
-            # 安装PM2（如果不存在）
-            if ! command -v pm2 >/dev/null 2>&1; then
-              echo "📦 安装PM2..."
-              npm install -g pm2
-            fi
-            
-            # 使用PM2启动服务
-            echo "使用PM2启动服务..."
-            pm2 start server/entry.mjs --name dongboge --log logs/server.log --error logs/error.log --out logs/out.log
-            pm2 save
-            
-            # 等待服务启动
-            echo "⏳ 等待服务启动..."
-            sleep 8
-            
-            # 检查PM2状态
-            echo "=== PM2状态 ==="
-            pm2 status
-            
-            # 检查进程状态
-            echo "=== 进程检查 ==="
-            ps aux | grep "node.*server/entry.mjs" | grep -v grep || echo "没有找到Node.js进程"
-            
-            # 检查端口监听
-            echo "=== 端口检查 ==="
-            netstat -tlnp | grep :3000 || echo "端口3000未被监听"
-            
-            # 如果PM2启动失败，尝试直接启动
-            if ! ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-              echo "⚠️ PM2启动失败，尝试直接启动..."
-              pm2 logs dongboge --lines 10 || echo "无法获取PM2日志"
-              
-              echo "使用nohup直接启动..."
-              nohup node server/entry.mjs > logs/server.log 2>&1 &
-              sleep 5
-              
-              if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-                echo "✅ 直接启动成功"
-              else
-                echo "❌ 服务启动完全失败，查看日志："
-                tail -20 logs/server.log || echo "无法读取日志"
-                echo "=== 错误排查 ==="
-                echo "Node.js版本: $(node --version)"
-                echo "当前工作目录: $(pwd)"
-                echo "环境变量:"
-                cat .env || echo "没有.env文件"
-                exit 1
-              fi
-            else
-              echo "✅ PM2启动成功"
-            fi
-            
-            echo "✅ 完整部署成功！"
-            
-            # 创建内联修复脚本（解决scripts文件夹不存在的问题）
-            echo "🔧 创建服务器修复脚本..."
-            cat > fix-server.sh << 'SCRIPT_EOF'
-#!/bin/bash
-echo "🚀 开始服务器修复..."
-
-# 检查关键文件
-if [ ! -f "server/entry.mjs" ]; then
-    echo "❌ server/entry.mjs 不存在！"
-    exit 1
-fi
-
-# 创建必要目录
-mkdir -p logs backup
-
-# 安装PM2（如果需要）
-if ! command -v pm2 >/dev/null 2>&1; then
-    echo "📦 安装PM2..."
-    npm install -g pm2
-fi
-
-# 停止现有服务
-echo "🛑 停止现有服务..."
-pm2 stop dongboge 2>/dev/null || true
-pm2 delete dongboge 2>/dev/null || true
-pkill -f "node.*server/entry.mjs" 2>/dev/null || true
-
-sleep 2
-
-# 启动服务
-echo "🚀 启动服务..."
-pm2 start server/entry.mjs --name dongboge --log logs/server.log --error logs/error.log --out logs/out.log
-pm2 save
-
-sleep 5
-
-# 检查状态
-if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-    echo "✅ 服务启动成功！"
-    pm2 status dongboge
-    
-    # 检查端口
-    if netstat -tlnp | grep :3000 > /dev/null; then
-        echo "✅ 端口3000正在监听"
-        
-        # 测试响应
-        sleep 3
-        LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ 2>/dev/null || echo "ERROR")
-        echo "本地响应: $LOCAL_RESPONSE"
-        
-        if [ "$LOCAL_RESPONSE" = "200" ]; then
-            echo "🎉 服务完全正常！"
-        else
-            echo "⚠️ 服务启动但响应异常"
-            tail -10 logs/server.log
-        fi
-    else
-        echo "❌ 端口3000未监听"
-        pm2 logs dongboge --lines 10
-    fi
-else
-    echo "❌ 服务启动失败"
-    pm2 logs dongboge --lines 10
-    
-    # 尝试直接启动
-    echo "尝试直接启动..."
-    nohup node server/entry.mjs > logs/server.log 2>&1 &
-    sleep 5
-    
-    if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-        echo "✅ 直接启动成功"
-    else
-        echo "❌ 所有启动方法都失败"
-        tail -20 logs/server.log
-        exit 1
-    fi
-fi
-
-echo "修复完成！"
-SCRIPT_EOF
-
-            chmod +x fix-server.sh
-            echo "✅ 修复脚本已创建"
-
-      # ==================== 增量部署流程 ====================
-      - name: 增量部署 - rsync传输
-        if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
-        uses: burnett01/rsync-deployments@6.0.0
-        with:
-          switches: -avz --checksum --delete --rsync-path="mkdir -p /var/www/dongboge && rsync"
-          path: dist/
-          remote_path: /var/www/dongboge
-          remote_host: ${{ secrets.HOST }}
-          remote_user: ${{ secrets.USERNAME }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
-
-      - name: 增量部署 - 重启服务
-        if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          port: ${{ secrets.PORT || '22' }}
-          script: |
-            echo "🔄 增量部署后重启服务..."
-            cd /var/www/dongboge
-            
-            # 安装依赖（如果package.json有变化）
-            npm install --production --silent
             
             # 重启服务
             if command -v pm2 >/dev/null 2>&1; then
               pm2 restart dongboge || pm2 start server/entry.mjs --name dongboge --log logs/server.log
+              echo "✅ PM2服务已重启"
             else
-              pkill -f "node.*server/entry.mjs" || echo "没有运行的进程"
+              pkill -f "node.*server/entry.mjs" 2>/dev/null || true
+              sleep 2
               nohup node server/entry.mjs > logs/server.log 2>&1 &
+              echo "✅ 服务已重启"
             fi
-            
-            echo "✅ 增量部署完成！"
 
-      # ==================== 部署验证 ====================
-      - name: 验证部署结果
+      - name: 验证部署
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -458,42 +179,33 @@ SCRIPT_EOF
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
           script: |
-            echo "🧪 验证部署结果..."
+            echo "🧪 验证部署..."
             cd /var/www/dongboge
             
-            echo "=== 文件结构验证 ==="
-            ls -la server/pages/ | head -10 || echo "pages目录为空"
-            echo "服务端.mjs文件数量: $(find server -name '*.mjs' | wc -l)"
+            # 等待服务启动
+            sleep 5
             
-            echo "=== 进程状态验证 ==="
-            if command -v pm2 >/dev/null 2>&1; then
-              pm2 status dongboge 2>/dev/null || echo "PM2状态获取失败"
-            fi
-            ps aux | grep "node.*server/entry.mjs" | grep -v grep || echo "没有找到Node.js进程"
-            
-            echo "=== 端口监听验证 ==="
-            netstat -tlnp | grep :3000 || echo "端口3000未被监听"
-            
-            echo "=== 服务响应验证 ==="
-            sleep 3
-            LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ 2>/dev/null || echo "ERROR")
-            echo "本地响应: $LOCAL_RESPONSE"
-            
-            EXTERNAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ 2>/dev/null || echo "ERROR")
-            echo "外部响应: $EXTERNAL_RESPONSE"
-            
-            # 测试关键页面
-            CONTACT_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/contact 2>/dev/null || echo "ERROR")
-            echo "Contact页面: $CONTACT_RESPONSE"
-            
-            if [ "$LOCAL_RESPONSE" = "200" ] && [ "$EXTERNAL_RESPONSE" = "200" ]; then
-              echo "✅ 部署验证成功！"
+            # 检查服务状态
+            if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
+              echo "✅ 服务运行正常"
+              
+              # 测试响应
+              LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ 2>/dev/null || echo "ERROR")
+              SITE_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ 2>/dev/null || echo "ERROR")
+              
+              echo "本地响应: $LOCAL_RESPONSE"
+              echo "网站响应: $SITE_RESPONSE"
+              
+              if [ "$LOCAL_RESPONSE" = "200" ] && [ "$SITE_RESPONSE" = "200" ]; then
+                echo "🎉 部署成功！网站正常运行"
+              else
+                echo "⚠️ 响应异常，查看日志："
+                tail -10 logs/server.log 2>/dev/null || echo "无日志"
+              fi
             else
-              echo "⚠️ 部署可能存在问题，查看日志："
-              tail -20 logs/server.log 2>/dev/null || echo "无法读取日志"
+              echo "❌ 服务未运行，尝试修复..."
+              ./fix-file-structure.sh $(hostname -I | awk '{print $1}') $USER ~/.ssh/id_rsa 2>/dev/null || echo "修复脚本不存在"
             fi
             
-            echo "=== 部署完成总结 ==="
-            echo "部署策略: ${{ steps.deploy_strategy.outputs.strategy }}"
-            echo "部署时间: $(date)"
-            echo "服务状态: $([ "$LOCAL_RESPONSE" = "200" ] && echo "正常" || echo "异常")"
+            echo "部署类型: ${{ steps.strategy.outputs.type }}"
+            echo "完成时间: $(date)"
