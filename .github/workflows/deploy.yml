@@ -149,11 +149,17 @@ jobs:
           port: ${{ secrets.PORT || '22' }}
           script: |
             set -e
-            echo "🚀 开始完整部署准备..."
+            echo "🚀 开始混合架构部署准备..."
             
-            # 1. 创建完整目录结构
-            echo "📁 创建目录结构..."
-            mkdir -p /var/www/dongboge/{server/pages/{admin,api,blog},client,logs,backup}
+            # 1. 创建混合架构目录结构
+            echo "📁 创建混合架构目录结构..."
+            mkdir -p /var/www/dongboge/{server,client,logs,backup,node_modules}
+            
+            # 确保client目录存在（静态文件）
+            mkdir -p /var/www/dongboge/client
+            
+            # 确保server目录存在（动态服务）
+            mkdir -p /var/www/dongboge/server
             
             # 2. 设置权限
             echo "🔐 设置目录权限..."
@@ -163,8 +169,8 @@ jobs:
             # 3. 备份现有部署
             echo "💾 备份现有部署..."
             cd /var/www
-            if [ -d "dongboge/server" ]; then
-              tar -czf dongboge/backup/backup-$(date +%Y%m%d-%H%M%S).tar.gz dongboge/ 2>/dev/null || echo "⚠️ 备份跳过"
+            if [ -d "dongboge/server" ] && [ -f "dongboge/server/entry.mjs" ]; then
+              tar -czf dongboge/backup/backup-$(date +%Y%m%d-%H%M%S).tar.gz dongboge/server dongboge/client dongboge/package.json dongboge/.env 2>/dev/null || echo "⚠️ 备份跳过"
               # 只保留最近5个备份
               cd dongboge/backup && ls -t backup-*.tar.gz | tail -n +6 | xargs rm -f 2>/dev/null || true
             fi
@@ -185,7 +191,7 @@ jobs:
               kill -9 $pid 2>/dev/null || true
             done
             
-            echo "✅ 服务器准备完成"
+            echo "✅ 混合架构服务器准备完成"
 
       - name: 完整部署 - 上传部署包
         if: steps.deploy_strategy.outputs.strategy == 'full'
