@@ -53,18 +53,23 @@ jobs:
             echo "☁️ 增量更新CDN资源..."
             node scripts/incremental-upload.cjs
           env:
-            COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
-            COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+            TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+            TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+            TENCENT_COS_BUCKET: ${{ secrets.TENCENT_COS_BUCKET }}
+            TENCENT_COS_REGION: ${{ secrets.TENCENT_COS_REGION }}
+            CDN_DOMAIN: ${{ secrets.CDN_DOMAIN }}
 
         - name: 🚀 快速部署 (仅博客更新)
           if: steps.detect_changes.outputs.deployment_type == 'blog_only'
           uses: easingthemes/ssh-deploy@main
           env:
-            SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+            SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
             ARGS: "-rlgoDzvc -i --exclude=node_modules/ --exclude=.git/"
             SOURCE: "dist/"
-            REMOTE_HOST: ${{ secrets.SERVER_HOST }}
-            REMOTE_USER: ${{ secrets.SERVER_USER }}
+            REMOTE_HOST: ${{ secrets.HOST }}
+            REMOTE_USER: ${{ secrets.USERNAME }}
+            REMOTE_PORT: ${{ secrets.PORT }}
             TARGET: "/var/www/dongboge/"
             SCRIPT_AFTER: |
               echo "🔄 重启服务..."
@@ -75,11 +80,13 @@ jobs:
           if: steps.detect_changes.outputs.deployment_type == 'full'
           uses: easingthemes/ssh-deploy@main
           env:
-            SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+            SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
             ARGS: "-rlgoDzvc -i --delete-after --exclude=node_modules/ --exclude=.git/"
             SOURCE: "dist/"
-            REMOTE_HOST: ${{ secrets.SERVER_HOST }}
-            REMOTE_USER: ${{ secrets.SERVER_USER }}
+            REMOTE_HOST: ${{ secrets.HOST }}
+            REMOTE_USER: ${{ secrets.USERNAME }}
+            REMOTE_PORT: ${{ secrets.PORT }}
             TARGET: "/var/www/dongboge/"
             SCRIPT_AFTER: |
               echo "🔧 完整部署处理..."
