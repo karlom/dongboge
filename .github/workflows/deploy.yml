@@ -72,10 +72,12 @@ jobs:
         run: |
           echo "检查构建输出文件..."
           ls -la dist/
-          echo "检查CSS文件..."
-          find dist -name "*.css" | xargs ls -la
-          echo "检查HTML文件中的资源引用..."
-          grep -r "cdn.dongboge.cn" dist/index.html || echo "未找到CDN引用"
+          echo "检查客户端文件..."
+          ls -la dist/client/ || echo "没有client目录"
+          echo "检查服务端文件..."
+          ls -la dist/server/ || echo "没有server目录"
+          echo "检查HTML文件..."
+          find dist -name "*.html" | head -5 | xargs ls -la || echo "未找到HTML文件"
 
       - name: 增量上传静态资源到腾讯云COS
         timeout-minutes: 15
@@ -90,20 +92,42 @@ jobs:
           export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
 
           # 运行增量上传脚本
-          timeout 900 node scripts/incremental-upload.cjs || echo "上传脚本超时，但继续部署"
+          node scripts/incremental-upload.cjs
 
-      - name: 部署HTML和其他文件到服务器
+      - name: 部署客户端文件到服务器
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr --delete --exclude="fonts/" --exclude="images/"
-          path: dist/
+          path: dist/client/
           remote_path: /var/www/dongboge
           remote_host: ${{ secrets.HOST }}
           remote_user: ${{ secrets.USERNAME }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
 
-      - name: 重启Nginx
+      - name: 部署服务端文件到服务器
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete
+          path: dist/server/
+          remote_path: /var/www/dongboge/server
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 更新Nginx配置
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avz
+          path: deploy/nginx-server-mode.conf
+          remote_path: /etc/nginx/sites-available/dongboge.conf
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 启动Node.js服务器和重启Nginx
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -112,6 +136,33 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
           script: |
+            echo "🔄 设置环境变量..."
+            cd /var/www/dongboge
+
+            # 创建环境变量文件
+            cat > .env << EOF
+            PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
+            PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+            PUBLIC_CDN_URL=https://cdn.dongboge.cn
+            SITE_URL=https://dongboge.cn
+            NODE_ENV=production
+            HOST=127.0.0.1
+            PORT=3000
+            EOF
+
+            echo "🚀 启动Node.js服务器..."
+            # 停止旧的进程
+            pkill -f "node.*server/entry.mjs" || echo "没有运行的服务器进程"
+
+            # 启动新的服务器进程
+            nohup node server/entry.mjs > server.log 2>&1 &
+
+            # 等待服务器启动
+            sleep 3
+
             echo "🔄 重载Nginx..."
             sudo systemctl reload nginx
+
             echo "✅ 部署完成！"
+            echo "服务器进程状态:"
+            ps aux | grep "node.*server/entry.mjs" | grep -v grep || echo "服务器进程未找到"
