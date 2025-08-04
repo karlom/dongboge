@@ -66,7 +66,7 @@ const hasNavigation = prevPost || nextPost;
   .blog-navigation {
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 1px solid rgb(229, 231, 235);
+    border-top: 1px solid var(--border-color-light);
   }
 
   .nav-container {
@@ -93,21 +93,22 @@ const hasNavigation = prevPost || nextPost;
   .nav-link {
     display: block;
     padding: 1.5rem;
-    background: rgb(249, 250, 251);
-    border: 1px solid rgb(229, 231, 235);
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color-light);
     border-radius: 12px;
     text-decoration: none;
-    color: rgb(55, 65, 81);
-    transition: all 0.2s ease;
+    color: var(--text-on-light);
+    transition: all var(--transition-speed) ease;
     height: 100%;
     min-height: 120px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
 
   .nav-link:hover {
-    background: rgb(243, 244, 246);
-    border-color: rgb(59, 130, 246);
+    background-color: rgba(11, 105, 163, 0.05);
+    border-color: var(--action-blue);
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
   }
 
   .nav-direction {
@@ -116,7 +117,7 @@ const hasNavigation = prevPost || nextPost;
     margin-bottom: 0.75rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: rgb(107, 114, 128);
+    color: var(--text-secondary);
   }
 
   .nav-item.prev .nav-direction {
@@ -131,6 +132,7 @@ const hasNavigation = prevPost || nextPost;
     width: 1rem;
     height: 1rem;
     flex-shrink: 0;
+    color: var(--action-blue);
   }
 
   .nav-item.prev .nav-icon {
@@ -150,7 +152,7 @@ const hasNavigation = prevPost || nextPost;
     font-size: 1.125rem;
     font-weight: 600;
     line-height: 1.4;
-    color: rgb(17, 24, 39);
+    color: var(--text-on-light);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -158,7 +160,7 @@ const hasNavigation = prevPost || nextPost;
   }
 
   .nav-link:hover .nav-title {
-    color: rgb(59, 130, 246);
+    color: var(--action-blue);
   }
 
   .nav-placeholder {
@@ -202,12 +204,12 @@ const hasNavigation = prevPost || nextPost;
 
   /* 可访问性增强 */
   .nav-link:focus {
-    outline: 2px solid rgb(59, 130, 246);
+    outline: 2px solid var(--action-blue);
     outline-offset: 2px;
   }
 
   .nav-link:focus-visible {
-    outline: 2px solid rgb(59, 130, 246);
+    outline: 2px solid var(--action-blue);
     outline-offset: 2px;
   }
 
@@ -233,7 +235,7 @@ const hasNavigation = prevPost || nextPost;
     }
     
     .nav-link:hover {
-      border-color: rgb(17, 24, 39);
+      border-color: var(--text-on-light);
     }
   }
 
@@ -241,32 +243,6 @@ const hasNavigation = prevPost || nextPost;
   @media print {
     .blog-navigation {
       display: none;
-    }
-  }
-
-  /* 深色模式支持（如果需要） */
-  @media (prefers-color-scheme: dark) {
-    .nav-link {
-      background: rgb(31, 41, 55);
-      border-color: rgb(75, 85, 99);
-      color: rgb(229, 231, 235);
-    }
-    
-    .nav-link:hover {
-      background: rgb(55, 65, 81);
-      border-color: rgb(59, 130, 246);
-    }
-    
-    .nav-direction {
-      color: rgb(156, 163, 175);
-    }
-    
-    .nav-title {
-      color: rgb(243, 244, 246);
-    }
-    
-    .nav-link:hover .nav-title {
-      color: rgb(96, 165, 250);
     }
   }
 </style>
