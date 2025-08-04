@@ -62,7 +62,7 @@ jobs:
         - name: 🚀 快速部署 (仅博客更新)
           if: steps.detect_changes.outputs.deployment_type == 'blog_only'
           uses: easingthemes/ssh-deploy@main
-          env:
+          with:
             SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
             SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
             ARGS: "-rlgoDzvc -i --exclude=node_modules/ --exclude=.git/"
@@ -71,6 +71,7 @@ jobs:
             REMOTE_USER: ${{ secrets.USERNAME }}
             REMOTE_PORT: ${{ secrets.PORT }}
             TARGET: "/var/www/dongboge/"
+            SSH_CMD_ARGS: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
             SCRIPT_AFTER: |
               echo "🔄 重启服务..."
               sudo systemctl restart dongboge
@@ -79,7 +80,7 @@ jobs:
         - name: 🚀 完整部署 (功能更新)
           if: steps.detect_changes.outputs.deployment_type == 'full'
           uses: easingthemes/ssh-deploy@main
-          env:
+          with:
             SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
             SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
             ARGS: "-rlgoDzvc -i --delete-after --exclude=node_modules/ --exclude=.git/"
@@ -88,6 +89,7 @@ jobs:
             REMOTE_USER: ${{ secrets.USERNAME }}
             REMOTE_PORT: ${{ secrets.PORT }}
             TARGET: "/var/www/dongboge/"
+            SSH_CMD_ARGS: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
             SCRIPT_AFTER: |
               echo "🔧 完整部署处理..."
               sudo chown -R www-data:www-data /var/www/dongboge
