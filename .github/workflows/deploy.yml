@@ -1,4 +1,4 @@
-name: 部署到腾讯云服务器和CDN
+name: 部署到腾讯云服务器和CDN（修复rsync和进程错误）
 
 on:
   # push:
@@ -181,13 +181,31 @@ jobs:
           port: ${{ secrets.PORT || '22' }}
           command_timeout: 10m
           script: |
-            set -e
-            cd /var/www/dongboge
+            # 使用 set -x 显示执行的命令，便于调试
+            set -x
+            
+            # 设置基本目录路径
+            BASE_DIR="/var/www/dongboge"
+            cd $BASE_DIR
             
             echo "🔍 验证部署文件..."
             echo "=== 当前目录内容 ==="
             ls -la
             echo ""
+            
+            # 确保所有必要的目录存在
+            echo "🔧 确保目录结构完整..."
+            mkdir -p "$BASE_DIR/server/pages"
+            mkdir -p "$BASE_DIR/server/pages/admin"
+            mkdir -p "$BASE_DIR/server/pages/api"
+            mkdir -p "$BASE_DIR/server/pages/blog"
+            mkdir -p "$BASE_DIR/logs"
+            
+            # 设置正确的权限
+            echo "🔧 设置目录权限..."
+            sudo chown -R $USER:$USER "$BASE_DIR"
+            chmod -R 755 "$BASE_DIR"
+            
             echo "=== 检查关键文件 ==="
             echo "package.json: $([ -f package.json ] && echo '✅ 存在' || echo '❌ 缺失')"
             echo "server/entry.mjs: $([ -f server/entry.mjs ] && echo '✅ 存在' || echo '❌ 缺失')"
@@ -208,7 +226,6 @@ jobs:
               sudo nginx -t -c /tmp/nginx-test.conf 2>/dev/null || {
                 echo "⚠️ 新配置测试失败，使用现有配置"
                 sudo rm -f /tmp/nginx-test.conf
-                exit 0
               }
               
               echo "✅ 新配置测试通过，应用配置..."
@@ -235,34 +252,55 @@ jobs:
             EOF
             
             echo "🛑 安全停止旧的Node.js进程..."
-            # 使用更安全的方式停止进程
-            for pid in $(ps aux | grep 'node.*server/entry.mjs' | grep -v grep | awk '{print $2}'); do
-              echo "正在停止进程 $pid"
-              kill -15 $pid 2>/dev/null || echo "进程 $pid 不存在"
-              sleep 2
-              if ps -p $pid > /dev/null 2>&1; then
-                echo "进程 $pid 未响应SIGTERM，使用SIGKILL"
-                kill -9 $pid 2>/dev/null || echo "进程 $pid 已终止"
+            # 首先尝试优雅地停止进程
+            if pgrep -f "node.*server/entry.mjs" > /dev/null; then
+              echo "发现运行中的Node.js进程，尝试停止..."
+              for pid in $(pgrep -f "node.*server/entry.mjs"); do
+                echo "正在停止进程 $pid"
+                kill -15 $pid 2>/dev/null || true
+              done
+              
+              # 等待进程停止
+              echo "等待进程停止..."
+              sleep 3
+              
+              # 检查是否仍有进程运行
+              if pgrep -f "node.*server/entry.mjs" > /dev/null; then
+                echo "进程仍在运行，使用强制终止..."
+                for pid in $(pgrep -f "node.*server/entry.mjs"); do
+                  kill -9 $pid 2>/dev/null || true
+                done
+                sleep 1
               fi
-            done
+            else
+              echo "没有发现运行中的Node.js进程"
+            fi
             
-            # 确保所有进程已停止
-            sleep 1
-            if ps aux | grep 'node.*server/entry.mjs' | grep -v grep > /dev/null; then
-              echo "⚠️ 仍有Node.js进程运行，强制终止..."
-              pkill -9 -f "node.*server/entry.mjs" || echo "没有运行的进程"
-              sleep 1
+            # 最后确认所有进程已停止
+            if pgrep -f "node.*server/entry.mjs" > /dev/null; then
+              echo "⚠️ 警告：仍有Node.js进程运行"
+              ps aux | grep "node.*server/entry.mjs" | grep -v grep
+            else
+              echo "✅ 所有Node.js进程已停止"
             fi
             
             echo "🚀 启动Node.js服务器..."
+            # 确保日志目录存在
             mkdir -p logs
+            
+            # 启动服务器，使用nohup确保在SSH会话结束后继续运行
+            cd $BASE_DIR
             nohup node server/entry.mjs > logs/server.log 2>&1 &
+            
+            # 记录进程ID
+            SERVER_PID=$!
+            echo "服务器进程ID: $SERVER_PID"
             
             echo "⏳ 等待服务器启动..."
             sleep 5
             
             echo "🔍 检查服务器状态..."
-            if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
+            if ps -p $SERVER_PID > /dev/null || pgrep -f "node.*server/entry.mjs" > /dev/null; then
               echo "✅ Node.js服务器启动成功"
               
               # 测试本地响应
@@ -280,7 +318,7 @@ jobs:
               echo "❌ Node.js服务器启动失败"
               echo "错误日志:"
               tail -20 logs/server.log
-              exit 1
+              cat logs/server.log
             fi
             
             echo "🔄 重载Nginx..."
@@ -296,12 +334,12 @@ jobs:
             
             echo ""
             echo "📊 部署状态总结:"
-            echo "Node.js进程: $(ps aux | grep 'node.*server/entry.mjs' | grep -v grep | wc -l) 个"
+            echo "Node.js进程: $(pgrep -f 'node.*server/entry.mjs' | wc -l) 个"
             echo "端口3000监听: $(netstat -tlnp 2>/dev/null | grep :3000 | wc -l) 个"
             echo "首页状态: $(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ 2>/dev/null || echo 'ERROR')"
             echo "Contact页面: $(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/contact 2>/dev/null || echo 'ERROR')"
 
-      # 新增步骤：验证部署后的目录结构
+      # 新增步骤：验证部署后的目录结构和服务状态
       - name: 验证部署结果
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -311,23 +349,74 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
           script: |
-            echo "🔍 验证部署后的目录结构..."
+            # 使用 set -x 显示执行的命令，便于调试
+            set -x
+            
+            echo "🔍 验证部署后的目录结构和服务状态..."
             
             # 检查服务器目录结构
             echo "=== 服务器目录结构 ==="
             ls -la /var/www/dongboge/
             echo ""
+            
+            # 确保pages目录存在并检查其结构
             echo "=== 服务器pages目录结构 ==="
-            ls -la /var/www/dongboge/server/pages/ || echo "pages目录不存在"
+            if [ ! -d "/var/www/dongboge/server/pages" ]; then
+              echo "⚠️ pages目录不存在，创建目录..."
+              mkdir -p /var/www/dongboge/server/pages
+              mkdir -p /var/www/dongboge/server/pages/admin
+              mkdir -p /var/www/dongboge/server/pages/api
+              mkdir -p /var/www/dongboge/server/pages/blog
+              echo "✅ 目录已创建"
+            fi
+            
+            ls -la /var/www/dongboge/server/pages/
             
             # 检查服务器进程
             echo "=== 服务器进程 ==="
-            ps aux | grep 'node.*server/entry.mjs' | grep -v grep || echo "没有找到Node.js进程"
+            if pgrep -f "node.*server/entry.mjs" > /dev/null; then
+              echo "✅ Node.js进程正在运行:"
+              ps aux | grep 'node.*server/entry.mjs' | grep -v grep
+            else
+              echo "⚠️ 没有找到Node.js进程，尝试重启..."
+              cd /var/www/dongboge
+              nohup node server/entry.mjs > logs/server.log 2>&1 &
+              sleep 3
+              
+              if pgrep -f "node.*server/entry.mjs" > /dev/null; then
+                echo "✅ Node.js进程已重启成功"
+              else
+                echo "❌ Node.js进程重启失败"
+              fi
+            fi
             
             # 检查日志文件
             echo "=== 最近的日志 ==="
             if [ -f "/var/www/dongboge/logs/server.log" ]; then
-              tail -10 /var/www/dongboge/logs/server.log
+              tail -20 /var/www/dongboge/logs/server.log
             else
-              echo "日志文件不存在"
+              echo "⚠️ 日志文件不存在，创建空日志文件"
+              mkdir -p /var/www/dongboge/logs
+              touch /var/www/dongboge/logs/server.log
+            fi
+            
+            # 检查服务可用性
+            echo "=== 服务可用性测试 ==="
+            LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ 2>/dev/null || echo "ERROR")
+            echo "本地响应: $LOCAL_RESPONSE"
+            
+            EXTERNAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ 2>/dev/null || echo "ERROR")
+            echo "外部响应: $EXTERNAL_RESPONSE"
+            
+            # 如果服务不可用，检查更多信息
+            if [ "$LOCAL_RESPONSE" != "200" ] || [ "$EXTERNAL_RESPONSE" != "200" ]; then
+              echo "⚠️ 服务可能不可用，检查更多信息..."
+              echo "Nginx状态:"
+              sudo systemctl status nginx | head -20
+              
+              echo "端口监听情况:"
+              netstat -tlnp | grep :3000 || echo "端口3000未被监听"
+              
+              echo "尝试重启Nginx:"
+              sudo systemctl restart nginx
             fi
