@@ -157,13 +157,7 @@ const budgetOptions = [
             填写咨询需求
           </h2>
 
-          <form
-            id="contactForm"
-            name="contact"
-            method="POST"
-            data-netlify="true"
-            class="space-y-4 sm:space-y-6"
-          >
+          <form id="contactForm" class="space-y-4 sm:space-y-6">
             <!-- 企业信息 -->
             <div class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0">
               <div>
@@ -636,62 +630,91 @@ const budgetOptions = [
 </Layout>
 
 <script>
+  import { submitContactForm } from "../lib/supabase.ts";
+
   // 表单提交处理
   document
     .getElementById("contactForm")
-    ?.addEventListener("submit", function (e) {
-      // 先进行验证，如果验证失败才阻止提交
+    ?.addEventListener("submit", async function (e) {
+      e.preventDefault(); // 阻止默认提交，使用Supabase
 
-      // 获取表单数据
-      const formData = new FormData(e.target as HTMLFormElement);
-      const data: Record<string, any> = Object.fromEntries(formData.entries());
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
 
       // 获取多选框数据
       const consultationTypes = Array.from(
         document.querySelectorAll('input[name="consultationType"]:checked')
-      ).map((cb: any) => cb.value);
-      data.consultationType = consultationTypes;
+      ).map((cb: HTMLInputElement) => cb.value);
 
-      // 简单的表单验证
-      if (
-        !data.companyName ||
-        !data.contactName ||
-        !data.phone ||
-        !data.requirements
-      ) {
-        e.preventDefault();
+      // 表单验证
+      const companyName = formData.get("companyName") as string;
+      const contactName = formData.get("contactName") as string;
+      const phone = formData.get("phone") as string;
+      const requirements = formData.get("requirements") as string;
+
+      if (!companyName || !contactName || !phone || !requirements) {
         alert("请填写必填项目");
         return;
       }
 
       if (consultationTypes.length === 0) {
-        e.preventDefault();
         alert("请至少选择一种咨询类型");
         return;
       }
 
-      // 将多选框数据合并到隐藏字段
-      const consultationTypesField = document.getElementById(
-        "consultationTypesHidden"
-      ) as HTMLInputElement;
-      if (consultationTypesField) {
-        consultationTypesField.value = consultationTypes.join(", ");
-      }
-
-      // 移除preventDefault，让表单正常提交到Netlify
-      // 如果使用其他服务，需要相应修改action属性
-
       // 显示提交中状态
-      const submitBtn = e.target.querySelector(
+      const submitBtn = form.querySelector(
         'button[type="submit"]'
       ) as HTMLButtonElement;
+      const originalText = submitBtn.innerHTML;
+
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerHTML =
           '<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 inline animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>提交中...';
       }
 
-      // 不阻止表单提交，让它正常提交到配置的服务
-      // e.preventDefault(); // 注释掉这行
+      try {
+        // 准备提交数据
+        const submissionData = {
+          company_name: companyName,
+          industry: (formData.get("industry") as string) || undefined,
+          contact_name: contactName,
+          position: (formData.get("position") as string) || undefined,
+          phone: phone,
+          email: (formData.get("email") as string) || undefined,
+          consultation_types: consultationTypes,
+          requirements: requirements,
+          budget: (formData.get("budget") as string) || undefined,
+        };
+
+        // 提交到Supabase
+        const result = await submitContactForm(submissionData);
+
+        if (result.success) {
+          // 成功处理
+          alert("感谢您的咨询申请！我们将在24小时内与您联系。");
+          form.reset(); // 重置表单
+
+          // 清除多选框选中状态
+          document
+            .querySelectorAll('input[name="consultationType"]')
+            .forEach((cb: HTMLInputElement) => {
+              cb.checked = false;
+            });
+        } else {
+          // 错误处理
+          alert("提交失败：" + result.error);
+        }
+      } catch (error) {
+        console.error("提交错误:", error);
+        alert("网络错误，请检查网络连接后重试");
+      } finally {
+        // 恢复按钮状态
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      }
     });
 </script>

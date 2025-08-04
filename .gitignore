@@ -24,6 +24,20 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 
+# 调试和测试文件
+debug-*.sql
+debug-*.js
+test-*.sql
+test-*.js
+fix-*.sql
+temp-*.sql
+force-*.sql
+setup-*.sql
+restore-*.sql
+remove-*.sql
+*测试*.md
+*调试*.md
+
 # 编辑器目录和文件
 .vscode/
 .codebuddy/

@@ -1,0 +1,424 @@
+---
+// 管理后台 - 联系表单提交记录
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="联系表单管理 - 东波哥" description="管理联系表单提交记录">
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 页面标题 -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">联系表单管理</h1>
+        <p class="mt-2 text-gray-600">查看和管理客户咨询申请</p>
+      </div>
+
+      <!-- 登录表单 -->
+      <div
+        id="loginSection"
+        class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6"
+      >
+        <h2 class="text-xl font-semibold mb-4">管理员登录</h2>
+        <form id="loginForm" class="space-y-4">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700"
+              >邮箱</label
+            >
+            <input
+              type="email"
+              id="email"
+              required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700">密码</label
+            >
+            <input
+              type="password"
+              id="password"
+              required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            登录
+          </button>
+        </form>
+      </div>
+
+      <!-- 数据展示区域 -->
+      <div id="dataSection" class="hidden">
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div
+                  class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">总提交数</p>
+                <p id="totalCount" class="text-2xl font-semibold text-gray-900">
+                  -
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div
+                  class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">待处理</p>
+                <p
+                  id="pendingCount"
+                  class="text-2xl font-semibold text-gray-900"
+                >
+                  -
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div
+                  class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">已完成</p>
+                <p
+                  id="completedCount"
+                  class="text-2xl font-semibold text-gray-900"
+                >
+                  -
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-center">
+              <button
+                id="logoutBtn"
+                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                退出登录
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">提交记录</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >企业信息</th
+                  >
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >联系人</th
+                  >
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >咨询类型</th
+                  >
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >状态</th
+                  >
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >提交时间</th
+                  >
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >操作</th
+                  >
+                </tr>
+              </thead>
+              <tbody
+                id="submissionsTable"
+                class="bg-white divide-y divide-gray-200"
+              >
+                <!-- 数据将通过JavaScript动态加载 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import {
+    supabase,
+    getContactSubmissions,
+    updateSubmissionStatus,
+  } from "../../lib/supabase.ts";
+
+  // 检查登录状态
+  async function checkAuthStatus() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      showDataSection();
+      loadSubmissions();
+    } else {
+      showLoginSection();
+    }
+  }
+
+  // 显示登录表单
+  function showLoginSection() {
+    document.getElementById("loginSection")?.classList.remove("hidden");
+    document.getElementById("dataSection")?.classList.add("hidden");
+  }
+
+  // 显示数据区域
+  function showDataSection() {
+    document.getElementById("loginSection")?.classList.add("hidden");
+    document.getElementById("dataSection")?.classList.remove("hidden");
+  }
+
+  // 登录处理
+  document
+    .getElementById("loginForm")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = (document.getElementById("email") as HTMLInputElement)
+        .value;
+      const password = (document.getElementById("password") as HTMLInputElement)
+        .value;
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          alert("登录失败: " + error.message);
+          return;
+        }
+
+        showDataSection();
+        loadSubmissions();
+      } catch (error) {
+        alert("登录错误: " + error);
+      }
+    });
+
+  // 退出登录
+  document.getElementById("logoutBtn")?.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    showLoginSection();
+  });
+
+  // 加载提交记录
+  async function loadSubmissions() {
+    try {
+      const result = await getContactSubmissions();
+
+      if (result.success && result.data) {
+        displaySubmissions(result.data);
+        updateStatistics(result.data);
+      } else {
+        alert("加载数据失败: " + result.error);
+      }
+    } catch (error) {
+      alert("加载数据错误: " + error);
+    }
+  }
+
+  // 显示提交记录
+  function displaySubmissions(submissions: any[]) {
+    const tbody = document.getElementById("submissionsTable");
+    if (!tbody) return;
+
+    tbody.innerHTML = submissions
+      .map(
+        (submission) => `
+      <tr>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm font-medium text-gray-900">${submission.company_name}</div>
+          <div class="text-sm text-gray-500">${submission.industry || "-"}</div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm font-medium text-gray-900">${submission.contact_name}</div>
+          <div class="text-sm text-gray-500">${submission.phone}</div>
+          <div class="text-sm text-gray-500">${submission.email || "-"}</div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="text-sm text-gray-900">
+            ${
+              Array.isArray(submission.consultation_types)
+                ? submission.consultation_types.join(", ")
+                : submission.consultation_types
+            }
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <select 
+            class="text-sm border rounded px-2 py-1 status-select" 
+            data-id="${submission.id}"
+            data-current="${submission.status}"
+          >
+            <option value="pending" ${submission.status === "pending" ? "selected" : ""}>待处理</option>
+            <option value="contacted" ${submission.status === "contacted" ? "selected" : ""}>已联系</option>
+            <option value="in_progress" ${submission.status === "in_progress" ? "selected" : ""}>处理中</option>
+            <option value="completed" ${submission.status === "completed" ? "selected" : ""}>已完成</option>
+            <option value="cancelled" ${submission.status === "cancelled" ? "selected" : ""}>已取消</option>
+          </select>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          ${new Date(submission.created_at).toLocaleString("zh-CN")}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <button 
+            class="text-blue-600 hover:text-blue-900 view-details-btn"
+            data-submission='${JSON.stringify(submission)}'
+          >
+            查看详情
+          </button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    // 绑定状态更新事件
+    document.querySelectorAll(".status-select").forEach((select) => {
+      select.addEventListener("change", async (e) => {
+        const target = e.target as HTMLSelectElement;
+        const id = target.dataset.id;
+        const newStatus = target.value;
+        const currentStatus = target.dataset.current;
+
+        if (id && newStatus !== currentStatus) {
+          const result = await updateSubmissionStatus(
+            id,
+            newStatus,
+            undefined,
+            "管理员"
+          );
+          if (result.success) {
+            target.dataset.current = newStatus;
+            loadSubmissions(); // 重新加载数据
+          } else {
+            alert("更新失败: " + result.error);
+            target.value = currentStatus || "pending"; // 恢复原值
+          }
+        }
+      });
+    });
+
+    // 绑定查看详情事件
+    document.querySelectorAll(".view-details-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const target = e.target as HTMLButtonElement;
+        const submission = JSON.parse(target.dataset.submission || "{}");
+        showSubmissionDetails(submission);
+      });
+    });
+  }
+
+  // 更新统计信息
+  function updateStatistics(submissions: any[]) {
+    const total = submissions.length;
+    const pending = submissions.filter((s) => s.status === "pending").length;
+    const completed = submissions.filter(
+      (s) => s.status === "completed"
+    ).length;
+
+    document.getElementById("totalCount")!.textContent = total.toString();
+    document.getElementById("pendingCount")!.textContent = pending.toString();
+    document.getElementById("completedCount")!.textContent =
+      completed.toString();
+  }
+
+  // 显示提交详情
+  function showSubmissionDetails(submission: any) {
+    const details = `
+企业名称: ${submission.company_name}
+所属行业: ${submission.industry || "-"}
+联系人: ${submission.contact_name}
+职位: ${submission.position || "-"}
+电话: ${submission.phone}
+邮箱: ${submission.email || "-"}
+咨询类型: ${Array.isArray(submission.consultation_types) ? submission.consultation_types.join(", ") : submission.consultation_types}
+预算范围: ${submission.budget || "-"}
+需求描述: ${submission.requirements}
+提交时间: ${new Date(submission.created_at).toLocaleString("zh-CN")}
+处理状态: ${submission.status}
+处理备注: ${submission.admin_notes || "-"}
+    `;
+
+    alert(details);
+  }
+
+  // 页面加载时检查登录状态
+  document.addEventListener("DOMContentLoaded", checkAuthStatus);
+</script>
