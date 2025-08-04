@@ -1,0 +1,64 @@
+# 快速部署版本 - 如果主要部署流程有问题时使用
+name: 快速部署（备用）
+
+on:
+  workflow_dispatch: # 只允许手动触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置Node.js环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: 清理并安装依赖
+        run: |
+          echo "清理缓存..."
+          npm cache clean --force
+          echo "安装依赖（忽略警告）..."
+          npm install --silent --no-audit --no-fund 2>/dev/null || npm install
+
+      - name: 构建项目
+        env:
+          PUBLIC_CDN_URL: https://cdn.dongboge.cn
+          SITE_URL: https://dongboge.cn
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+          NODE_ENV: production
+        run: |
+          echo "构建项目..."
+          npm run build
+
+      - name: 简单部署到服务器
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete
+          path: dist/
+          remote_path: /var/www/dongboge-backup
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 激活备用部署
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.PORT || '22' }}
+          script: |
+            echo "切换到备用部署..."
+            sudo rm -rf /var/www/dongboge-old
+            sudo mv /var/www/dongboge /var/www/dongboge-old
+            sudo mv /var/www/dongboge-backup /var/www/dongboge
+            sudo systemctl reload nginx
+            echo "✅ 快速部署完成！"

@@ -33,13 +33,29 @@ jobs:
 
       - name: 安装依赖
         run: |
-          echo "安装项目依赖..."
-          npm ci --prefer-offline --no-audit
+          echo "开始安装项目依赖..."
+          echo "这可能需要几分钟时间，请耐心等待..."
+
+          # 显示安装进度
+          npm ci --prefer-offline --no-audit --silent --no-fund &
+          PID=$!
+
+          # 显示进度点
+          while kill -0 $PID 2>/dev/null; do
+            echo -n "."
+            sleep 5
+          done
+          wait $PID
+
+          echo ""
+          echo "✅ 依赖安装完成"
 
       - name: 确保COS SDK依赖
         run: |
+          echo "检查COS SDK依赖..."
           chmod +x scripts/ensure-dependencies.cjs
           node scripts/ensure-dependencies.cjs
+          echo "✅ COS SDK检查完成"
 
       - name: 缓存构建产物
         uses: actions/cache@v3
@@ -116,18 +132,18 @@ jobs:
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
 
-      - name: 更新Nginx配置
+      - name: 上传Nginx配置到临时位置
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avz
           path: deploy/nginx-server-mode.conf
-          remote_path: /etc/nginx/sites-available/dongboge.conf
+          remote_path: /var/www/dongboge/nginx-server-mode.conf
           remote_host: ${{ secrets.HOST }}
           remote_user: ${{ secrets.USERNAME }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
 
-      - name: 启动Node.js服务器和重启Nginx
+      - name: 更新Nginx配置并启动服务器
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -136,9 +152,26 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
           script: |
-            echo "🔄 设置环境变量..."
+            echo "🔄 更新Nginx配置..."
             cd /var/www/dongboge
 
+            # 移动Nginx配置文件到正确位置
+            if [ -f "nginx-server-mode.conf" ]; then
+              sudo cp nginx-server-mode.conf /etc/nginx/sites-available/dongboge.conf
+              sudo ln -sf /etc/nginx/sites-available/dongboge.conf /etc/nginx/sites-enabled/dongboge.conf
+              echo "✅ Nginx配置已更新"
+            else
+              echo "⚠️ Nginx配置文件未找到，使用现有配置"
+            fi
+
+            # 测试Nginx配置
+            sudo nginx -t
+            if [ $? -ne 0 ]; then
+              echo "❌ Nginx配置测试失败"
+              exit 1
+            fi
+
+            echo "🔄 设置环境变量..."
             # 创建环境变量文件
             cat > .env << EOF
             PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
@@ -159,6 +192,15 @@ jobs:
 
             # 等待服务器启动
             sleep 3
+
+            # 检查服务器是否启动成功
+            if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
+              echo "✅ Node.js服务器启动成功"
+            else
+              echo "❌ Node.js服务器启动失败"
+              echo "查看错误日志:"
+              tail -10 server.log || echo "无法读取日志文件"
+            fi
 
             echo "🔄 重载Nginx..."
             sudo systemctl reload nginx

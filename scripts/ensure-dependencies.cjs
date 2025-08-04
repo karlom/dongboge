@@ -16,7 +16,7 @@ try {
 
     if (!fs.existsSync(cosSDKPath)) {
         console.log('📦 安装COS SDK...');
-        execSync('npm install cos-nodejs-sdk-v5@2.11.19 --save-dev', { stdio: 'inherit' });
+        execSync('npm install cos-nodejs-sdk-v5@2.11.19 --save-dev --silent --no-audit --no-fund', { stdio: 'pipe' });
     }
 
     // 验证安装
@@ -25,7 +25,7 @@ try {
         console.log('✅ COS SDK验证成功');
     } catch (error) {
         console.log('❌ COS SDK验证失败，重新安装...');
-        execSync('npm install cos-nodejs-sdk-v5@2.11.19 --save-dev --force', { stdio: 'inherit' });
+        execSync('npm install cos-nodejs-sdk-v5@2.11.19 --save-dev --force --silent --no-audit --no-fund', { stdio: 'pipe' });
         require('cos-nodejs-sdk-v5');
         console.log('✅ COS SDK重新安装成功');
     }
