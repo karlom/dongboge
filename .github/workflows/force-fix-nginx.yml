@@ -1,0 +1,43 @@
+name: 强制修复Nginx配置
+
+on:
+  workflow_dispatch: # 手动触发
+
+jobs:
+  force-fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 上传强制修复脚本
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avz
+          path: deploy/force-fix-nginx.sh
+          remote_path: /var/www/dongboge/force-fix-nginx.sh
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 执行强制修复
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.PORT || '22' }}
+          script: |
+            cd /var/www/dongboge
+            chmod +x force-fix-nginx.sh
+
+            # 设置环境变量
+            export PUBLIC_SUPABASE_URL="${{ secrets.PUBLIC_SUPABASE_URL }}"
+            export PUBLIC_SUPABASE_ANON_KEY="${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}"
+
+            # 执行强制修复
+            ./force-fix-nginx.sh
