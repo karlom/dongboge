@@ -1,0 +1,151 @@
+name: 修复版部署到腾讯云服务器和CDN
+
+on:
+  workflow_dispatch: # 只允许手动触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置Node.js环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: 安装依赖
+        run: |
+          echo "安装项目依赖..."
+          npm ci --prefer-offline --no-audit --silent --no-fund
+
+      - name: 确保COS SDK依赖
+        run: |
+          echo "检查COS SDK依赖..."
+          chmod +x scripts/ensure-dependencies.cjs
+          node scripts/ensure-dependencies.cjs
+
+      - name: 构建项目
+        env:
+          PUBLIC_CDN_URL: https://cdn.dongboge.cn
+          SITE_URL: https://dongboge.cn
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+          NODE_ENV: production
+        run: |
+          echo "构建项目..."
+          npm run build
+
+      - name: 检查构建输出
+        run: |
+          echo "检查构建输出..."
+          ls -la dist/
+          ls -la dist/client/ || echo "没有client目录"
+          ls -la dist/server/ || echo "没有server目录"
+
+      - name: 增量上传静态资源到腾讯云COS
+        timeout-minutes: 10
+        run: |
+          echo "上传静态资源到CDN..."
+          export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
+          export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
+          export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
+          export TENCENT_COS_REGION=ap-guangzhou
+          export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
+          node scripts/incremental-upload.cjs
+
+      - name: 部署客户端文件到服务器
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete --exclude="fonts/" --exclude="images/"
+          path: dist/client/
+          remote_path: /var/www/dongboge
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 部署服务端文件到服务器
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete
+          path: dist/server/
+          remote_path: /var/www/dongboge/server
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 上传配置文件
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avz
+          path: deploy/
+          remote_path: /var/www/dongboge/deploy
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 执行部署脚本
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.PORT || '22' }}
+          script: |
+            cd /var/www/dongboge
+
+            echo "🔧 设置权限..."
+            chmod +x deploy/safe-deploy.sh
+
+            echo "🚀 执行部署..."
+            export PUBLIC_SUPABASE_URL="${{ secrets.PUBLIC_SUPABASE_URL }}"
+            export PUBLIC_SUPABASE_ANON_KEY="${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}"
+
+            # 简化部署流程
+            echo "📝 更新Nginx配置..."
+            if [ -f "deploy/nginx-simple.conf" ]; then
+              sudo cp deploy/nginx-simple.conf /etc/nginx/sites-available/dongboge.conf
+              sudo ln -sf /etc/nginx/sites-available/dongboge.conf /etc/nginx/sites-enabled/dongboge.conf
+              echo "✅ Nginx配置已更新"
+            fi
+
+            echo "🔄 设置环境变量..."
+            cat > .env << EOF
+            PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
+            PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+            PUBLIC_CDN_URL=https://cdn.dongboge.cn
+            SITE_URL=https://dongboge.cn
+            NODE_ENV=production
+            HOST=127.0.0.1
+            PORT=3000
+            EOF
+
+            echo "🚀 启动Node.js服务器..."
+            pkill -f "node.*server/entry.mjs" || echo "没有运行的服务器进程"
+
+            if [ -f "server/entry.mjs" ]; then
+              nohup node server/entry.mjs > server.log 2>&1 &
+              sleep 3
+              
+              if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
+                echo "✅ Node.js服务器启动成功"
+              else
+                echo "❌ Node.js服务器启动失败"
+                tail -10 server.log || echo "无法读取日志"
+              fi
+            else
+              echo "❌ 服务器入口文件不存在"
+            fi
+
+            echo "🔄 测试并重载Nginx..."
+            sudo nginx -t && sudo systemctl reload nginx
+
+            echo "✅ 部署完成！"
