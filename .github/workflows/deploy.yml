@@ -324,6 +324,90 @@ jobs:
             fi
             
             echo "✅ 完整部署成功！"
+            
+            # 创建内联修复脚本（解决scripts文件夹不存在的问题）
+            echo "🔧 创建服务器修复脚本..."
+            cat > fix-server.sh << 'SCRIPT_EOF'
+#!/bin/bash
+echo "🚀 开始服务器修复..."
+
+# 检查关键文件
+if [ ! -f "server/entry.mjs" ]; then
+    echo "❌ server/entry.mjs 不存在！"
+    exit 1
+fi
+
+# 创建必要目录
+mkdir -p logs backup
+
+# 安装PM2（如果需要）
+if ! command -v pm2 >/dev/null 2>&1; then
+    echo "📦 安装PM2..."
+    npm install -g pm2
+fi
+
+# 停止现有服务
+echo "🛑 停止现有服务..."
+pm2 stop dongboge 2>/dev/null || true
+pm2 delete dongboge 2>/dev/null || true
+pkill -f "node.*server/entry.mjs" 2>/dev/null || true
+
+sleep 2
+
+# 启动服务
+echo "🚀 启动服务..."
+pm2 start server/entry.mjs --name dongboge --log logs/server.log --error logs/error.log --out logs/out.log
+pm2 save
+
+sleep 5
+
+# 检查状态
+if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
+    echo "✅ 服务启动成功！"
+    pm2 status dongboge
+    
+    # 检查端口
+    if netstat -tlnp | grep :3000 > /dev/null; then
+        echo "✅ 端口3000正在监听"
+        
+        # 测试响应
+        sleep 3
+        LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ 2>/dev/null || echo "ERROR")
+        echo "本地响应: $LOCAL_RESPONSE"
+        
+        if [ "$LOCAL_RESPONSE" = "200" ]; then
+            echo "🎉 服务完全正常！"
+        else
+            echo "⚠️ 服务启动但响应异常"
+            tail -10 logs/server.log
+        fi
+    else
+        echo "❌ 端口3000未监听"
+        pm2 logs dongboge --lines 10
+    fi
+else
+    echo "❌ 服务启动失败"
+    pm2 logs dongboge --lines 10
+    
+    # 尝试直接启动
+    echo "尝试直接启动..."
+    nohup node server/entry.mjs > logs/server.log 2>&1 &
+    sleep 5
+    
+    if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
+        echo "✅ 直接启动成功"
+    else
+        echo "❌ 所有启动方法都失败"
+        tail -20 logs/server.log
+        exit 1
+    fi
+fi
+
+echo "修复完成！"
+SCRIPT_EOF
+
+            chmod +x fix-server.sh
+            echo "✅ 修复脚本已创建"
 
       # ==================== 增量部署流程 ====================
       - name: 增量部署 - rsync传输
