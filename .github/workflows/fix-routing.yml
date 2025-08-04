@@ -1,0 +1,44 @@
+name: 修复路由问题
+
+on:
+  workflow_dispatch: # 手动触发
+
+jobs:
+  fix-routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 上传修复脚本
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avz
+          path: deploy/
+          remote_path: /var/www/dongboge/deploy
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 执行路由修复
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.PORT || '22' }}
+          script: |
+            cd /var/www/dongboge
+            chmod +x deploy/quick-fix-routing.sh
+            chmod +x deploy/diagnose-routing.sh
+
+            echo "🔍 运行诊断..."
+            ./deploy/diagnose-routing.sh
+
+            echo ""
+            echo "🔧 执行修复..."
+            ./deploy/quick-fix-routing.sh
