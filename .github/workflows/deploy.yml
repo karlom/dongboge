@@ -1,4 +1,4 @@
-name: 部署到腾讯云服务器和CDN（已禁用）
+name: 部署到腾讯云服务器和CDN
 
 on:
   # push:
@@ -110,6 +110,33 @@ jobs:
           # 运行增量上传脚本
           node scripts/incremental-upload.cjs
 
+      # 新增步骤：确保服务器上的目录结构存在
+      - name: 确保服务器目录结构
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.PORT || '22' }}
+          script: |
+            echo "🔍 检查并创建必要的目录结构..."
+            
+            # 设置基本目录路径
+            BASE_DIR="/var/www/dongboge"
+            
+            # 创建所有必要的目录结构
+            mkdir -p "$BASE_DIR/server/pages"
+            mkdir -p "$BASE_DIR/server/pages/admin"
+            mkdir -p "$BASE_DIR/server/pages/api"
+            mkdir -p "$BASE_DIR/server/pages/blog"
+            
+            # 设置正确的权限
+            sudo chown -R $USER:$USER "$BASE_DIR"
+            chmod -R 755 "$BASE_DIR"
+            
+            echo "✅ 目录结构已创建并设置权限"
+
       - name: 部署客户端文件到服务器
         uses: burnett01/rsync-deployments@6.0.0
         with:
@@ -121,10 +148,11 @@ jobs:
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
 
+      # 修改服务端文件部署步骤，使用rsync-path参数确保目录存在
       - name: 部署服务端文件到服务器
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr --delete
+          switches: -avzr --delete --rsync-path="mkdir -p /var/www/dongboge/server && rsync"
           path: dist/server/
           remote_path: /var/www/dongboge/server
           remote_host: ${{ secrets.HOST }}
@@ -151,11 +179,29 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
+          command_timeout: 10m
           script: |
-            echo "🔄 更新Nginx配置..."
+            set -e
             cd /var/www/dongboge
-
-            # 移动Nginx配置文件到正确位置
+            
+            echo "🔍 验证部署文件..."
+            echo "=== 当前目录内容 ==="
+            ls -la
+            echo ""
+            echo "=== 检查关键文件 ==="
+            echo "package.json: $([ -f package.json ] && echo '✅ 存在' || echo '❌ 缺失')"
+            echo "server/entry.mjs: $([ -f server/entry.mjs ] && echo '✅ 存在' || echo '❌ 缺失')"
+            echo "client目录: $([ -d client ] && echo '✅ 存在' || echo '❌ 缺失')"
+            
+            if [ ! -f package.json ]; then
+              echo "❌ package.json 缺失，部署失败"
+              exit 1
+            fi
+            
+            echo "📦 安装生产依赖..."
+            npm install --production --silent
+            
+            echo "🔧 更新Nginx配置..."
             if [ -f "nginx-config.conf" ]; then
               echo "📝 测试新的Nginx配置..."
               sudo cp nginx-config.conf /tmp/nginx-test.conf
@@ -173,16 +219,11 @@ jobs:
             else
               echo "⚠️ Nginx配置文件未找到，使用现有配置"
             fi
-
-            # 测试Nginx配置
+            
+            echo "🧪 测试Nginx配置..."
             sudo nginx -t
-            if [ $? -ne 0 ]; then
-              echo "❌ Nginx配置测试失败"
-              exit 1
-            fi
-
+            
             echo "🔄 设置环境变量..."
-            # 创建环境变量文件
             cat > .env << EOF
             PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
             PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
@@ -192,29 +233,101 @@ jobs:
             HOST=127.0.0.1
             PORT=3000
             EOF
-
+            
+            echo "🛑 安全停止旧的Node.js进程..."
+            # 使用更安全的方式停止进程
+            for pid in $(ps aux | grep 'node.*server/entry.mjs' | grep -v grep | awk '{print $2}'); do
+              echo "正在停止进程 $pid"
+              kill -15 $pid 2>/dev/null || echo "进程 $pid 不存在"
+              sleep 2
+              if ps -p $pid > /dev/null 2>&1; then
+                echo "进程 $pid 未响应SIGTERM，使用SIGKILL"
+                kill -9 $pid 2>/dev/null || echo "进程 $pid 已终止"
+              fi
+            done
+            
+            # 确保所有进程已停止
+            sleep 1
+            if ps aux | grep 'node.*server/entry.mjs' | grep -v grep > /dev/null; then
+              echo "⚠️ 仍有Node.js进程运行，强制终止..."
+              pkill -9 -f "node.*server/entry.mjs" || echo "没有运行的进程"
+              sleep 1
+            fi
+            
             echo "🚀 启动Node.js服务器..."
-            # 停止旧的进程
-            pkill -f "node.*server/entry.mjs" || echo "没有运行的服务器进程"
-
-            # 启动新的服务器进程
-            nohup node server/entry.mjs > server.log 2>&1 &
-
-            # 等待服务器启动
-            sleep 3
-
-            # 检查服务器是否启动成功
+            mkdir -p logs
+            nohup node server/entry.mjs > logs/server.log 2>&1 &
+            
+            echo "⏳ 等待服务器启动..."
+            sleep 5
+            
+            echo "🔍 检查服务器状态..."
             if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
               echo "✅ Node.js服务器启动成功"
+              
+              # 测试本地响应
+              echo "🧪 测试本地服务器响应..."
+              LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ 2>/dev/null || echo "ERROR")
+              echo "本地响应: $LOCAL_RESPONSE"
+              
+              if [ "$LOCAL_RESPONSE" = "200" ]; then
+                echo "✅ 本地服务器响应正常"
+              else
+                echo "⚠️ 本地服务器响应异常，查看日志:"
+                tail -20 logs/server.log
+              fi
             else
               echo "❌ Node.js服务器启动失败"
-              echo "查看错误日志:"
-              tail -10 server.log || echo "无法读取日志文件"
+              echo "错误日志:"
+              tail -20 logs/server.log
+              exit 1
             fi
-
+            
             echo "🔄 重载Nginx..."
             sudo systemctl reload nginx
-
+            
             echo "✅ 部署完成！"
-            echo "服务器进程状态:"
-            ps aux | grep "node.*server/entry.mjs" | grep -v grep || echo "服务器进程未找到"
+            
+            echo ""
+            echo "🧪 最终测试..."
+            sleep 3
+            EXTERNAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ 2>/dev/null || echo "ERROR")
+            echo "外部访问响应: $EXTERNAL_RESPONSE"
+            
+            echo ""
+            echo "📊 部署状态总结:"
+            echo "Node.js进程: $(ps aux | grep 'node.*server/entry.mjs' | grep -v grep | wc -l) 个"
+            echo "端口3000监听: $(netstat -tlnp 2>/dev/null | grep :3000 | wc -l) 个"
+            echo "首页状态: $(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ 2>/dev/null || echo 'ERROR')"
+            echo "Contact页面: $(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/contact 2>/dev/null || echo 'ERROR')"
+
+      # 新增步骤：验证部署后的目录结构
+      - name: 验证部署结果
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.PORT || '22' }}
+          script: |
+            echo "🔍 验证部署后的目录结构..."
+            
+            # 检查服务器目录结构
+            echo "=== 服务器目录结构 ==="
+            ls -la /var/www/dongboge/
+            echo ""
+            echo "=== 服务器pages目录结构 ==="
+            ls -la /var/www/dongboge/server/pages/ || echo "pages目录不存在"
+            
+            # 检查服务器进程
+            echo "=== 服务器进程 ==="
+            ps aux | grep 'node.*server/entry.mjs' | grep -v grep || echo "没有找到Node.js进程"
+            
+            # 检查日志文件
+            echo "=== 最近的日志 ==="
+            if [ -f "/var/www/dongboge/logs/server.log" ]; then
+              tail -10 /var/www/dongboge/logs/server.log
+            else
+              echo "日志文件不存在"
+            fi
