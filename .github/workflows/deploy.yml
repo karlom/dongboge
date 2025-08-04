@@ -420,9 +420,9 @@ SCRIPT_EOF
         if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avz --checksum --delete --rsync-path="mkdir -p /var/www/dongboge && rsync"
+          switches: -avz --checksum --delete --rsync-path="mkdir -p /var/www/dongboge/client && rsync"
           path: dist/
-          remote_path: /var/www/dongboge
+          remote_path: /var/www/dongboge/client
           remote_host: ${{ secrets.HOST }}
           remote_user: ${{ secrets.USERNAME }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
