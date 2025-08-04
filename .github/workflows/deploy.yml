@@ -149,49 +149,36 @@ jobs:
           port: ${{ secrets.PORT || '22' }}
           script: |
             set -e
-            echo "🚀 开始混合架构部署准备..."
+            echo "🚀 开始服务器准备..."
             
-            # 1. 创建混合架构目录结构
-            echo "📁 创建混合架构目录结构..."
-            mkdir -p /var/www/dongboge/{server,client,logs,backup,node_modules}
+            # 创建目录结构
+            mkdir -p /var/www/dongboge/{server,client,logs,backup,node_modules} >/dev/null 2>&1
+            sudo chown -R $USER:$USER /var/www/dongboge >/dev/null 2>&1
+            chmod -R 755 /var/www/dongboge >/dev/null 2>&1
+            echo "📁 目录结构已创建"
             
-            # 确保client目录存在（静态文件）
-            mkdir -p /var/www/dongboge/client
-            
-            # 确保server目录存在（动态服务）
-            mkdir -p /var/www/dongboge/server
-            
-            # 2. 设置权限
-            echo "🔐 设置目录权限..."
-            sudo chown -R $USER:$USER /var/www/dongboge
-            chmod -R 755 /var/www/dongboge
-            
-            # 3. 备份现有部署
-            echo "💾 备份现有部署..."
+            # 备份现有部署
             cd /var/www
             if [ -d "dongboge/server" ] && [ -f "dongboge/server/entry.mjs" ]; then
-              tar -czf dongboge/backup/backup-$(date +%Y%m%d-%H%M%S).tar.gz dongboge/server dongboge/client dongboge/package.json dongboge/.env 2>/dev/null || echo "⚠️ 备份跳过"
-              # 只保留最近5个备份
-              cd dongboge/backup && ls -t backup-*.tar.gz | tail -n +6 | xargs rm -f 2>/dev/null || true
+              tar -czf dongboge/backup/backup-$(date +%Y%m%d-%H%M%S).tar.gz dongboge/server dongboge/client dongboge/package.json dongboge/.env >/dev/null 2>&1 || true
+              cd dongboge/backup && ls -t backup-*.tar.gz | tail -n +6 | xargs rm -f >/dev/null 2>&1 || true
+              echo "💾 已备份现有部署"
             fi
             
-            # 4. 停止现有服务
-            echo "🛑 停止现有服务..."
-            # 尝试使用PM2停止
+            # 停止现有服务
             if command -v pm2 >/dev/null 2>&1; then
-              pm2 stop dongboge 2>/dev/null || echo "PM2服务未运行"
-              pm2 delete dongboge 2>/dev/null || echo "PM2应用不存在"
+              pm2 stop dongboge >/dev/null 2>&1 || true
+              pm2 delete dongboge >/dev/null 2>&1 || true
             fi
             
-            # 强制停止Node.js进程
-            for pid in $(ps aux | grep 'node.*server/entry.mjs' | grep -v grep | awk '{print $2}'); do
-              echo "停止进程 $pid"
-              kill -15 $pid 2>/dev/null || true
-              sleep 2
-              kill -9 $pid 2>/dev/null || true
+            for pid in $(ps aux | grep 'node.*server/entry.mjs' | grep -v grep | awk '{print $2}' 2>/dev/null); do
+              kill -15 $pid >/dev/null 2>&1 || true
+              sleep 1
+              kill -9 $pid >/dev/null 2>&1 || true
             done
+            echo "🛑 已停止现有服务"
             
-            echo "✅ 混合架构服务器准备完成"
+            echo "✅ 服务器准备完成"
 
       - name: 完整部署 - 上传部署包
         if: steps.deploy_strategy.outputs.strategy == 'full'
@@ -217,42 +204,26 @@ jobs:
           command_timeout: 10m
           script: |
             set -e
-            echo "📦 解压和部署..."
+            echo "📦 开始部署..."
             cd /var/www/dongboge
             
             # 解压部署包
-            echo "📂 解压部署包..."
-            tar -xzf /tmp/deploy-*.tar.gz
+            tar -xzf /tmp/deploy-*.tar.gz >/dev/null 2>&1
             rm /tmp/deploy-*.tar.gz
+            echo "📂 部署包已解压"
             
-            # 验证文件完整性
-            echo "🔍 验证文件完整性..."
-            echo "=== 目录结构 ==="
-            ls -la
-            echo "=== 服务端文件 ==="
-            ls -la server/ || echo "server目录不存在"
-            echo "=== Pages文件 ==="
-            ls -la server/pages/ || echo "pages目录不存在"
-            echo "=== .mjs文件数量 ==="
-            find server -name "*.mjs" | wc -l || echo "0"
-            
-            # 检查关键文件
+            # 验证关键文件
             REQUIRED_FILES=("server/entry.mjs" "package.json")
             for file in "${REQUIRED_FILES[@]}"; do
               if [ ! -f "$file" ]; then
                 echo "❌ 关键文件缺失: $file"
                 exit 1
-              else
-                echo "✅ 关键文件存在: $file"
               fi
             done
+            echo "🔍 文件验证通过 ($(find server -name '*.mjs' | wc -l) 个.mjs文件)"
             
-            # 安装生产依赖
-            echo "📦 安装生产依赖..."
-            npm install --production --silent
-            
-            # 设置环境变量
-            echo "🔧 设置环境变量..."
+            # 安装依赖和设置环境
+            npm install --production --silent >/dev/null 2>&1
             cat > .env << EOF
             PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
             PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
@@ -262,158 +233,39 @@ jobs:
             HOST=127.0.0.1
             PORT=3000
             EOF
+            echo "📦 依赖安装完成，环境变量已设置"
             
             # 启动服务
-            echo "🚀 启动服务..."
             mkdir -p logs
-            
-            # 检查entry.mjs文件是否存在
-            if [ ! -f "server/entry.mjs" ]; then
-              echo "❌ server/entry.mjs 文件不存在！"
-              echo "当前目录内容："
-              ls -la
-              echo "server目录内容："
-              ls -la server/ || echo "server目录不存在"
-              exit 1
-            fi
-            
-            # 安装PM2（如果不存在）
             if ! command -v pm2 >/dev/null 2>&1; then
-              echo "📦 安装PM2..."
-              npm install -g pm2
+              npm install -g pm2 >/dev/null 2>&1
             fi
             
-            # 使用PM2启动服务
-            echo "使用PM2启动服务..."
-            pm2 start server/entry.mjs --name dongboge --log logs/server.log --error logs/error.log --out logs/out.log
-            pm2 save
+            pm2 start server/entry.mjs --name dongboge --log logs/server.log --error logs/error.log --out logs/out.log >/dev/null 2>&1
+            pm2 save >/dev/null 2>&1
+            sleep 5
             
-            # 等待服务启动
-            echo "⏳ 等待服务启动..."
-            sleep 8
-            
-            # 检查PM2状态
-            echo "=== PM2状态 ==="
-            pm2 status
-            
-            # 检查进程状态
-            echo "=== 进程检查 ==="
-            ps aux | grep "node.*server/entry.mjs" | grep -v grep || echo "没有找到Node.js进程"
-            
-            # 检查端口监听
-            echo "=== 端口检查 ==="
-            netstat -tlnp | grep :3000 || echo "端口3000未被监听"
-            
-            # 如果PM2启动失败，尝试直接启动
-            if ! ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-              echo "⚠️ PM2启动失败，尝试直接启动..."
-              pm2 logs dongboge --lines 10 || echo "无法获取PM2日志"
-              
-              echo "使用nohup直接启动..."
-              nohup node server/entry.mjs > logs/server.log 2>&1 &
-              sleep 5
-              
-              if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-                echo "✅ 直接启动成功"
+            # 检查服务状态
+            if ps aux | grep "node.*server/entry.mjs" | grep -v grep >/dev/null; then
+              if netstat -tlnp | grep :3000 >/dev/null; then
+                echo "✅ 服务启动成功，端口3000正在监听"
               else
-                echo "❌ 服务启动完全失败，查看日志："
-                tail -20 logs/server.log || echo "无法读取日志"
-                echo "=== 错误排查 ==="
-                echo "Node.js版本: $(node --version)"
-                echo "当前工作目录: $(pwd)"
-                echo "环境变量:"
-                cat .env || echo "没有.env文件"
-                exit 1
+                echo "⚠️ 服务已启动但端口未监听"
               fi
             else
-              echo "✅ PM2启动成功"
+              echo "⚠️ PM2启动失败，尝试直接启动..."
+              nohup node server/entry.mjs > logs/server.log 2>&1 &
+              sleep 3
+              if ps aux | grep "node.*server/entry.mjs" | grep -v grep >/dev/null; then
+                echo "✅ 直接启动成功"
+              else
+                echo "❌ 服务启动失败"
+                tail -10 logs/server.log 2>/dev/null || echo "无法读取日志"
+                exit 1
+              fi
             fi
             
             echo "✅ 完整部署成功！"
-            
-            # 创建内联修复脚本（解决scripts文件夹不存在的问题）
-            echo "🔧 创建服务器修复脚本..."
-            cat > fix-server.sh << 'SCRIPT_EOF'
-#!/bin/bash
-echo "🚀 开始服务器修复..."
-
-# 检查关键文件
-if [ ! -f "server/entry.mjs" ]; then
-    echo "❌ server/entry.mjs 不存在！"
-    exit 1
-fi
-
-# 创建必要目录
-mkdir -p logs backup
-
-# 安装PM2（如果需要）
-if ! command -v pm2 >/dev/null 2>&1; then
-    echo "📦 安装PM2..."
-    npm install -g pm2
-fi
-
-# 停止现有服务
-echo "🛑 停止现有服务..."
-pm2 stop dongboge 2>/dev/null || true
-pm2 delete dongboge 2>/dev/null || true
-pkill -f "node.*server/entry.mjs" 2>/dev/null || true
-
-sleep 2
-
-# 启动服务
-echo "🚀 启动服务..."
-pm2 start server/entry.mjs --name dongboge --log logs/server.log --error logs/error.log --out logs/out.log
-pm2 save
-
-sleep 5
-
-# 检查状态
-if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-    echo "✅ 服务启动成功！"
-    pm2 status dongboge
-    
-    # 检查端口
-    if netstat -tlnp | grep :3000 > /dev/null; then
-        echo "✅ 端口3000正在监听"
-        
-        # 测试响应
-        sleep 3
-        LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ 2>/dev/null || echo "ERROR")
-        echo "本地响应: $LOCAL_RESPONSE"
-        
-        if [ "$LOCAL_RESPONSE" = "200" ]; then
-            echo "🎉 服务完全正常！"
-        else
-            echo "⚠️ 服务启动但响应异常"
-            tail -10 logs/server.log
-        fi
-    else
-        echo "❌ 端口3000未监听"
-        pm2 logs dongboge --lines 10
-    fi
-else
-    echo "❌ 服务启动失败"
-    pm2 logs dongboge --lines 10
-    
-    # 尝试直接启动
-    echo "尝试直接启动..."
-    nohup node server/entry.mjs > logs/server.log 2>&1 &
-    sleep 5
-    
-    if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-        echo "✅ 直接启动成功"
-    else
-        echo "❌ 所有启动方法都失败"
-        tail -20 logs/server.log
-        exit 1
-    fi
-fi
-
-echo "修复完成！"
-SCRIPT_EOF
-
-            chmod +x fix-server.sh
-            echo "✅ 修复脚本已创建"
 
       # ==================== 增量部署流程 ====================
       - name: 增量部署 - rsync传输
@@ -438,21 +290,28 @@ SCRIPT_EOF
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
           script: |
-            echo "🔄 增量部署后重启服务..."
+            echo "🔄 重启服务..."
             cd /var/www/dongboge
             
-            # 安装依赖（如果package.json有变化）
-            npm install --production --silent
+            # 安装依赖
+            npm install --production --silent >/dev/null 2>&1
+            echo "📦 依赖更新完成"
             
             # 重启服务
             if command -v pm2 >/dev/null 2>&1; then
-              pm2 restart dongboge || pm2 start server/entry.mjs --name dongboge --log logs/server.log
+              pm2 restart dongboge >/dev/null 2>&1 || pm2 start server/entry.mjs --name dongboge --log logs/server.log >/dev/null 2>&1
             else
-              pkill -f "node.*server/entry.mjs" || echo "没有运行的进程"
+              pkill -f "node.*server/entry.mjs" >/dev/null 2>&1 || true
               nohup node server/entry.mjs > logs/server.log 2>&1 &
             fi
             
-            echo "✅ 增量部署完成！"
+            sleep 3
+            if ps aux | grep "node.*server/entry.mjs" | grep -v grep >/dev/null; then
+              echo "✅ 服务重启成功"
+            else
+              echo "❌ 服务重启失败"
+              exit 1
+            fi
 
       # ==================== 部署验证 ====================
       - name: 验证部署结果
@@ -467,39 +326,38 @@ SCRIPT_EOF
             echo "🧪 验证部署结果..."
             cd /var/www/dongboge
             
-            echo "=== 文件结构验证 ==="
-            ls -la server/pages/ | head -10 || echo "pages目录为空"
-            echo "服务端.mjs文件数量: $(find server -name '*.mjs' | wc -l)"
+            # 文件验证
+            MJS_COUNT=$(find server -name '*.mjs' 2>/dev/null | wc -l)
+            echo "📁 服务端文件: $MJS_COUNT 个.mjs文件"
             
-            echo "=== 进程状态验证 ==="
-            if command -v pm2 >/dev/null 2>&1; then
-              pm2 status dongboge 2>/dev/null || echo "PM2状态获取失败"
+            # 进程验证
+            if ps aux | grep "node.*server/entry.mjs" | grep -v grep >/dev/null; then
+              echo "✅ Node.js进程运行正常"
+            else
+              echo "❌ Node.js进程未运行"
             fi
-            ps aux | grep "node.*server/entry.mjs" | grep -v grep || echo "没有找到Node.js进程"
             
-            echo "=== 端口监听验证 ==="
-            netstat -tlnp | grep :3000 || echo "端口3000未被监听"
+            # 端口验证
+            if netstat -tlnp | grep :3000 >/dev/null; then
+              echo "✅ 端口3000正在监听"
+            else
+              echo "❌ 端口3000未监听"
+            fi
             
-            echo "=== 服务响应验证 ==="
-            sleep 3
+            # 服务响应验证
+            sleep 2
             LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ 2>/dev/null || echo "ERROR")
-            echo "本地响应: $LOCAL_RESPONSE"
-            
             EXTERNAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ 2>/dev/null || echo "ERROR")
-            echo "外部响应: $EXTERNAL_RESPONSE"
             
-            # 测试关键页面
-            CONTACT_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/contact 2>/dev/null || echo "ERROR")
-            echo "Contact页面: $CONTACT_RESPONSE"
+            echo "🌐 本地响应: $LOCAL_RESPONSE | 外部响应: $EXTERNAL_RESPONSE"
             
             if [ "$LOCAL_RESPONSE" = "200" ] && [ "$EXTERNAL_RESPONSE" = "200" ]; then
-              echo "✅ 部署验证成功！"
+              echo "🎉 部署验证成功！"
+              echo "📊 部署策略: ${{ steps.deploy_strategy.outputs.strategy }} | 时间: $(date '+%H:%M:%S')"
             else
-              echo "⚠️ 部署可能存在问题，查看日志："
-              tail -20 logs/server.log 2>/dev/null || echo "无法读取日志"
+              echo "⚠️ 部署可能存在问题"
+              if [ -f "logs/server.log" ]; then
+                echo "最近日志:"
+                tail -5 logs/server.log 2>/dev/null || echo "无法读取日志"
+              fi
             fi
-            
-            echo "=== 部署完成总结 ==="
-            echo "部署策略: ${{ steps.deploy_strategy.outputs.strategy }}"
-            echo "部署时间: $(date)"
-            echo "服务状态: $([ "$LOCAL_RESPONSE" = "200" ] && echo "正常" || echo "异常")"
