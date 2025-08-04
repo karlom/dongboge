@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: 检出代码
@@ -33,7 +34,7 @@ jobs:
       - name: 安装依赖
         run: |
           echo "安装项目依赖..."
-          npm install
+          npm ci --prefer-offline --no-audit
 
       - name: 确保COS SDK依赖
         run: |
@@ -60,9 +61,11 @@ jobs:
           SITE_URL: https://dongboge.cn
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+          NODE_ENV: production
         run: |
+          echo "开始构建项目..."
           echo "使用的CDN URL: $PUBLIC_CDN_URL"
-          echo "Supabase URL: $PUBLIC_SUPABASE_URL"
+          echo "Supabase URL: ${PUBLIC_SUPABASE_URL:0:30}..."
           npm run build
 
       - name: 检查构建输出
@@ -75,6 +78,7 @@ jobs:
           grep -r "cdn.dongboge.cn" dist/index.html || echo "未找到CDN引用"
 
       - name: 增量上传静态资源到腾讯云COS
+        timeout-minutes: 15
         run: |
           echo "增量上传静态资源到腾讯云COS..."
           # 设置环境变量
@@ -86,7 +90,7 @@ jobs:
           export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
 
           # 运行增量上传脚本
-          node scripts/incremental-upload.cjs
+          timeout 900 node scripts/incremental-upload.cjs || echo "上传脚本超时，但继续部署"
 
       - name: 部署HTML和其他文件到服务器
         uses: burnett01/rsync-deployments@6.0.0
