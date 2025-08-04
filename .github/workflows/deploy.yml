@@ -261,27 +261,66 @@ jobs:
             echo "🚀 启动服务..."
             mkdir -p logs
             
-            # 尝试使用PM2启动
-            if command -v pm2 >/dev/null 2>&1; then
-              echo "使用PM2启动服务..."
-              pm2 start server/entry.mjs --name dongboge --log logs/server.log
-              pm2 save
-            else
-              echo "使用nohup启动服务..."
-              nohup node server/entry.mjs > logs/server.log 2>&1 &
+            # 检查entry.mjs文件是否存在
+            if [ ! -f "server/entry.mjs" ]; then
+              echo "❌ server/entry.mjs 文件不存在！"
+              echo "当前目录内容："
+              ls -la
+              echo "server目录内容："
+              ls -la server/ || echo "server目录不存在"
+              exit 1
             fi
+            
+            # 安装PM2（如果不存在）
+            if ! command -v pm2 >/dev/null 2>&1; then
+              echo "📦 安装PM2..."
+              npm install -g pm2
+            fi
+            
+            # 使用PM2启动服务
+            echo "使用PM2启动服务..."
+            pm2 start server/entry.mjs --name dongboge --log logs/server.log --error logs/error.log --out logs/out.log
+            pm2 save
             
             # 等待服务启动
             echo "⏳ 等待服务启动..."
-            sleep 5
+            sleep 8
             
-            # 检查服务状态
-            if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-              echo "✅ Node.js服务启动成功"
+            # 检查PM2状态
+            echo "=== PM2状态 ==="
+            pm2 status
+            
+            # 检查进程状态
+            echo "=== 进程检查 ==="
+            ps aux | grep "node.*server/entry.mjs" | grep -v grep || echo "没有找到Node.js进程"
+            
+            # 检查端口监听
+            echo "=== 端口检查 ==="
+            netstat -tlnp | grep :3000 || echo "端口3000未被监听"
+            
+            # 如果PM2启动失败，尝试直接启动
+            if ! ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
+              echo "⚠️ PM2启动失败，尝试直接启动..."
+              pm2 logs dongboge --lines 10 || echo "无法获取PM2日志"
+              
+              echo "使用nohup直接启动..."
+              nohup node server/entry.mjs > logs/server.log 2>&1 &
+              sleep 5
+              
+              if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
+                echo "✅ 直接启动成功"
+              else
+                echo "❌ 服务启动完全失败，查看日志："
+                tail -20 logs/server.log || echo "无法读取日志"
+                echo "=== 错误排查 ==="
+                echo "Node.js版本: $(node --version)"
+                echo "当前工作目录: $(pwd)"
+                echo "环境变量:"
+                cat .env || echo "没有.env文件"
+                exit 1
+              fi
             else
-              echo "❌ Node.js服务启动失败，查看日志："
-              tail -20 logs/server.log
-              exit 1
+              echo "✅ PM2启动成功"
             fi
             
             echo "✅ 完整部署成功！"
