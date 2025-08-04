@@ -76,7 +76,7 @@ jobs:
           export TENCENT_COS_REGION=ap-guangzhou
           export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||')
           
-          node scripts/incremental-upload.cjs
+          node scripts/upload-to-cos.js
 
       # 仅博客部署 - 快速更新
       - name: 博客快速部署
