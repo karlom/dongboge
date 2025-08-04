@@ -630,13 +630,11 @@ const budgetOptions = [
 </Layout>
 
 <script>
-  import { submitContactForm } from "../lib/supabase.ts";
-
   // 表单提交处理
   document
     .getElementById("contactForm")
     ?.addEventListener("submit", async function (e) {
-      e.preventDefault(); // 阻止默认提交，使用Supabase
+      e.preventDefault(); // 阻止默认提交
 
       const form = e.target as HTMLFormElement;
       const formData = new FormData(form);
@@ -675,25 +673,22 @@ const budgetOptions = [
       }
 
       try {
-        // 准备提交数据
-        const submissionData = {
-          company_name: companyName,
-          industry: (formData.get("industry") as string) || undefined,
-          contact_name: contactName,
-          position: (formData.get("position") as string) || undefined,
-          phone: phone,
-          email: (formData.get("email") as string) || undefined,
-          consultation_types: consultationTypes,
-          requirements: requirements,
-          budget: (formData.get("budget") as string) || undefined,
-        };
+        // 将多选框数据添加到FormData
+        formData.set("consultationTypes", JSON.stringify(consultationTypes));
 
-        // 提交到Supabase
-        const result = await submitContactForm(submissionData);
+        // 提交到API端点
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
 
         if (result.success) {
           // 成功处理
-          alert("感谢您的咨询申请！我们将在24小时内与您联系。");
+          alert(
+            result.message || "感谢您的咨询申请！我们将在24小时内与您联系。"
+          );
           form.reset(); // 重置表单
 
           // 清除多选框选中状态

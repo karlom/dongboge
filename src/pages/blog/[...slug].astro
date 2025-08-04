@@ -1,35 +1,38 @@
 ---
-import { type CollectionEntry, getCollection, render } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
+export const prerender = true;
+
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import BlogPost from "../../layouts/BlogPost.astro";
 
 export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	
-	// 按发布日期降序排列（最新的在前）
-	const sortedPosts = posts.sort(
-		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-	);
-	
-	return sortedPosts.map((post, index) => {
-		// 计算上一篇和下一篇文章
-		const prevPost = index < sortedPosts.length - 1 ? sortedPosts[index + 1] : null;
-		const nextPost = index > 0 ? sortedPosts[index - 1] : null;
-		
-		return {
-			params: { slug: post.id },
-			props: {
-				post,
-				prevPost,
-				nextPost,
-			},
-		};
-	});
+  const posts = await getCollection("blog");
+
+  // 按发布日期降序排列（最新的在前）
+  const sortedPosts = posts.sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+
+  return sortedPosts.map((post, index) => {
+    // 计算上一篇和下一篇文章
+    const prevPost =
+      index < sortedPosts.length - 1 ? sortedPosts[index + 1] : null;
+    const nextPost = index > 0 ? sortedPosts[index - 1] : null;
+
+    return {
+      params: { slug: post.id },
+      props: {
+        post,
+        prevPost,
+        nextPost,
+      },
+    };
+  });
 }
 
 interface Props {
-	post: CollectionEntry<'blog'>;
-	prevPost?: CollectionEntry<'blog'>;
-	nextPost?: CollectionEntry<'blog'>;
+  post: CollectionEntry<"blog">;
+  prevPost?: CollectionEntry<"blog">;
+  nextPost?: CollectionEntry<"blog">;
 }
 
 const { post, prevPost, nextPost } = Astro.props;
@@ -37,5 +40,5 @@ const { Content } = await render(post);
 ---
 
 <BlogPost {...post.data} prevPost={prevPost} nextPost={nextPost}>
-	<Content />
+  <Content />
 </BlogPost>

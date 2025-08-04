@@ -1,220 +1,265 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.png';
-import Layout from '../layouts/BlogPost.astro';
+export const prerender = true;
+
+import AboutHeroImage from "../assets/blog-placeholder-about.png";
+import Layout from "../layouts/BlogPost.astro";
 ---
 
 <Layout
-	title="关于东波哥 - AI企业内训专家 | 程序员创业导师 "
-	description="东波哥（杨东波），20年IT从业经验，AI企业内训专家，曾就职于4399、三七互娱等知名公司。专注分享程序员职业规划、技术管理、AI应用和创业经验，帮助技术人员职业发展和创业成长。"
-	pubDate={new Date('August 02 2025')}
-	heroImage={AboutHeroImage}
+  title="关于东波哥 - AI企业内训专家 | 程序员创业导师 "
+  description="东波哥（杨东波），20年IT从业经验，AI企业内训专家，曾就职于4399、三七互娱等知名公司。专注分享程序员职业规划、技术管理、AI应用和创业经验，帮助技术人员职业发展和创业成长。"
+  pubDate={new Date("August 02 2025")}
+  heroImage={AboutHeroImage}
 >
-	<!-- 结构化数据 -->
-	<script type="application/ld+json">
-	{
-		"@context": "https://schema.org",
-		"@type": "Person",
-		"name": "杨东波",
-		"alternateName": "东波哥",
-		"description": "AI企业内训专家，程序员创业导师，20年IT从业经验",
-		"jobTitle": "AI企业内训专家",
-		"worksFor": {
-			"@type": "Organization",
-			"name": "东波哥说"
-		},
-		"alumniOf": [
-			{
-				"@type": "Organization",
-				"name": "4399小游戏"
-			},
-			{
-				"@type": "Organization", 
-				"name": "三七互娱"
-			},
-			{
-				"@type": "Organization",
-				"name": "广州益世界"
-			}
-		],
-		"address": {
-			"@type": "PostalAddress",
-			"addressLocality": "广州",
-			"addressRegion": "广东",
-			"addressCountry": "中国"
-		},
-		"birthPlace": {
-			"@type": "Place",
-			"name": "广东湛江吴川"
-		},
-		"knowsAbout": [
-			"人工智能",
-			"企业内训",
-			"程序员职业规划",
-			"技术管理",
-			"创业经验",
-			"AIGC技术",
-			"软件开发"
-		],
-		"url": "https://dongboge.cn/about",
-		"sameAs": [
-			"https://dongboge.cn"
-		]
-	}
-	</script>
+  <!-- 结构化数据 -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "杨东波",
+      "alternateName": "东波哥",
+      "description": "AI企业内训专家，程序员创业导师，20年IT从业经验",
+      "jobTitle": "AI企业内训专家",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "东波哥说"
+      },
+      "alumniOf": [
+        {
+          "@type": "Organization",
+          "name": "4399小游戏"
+        },
+        {
+          "@type": "Organization",
+          "name": "三七互娱"
+        },
+        {
+          "@type": "Organization",
+          "name": "广州益世界"
+        }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "广州",
+        "addressRegion": "广东",
+        "addressCountry": "中国"
+      },
+      "birthPlace": {
+        "@type": "Place",
+        "name": "广东湛江吴川"
+      },
+      "knowsAbout": [
+        "人工智能",
+        "企业内训",
+        "程序员职业规划",
+        "技术管理",
+        "创业经验",
+        "AIGC技术",
+        "软件开发"
+      ],
+      "url": "https://dongboge.cn/about",
+      "sameAs": ["https://dongboge.cn"]
+    }
+  </script>
 
-	<!-- 面包屑导航 -->
-	<nav class="mb-6" aria-label="面包屑导航">
-		<ol class="flex items-center space-x-2 text-sm text-gray-600">
-			<li><a href="/" class="hover:text-blue-600">首页</a></li>
-			<li class="before:content-['/'] before:mx-2">关于我</li>
-		</ol>
-	</nav>
+  <!-- 面包屑导航 -->
+  <nav class="mb-6" aria-label="面包屑导航">
+    <ol class="flex items-center space-x-2 text-sm text-gray-600">
+      <li><a href="/" class="hover:text-blue-600">首页</a></li>
+      <li class="before:content-['/'] before:mx-2">关于我</li>
+    </ol>
+  </nav>
 
-	<div class="prose prose-lg max-w-none">
-		<div class="mb-8">
-			<p class="text-xl text-gray-600 mb-4">
-				让我们用这篇文章正式认识一下，主要说三块内容：我是谁、我要做什么内容、我为什么要做这个博客。
-			</p>
-			<div class="flex flex-wrap gap-2 mb-6">
-				<span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">AI企业内训</span>
-				<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">程序员导师</span>
-				<span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">技术管理</span>
-				<span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">创业经验</span>
-				<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">20年IT经验</span>
-			</div>
-		</div>
+  <div class="prose prose-lg max-w-none">
+    <div class="mb-8">
+      <p class="text-xl text-gray-600 mb-4">
+        让我们用这篇文章正式认识一下，主要说三块内容：我是谁、我要做什么内容、我为什么要做这个博客。
+      </p>
+      <div class="flex flex-wrap gap-2 mb-6">
+        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+          >AI企业内训</span
+        >
+        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+          >程序员导师</span
+        >
+        <span
+          class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
+          >技术管理</span
+        >
+        <span
+          class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm"
+          >创业经验</span
+        >
+        <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm"
+          >20年IT经验</span
+        >
+      </div>
+    </div>
 
-		<h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">一、我是谁？</h2>
+    <h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">一、我是谁？</h2>
 
-		<h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">网站名字的由来</h3>
-		<p class="mb-6">
-			我的本名叫"杨东波"。我把公众号、视频号、小红书和抖音的名字都改为了"东波哥说"，同时也统一了一个头像。所以我用了dongboge.cn这个域名。
-		</p>
+    <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">
+      网站名字的由来
+    </h3>
+    <p class="mb-6">
+      我的本名叫"杨东波"。我把公众号、视频号、小红书和抖音的名字都改为了"东波哥说"，同时也统一了一个头像。所以我用了dongboge.cn这个域名。
+    </p>
 
-		<h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">个人简介</h3>
-		<p class="mb-6">
-			本人男，80后，广东湛江吴川人，现居广州海珠区广州塔旁边。拥有20年IT从业经验，专注于AI企业内训、程序员职业规划和技术管理领域。
-		</p>
+    <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">个人简介</h3>
+    <p class="mb-6">
+      本人男，80后，广东湛江吴川人，现居广州海珠区广州塔旁边。拥有20年IT从业经验，专注于AI企业内训、程序员职业规划和技术管理领域。
+    </p>
 
-		<h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">求学经历</h3>
-		<p class="mb-4">
-			2002年10月，我来到广州读大学。那是我第一次离开我所在的小县城吴川来到广州。从那时起我就开始了长达十几年的广州之旅。
-		</p>
-		<p class="mb-4">
-			我从小喜欢玩游戏，在高中的时候就确立了自己将来要从事的行业：IT行业。
-		</p>
-		<p class="mb-4">
-			高中时期，我把大部分的零花钱都拿来买《电脑报》、《电脑爱好者》、还有很多不记得名字的电脑类刊物，这些书在老家堆起来有将近一米五六，快和我一样高了。高二的时候和弟弟一起攒了些压岁钱，再加上磨了父亲两年得到的赞助，如愿买到了第一台电脑，天价七千多，也算是村子里的第一台电脑了。
-		</p>
-		<p class="mb-6">
-			高考第一次考上的不是软件专业，是CAD相关的；我觉得我一定要做软件开发才可以，于是就复读了。心里认定了一个：只要是软件专业，我就去读。后来我如愿考上了计算机科学和技术这个专业。
-		</p>
+    <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">求学经历</h3>
+    <p class="mb-4">
+      2002年10月，我来到广州读大学。那是我第一次离开我所在的小县城吴川来到广州。从那时起我就开始了长达十几年的广州之旅。
+    </p>
+    <p class="mb-4">
+      我从小喜欢玩游戏，在高中的时候就确立了自己将来要从事的行业：IT行业。
+    </p>
+    <p class="mb-4">
+      高中时期，我把大部分的零花钱都拿来买《电脑报》、《电脑爱好者》、还有很多不记得名字的电脑类刊物，这些书在老家堆起来有将近一米五六，快和我一样高了。高二的时候和弟弟一起攒了些压岁钱，再加上磨了父亲两年得到的赞助，如愿买到了第一台电脑，天价七千多，也算是村子里的第一台电脑了。
+    </p>
+    <p class="mb-6">
+      高考第一次考上的不是软件专业，是CAD相关的；我觉得我一定要做软件开发才可以，于是就复读了。心里认定了一个：只要是软件专业，我就去读。后来我如愿考上了计算机科学和技术这个专业。
+    </p>
 
-		<h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">职业生涯历程</h3>
-		<div class="space-y-4 mb-6">
-			<div class="border-l-4 border-blue-500 pl-4">
-				<p><strong>2005年</strong>：计算机科学与技术专业毕业，进入移动增值业务（SP）行业，开始软件开发职业生涯</p>
-			</div>
-			<div class="border-l-4 border-green-500 pl-4">
-				<p><strong>2007-2009年</strong>：与高中同学创业做网站开发，积累创业和项目管理经验</p>
-			</div>
-			<div class="border-l-4 border-purple-500 pl-4">
-				<p><strong>2009年</strong>：加入4399小游戏广州公司，开始游戏行业生涯，专注游戏开发和技术架构</p>
-			</div>
-			<div class="border-l-4 border-orange-500 pl-4">
-				<p><strong>2009-2023年</strong>：在广州菲音、三七互娱、广州益世界等知名互联网公司工作，担任技术管理职位</p>
-			</div>
-			<div class="border-l-4 border-red-500 pl-4">
-				<p><strong>2023年初</strong>：组织iTechClub线下技术沙龙，发现AIGC技术机遇，开始AI领域探索</p>
-			</div>
-			<div class="border-l-4 border-indigo-500 pl-4">
-				<p><strong>目前</strong>：专注AI企业内训业务，帮助企业和个人掌握AI技术应用</p>
-			</div>
-		</div>
+    <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">职业生涯历程</h3>
+    <div class="space-y-4 mb-6">
+      <div class="border-l-4 border-blue-500 pl-4">
+        <p>
+          <strong>2005年</strong
+          >：计算机科学与技术专业毕业，进入移动增值业务（SP）行业，开始软件开发职业生涯
+        </p>
+      </div>
+      <div class="border-l-4 border-green-500 pl-4">
+        <p>
+          <strong>2007-2009年</strong
+          >：与高中同学创业做网站开发，积累创业和项目管理经验
+        </p>
+      </div>
+      <div class="border-l-4 border-purple-500 pl-4">
+        <p>
+          <strong>2009年</strong
+          >：加入4399小游戏广州公司，开始游戏行业生涯，专注游戏开发和技术架构
+        </p>
+      </div>
+      <div class="border-l-4 border-orange-500 pl-4">
+        <p>
+          <strong>2009-2023年</strong
+          >：在广州菲音、三七互娱、广州益世界等知名互联网公司工作，担任技术管理职位
+        </p>
+      </div>
+      <div class="border-l-4 border-red-500 pl-4">
+        <p>
+          <strong>2023年初</strong
+          >：组织iTechClub线下技术沙龙，发现AIGC技术机遇，开始AI领域探索
+        </p>
+      </div>
+      <div class="border-l-4 border-indigo-500 pl-4">
+        <p>
+          <strong>目前</strong
+          >：专注AI企业内训业务，帮助企业和个人掌握AI技术应用
+        </p>
+      </div>
+    </div>
 
-		<h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">个人生活</h3>
-		<ul class="list-disc pl-6 mb-6 space-y-2">
-			<li>2011年：第一个孩子出生</li>
-			<li>2018年：第二个孩子出生</li>
-			<li>现在：已在广州安居乐业，实现了从偏远农村走向省城并扎根的小目标</li>
-		</ul>
+    <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">个人生活</h3>
+    <ul class="list-disc pl-6 mb-6 space-y-2">
+      <li>2011年：第一个孩子出生</li>
+      <li>2018年：第二个孩子出生</li>
+      <li>现在：已在广州安居乐业，实现了从偏远农村走向省城并扎根的小目标</li>
+    </ul>
 
-		<h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">二、我要写什么内容？</h2>
-		<p class="mb-4">
-			从05年至今，我已经工作二十个年头，期间也经历了很多个公司、岗位和同事。虽然不敢说事业有成，但是对工作也渐渐有了些积累和看法，自认可以帮助到后来的人，想把这些感悟写出来，帮助到后面进入职场的新同学。同时在创业的这两年时间里感悟和体验更是打工上班所不能比的丰富，我也想分享给你。
-		</p>
-		<p class="mb-4">我写的内容将包括：</p>
-		<ul class="list-disc pl-6 mb-6 space-y-2">
-			<li><strong>职场经验总结</strong>：过去二十年工作的职场经验总结，包括技术管理、团队协作等</li>
-			<li><strong>创业感悟和经验</strong>：从技术人员到创业者的转型经验分享</li>
-			<li><strong>AI使用案例和教程</strong>：AIGC技术应用、AI企业内训实战案例</li>
-			<li><strong>商业洞察和理解</strong>：技术与商业结合的思考和实践</li>
-			<li><strong>创业项目笔记</strong>：创业过程中的经验教训和心得体会</li>
-			<li><strong>线下活动通知和总结</strong>：iTechClub等技术沙龙活动分享</li>
-		</ul>
+    <h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">
+      二、我要写什么内容？
+    </h2>
+    <p class="mb-4">
+      从05年至今，我已经工作二十个年头，期间也经历了很多个公司、岗位和同事。虽然不敢说事业有成，但是对工作也渐渐有了些积累和看法，自认可以帮助到后来的人，想把这些感悟写出来，帮助到后面进入职场的新同学。同时在创业的这两年时间里感悟和体验更是打工上班所不能比的丰富，我也想分享给你。
+    </p>
+    <p class="mb-4">我写的内容将包括：</p>
+    <ul class="list-disc pl-6 mb-6 space-y-2">
+      <li>
+        <strong>职场经验总结</strong
+        >：过去二十年工作的职场经验总结，包括技术管理、团队协作等
+      </li>
+      <li><strong>创业感悟和经验</strong>：从技术人员到创业者的转型经验分享</li>
+      <li>
+        <strong>AI使用案例和教程</strong>：AIGC技术应用、AI企业内训实战案例
+      </li>
+      <li><strong>商业洞察和理解</strong>：技术与商业结合的思考和实践</li>
+      <li><strong>创业项目笔记</strong>：创业过程中的经验教训和心得体会</li>
+      <li><strong>线下活动通知和总结</strong>：iTechClub等技术沙龙活动分享</li>
+    </ul>
 
-		<h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">三、我为什么要做这个博客？</h2>
+    <h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">
+      三、我为什么要做这个博客？
+    </h2>
 
-		<h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">个人兴趣</h3>
-		<p class="mb-6">
-			在小学的时候我的理想是成为一个作家，后来这个理想变了，但我写作的爱好没变；我一直坚持写日记、技术博客。平时有很多想写的内容在脑子里晃来晃去，但是始终没有成文；一来是因为拖延症，二来是因为懒。到最近几年是因为自媒体的作用已经不仅仅是做一个记录，更是打造个人IP，建立影响力的最好载体，现在不做公众号就是亏的。
-		</p>
+    <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">个人兴趣</h3>
+    <p class="mb-6">
+      在小学的时候我的理想是成为一个作家，后来这个理想变了，但我写作的爱好没变；我一直坚持写日记、技术博客。平时有很多想写的内容在脑子里晃来晃去，但是始终没有成文；一来是因为拖延症，二来是因为懒。到最近几年是因为自媒体的作用已经不仅仅是做一个记录，更是打造个人IP，建立影响力的最好载体，现在不做公众号就是亏的。
+    </p>
 
-		<h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">想要帮助他人</h3>
-		<p class="mb-4">
-			我家里有三兄妹，我是大哥，我一直充当着榜样和带路人的角色；其实我很想要一个哥哥或是姐姐，希望也有人能带我一把。生活中如此，工作中也如此，在过去十多年的工作中，很少有人可以带我一把，都是从书本、名人传记等书面形式中得到别人的经验和感悟，没办法交互和交流，都是自己懵懵懂懂地去探索去碰撞得到的经验和成果，如果有前辈高人能带我一把，给我指点一下迷津，相信我可以走得更快更远。
-		</p>
-		<p class="mb-6">
-			已所欲，施于人。我想成为职场新同学的这个领路人的角色，做你们的大哥和方向灯，帮助你们走得更快，少走弯路。我想做你创业路上的好伙伴，成为你的矛或是成为你的盾，互相成就。
-		</p>
+    <h3 class="text-xl font-semibold mt-8 mb-4 text-gray-700">想要帮助他人</h3>
+    <p class="mb-4">
+      我家里有三兄妹，我是大哥，我一直充当着榜样和带路人的角色；其实我很想要一个哥哥或是姐姐，希望也有人能带我一把。生活中如此，工作中也如此，在过去十多年的工作中，很少有人可以带我一把，都是从书本、名人传记等书面形式中得到别人的经验和感悟，没办法交互和交流，都是自己懵懵懂懂地去探索去碰撞得到的经验和成果，如果有前辈高人能带我一把，给我指点一下迷津，相信我可以走得更快更远。
+    </p>
+    <p class="mb-6">
+      已所欲，施于人。我想成为职场新同学的这个领路人的角色，做你们的大哥和方向灯，帮助你们走得更快，少走弯路。我想做你创业路上的好伙伴，成为你的矛或是成为你的盾，互相成就。
+    </p>
 
-		<h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">四、你能获得什么？</h2>
+    <h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">
+      四、你能获得什么？
+    </h2>
 
-		<div class="grid md:grid-cols-2 gap-8 mt-8">
-			<div class="bg-blue-50 p-6 rounded-lg">
-				<h3 class="text-lg font-semibold mb-4 text-blue-800">AI技术与创新</h3>
-				<ul class="list-disc pl-4 space-y-2 text-blue-700">
-					<li>AIGC技术趋势解读与应用实践</li>
-					<li>AI企业内训实战经验分享</li>
-					<li>企业AI转型案例分析</li>
-					<li>最新AI工具使用技巧</li>
-				</ul>
-			</div>
+    <div class="grid md:grid-cols-2 gap-8 mt-8">
+      <div class="bg-blue-50 p-6 rounded-lg">
+        <h3 class="text-lg font-semibold mb-4 text-blue-800">AI技术与创新</h3>
+        <ul class="list-disc pl-4 space-y-2 text-blue-700">
+          <li>AIGC技术趋势解读与应用实践</li>
+          <li>AI企业内训实战经验分享</li>
+          <li>企业AI转型案例分析</li>
+          <li>最新AI工具使用技巧</li>
+        </ul>
+      </div>
 
-			<div class="bg-green-50 p-6 rounded-lg">
-				<h3 class="text-lg font-semibold mb-4 text-green-800">职场进阶指南</h3>
-				<ul class="list-disc pl-4 space-y-2 text-green-700">
-					<li>技术人员转型管理的经验分享</li>
-					<li>程序员职业生涯规划建议</li>
-					<li>技术管理的实战心得</li>
-					<li>跨部门沟通与协作技巧</li>
-				</ul>
-			</div>
+      <div class="bg-green-50 p-6 rounded-lg">
+        <h3 class="text-lg font-semibold mb-4 text-green-800">职场进阶指南</h3>
+        <ul class="list-disc pl-4 space-y-2 text-green-700">
+          <li>技术人员转型管理的经验分享</li>
+          <li>程序员职业生涯规划建议</li>
+          <li>技术管理的实战心得</li>
+          <li>跨部门沟通与协作技巧</li>
+        </ul>
+      </div>
 
-			<div class="bg-purple-50 p-6 rounded-lg md:col-span-2">
-				<h3 class="text-lg font-semibold mb-4 text-purple-800">创业经验萃取</h3>
-				<ul class="list-disc pl-4 space-y-2 text-purple-700 md:columns-2">
-					<li>从0到1的创业实战分享</li>
-					<li>创业过程中的坑与教训</li>
-					<li>商业模式选择与调整经验</li>
-					<li>团队组建与管理心得</li>
-				</ul>
-			</div>
-		</div>
+      <div class="bg-purple-50 p-6 rounded-lg md:col-span-2">
+        <h3 class="text-lg font-semibold mb-4 text-purple-800">创业经验萃取</h3>
+        <ul class="list-disc pl-4 space-y-2 text-purple-700 md:columns-2">
+          <li>从0到1的创业实战分享</li>
+          <li>创业过程中的坑与教训</li>
+          <li>商业模式选择与调整经验</li>
+          <li>团队组建与管理心得</li>
+        </ul>
+      </div>
+    </div>
 
-		<h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">五、互动与交流</h2>
+    <h2 class="text-2xl font-bold mt-12 mb-6 text-gray-800">五、互动与交流</h2>
 
-		<div class="bg-gray-50 p-6 rounded-lg">
-			<h3 class="text-lg font-semibold mb-4 text-gray-800">即时互动</h3>
-			<ul class="list-disc pl-4 space-y-2 text-gray-700">
-				<li><strong>微信号</strong>：codeo4（备注：博客读者）</li>
-			</ul>
-		</div>
+    <div class="bg-gray-50 p-6 rounded-lg">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800">即时互动</h3>
+      <ul class="list-disc pl-4 space-y-2 text-gray-700">
+        <li><strong>微信号</strong>：codeo4（备注：博客读者）</li>
+      </ul>
+    </div>
 
-		<div class="mt-12 p-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg text-center">
-			<p class="text-lg font-medium">
-				期待与你在这里相遇，一起成长，一起进步！
-			</p>
-		</div>
-	</div>
+    <div
+      class="mt-12 p-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg text-center"
+    >
+      <p class="text-lg font-medium">
+        期待与你在这里相遇，一起成长，一起进步！
+      </p>
+    </div>
+  </div>
 </Layout>

@@ -2,109 +2,112 @@ name: 部署到腾讯云服务器和CDN
 
 on:
   push:
-    branches: [ main, master ]
-  workflow_dispatch:  # 允许手动触发工作流
+    branches: [main, master]
+  workflow_dispatch: # 允许手动触发工作流
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: 检出代码
-      uses: actions/checkout@v4
-      
-    - name: 设置Node.js环境
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: 缓存依赖
-      uses: actions/cache@v3
-      id: npm-cache
-      with:
-        path: |
-          **/node_modules
-          ~/.npm
-        key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-npm-
-        
-    - name: 安装依赖
-      run: |
-        echo "安装项目依赖..."
-        npm install
-        
-    - name: 确保COS SDK依赖
-      run: |
-        chmod +x scripts/ensure-dependencies.cjs
-        node scripts/ensure-dependencies.cjs
-      
-    - name: 缓存构建产物
-      uses: actions/cache@v3
-      with:
-        path: |
-          dist/
-          .astro/
-        key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'astro.config.mjs') }}
-        restore-keys: |
-          ${{ runner.os }}-build-
-        
-    - name: 设置脚本权限
-      run: |
-        chmod +x scripts/incremental-upload.cjs
-        
-    - name: 构建项目
-      env:
-        PUBLIC_CDN_URL: https://cdn.dongboge.cn
-        SITE_URL: https://dongboge.cn
-      run: |
-        echo "使用的CDN URL: $PUBLIC_CDN_URL"
-        npm run build
-        
-    - name: 检查构建输出
-      run: |
-        echo "检查构建输出文件..."
-        ls -la dist/
-        echo "检查CSS文件..."
-        find dist -name "*.css" | xargs ls -la
-        echo "检查HTML文件中的资源引用..."
-        grep -r "cdn.dongboge.cn" dist/index.html || echo "未找到CDN引用"
-        
-    - name: 增量上传静态资源到腾讯云COS
-      run: |
-        echo "增量上传静态资源到腾讯云COS..."
-        # 设置环境变量
-        export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
-        export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
-        export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
-        export TENCENT_COS_REGION=ap-guangzhou
-        # 确保CDN_DOMAIN不包含协议前缀
-        export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
-        
-        # 运行增量上传脚本
-        node scripts/incremental-upload.cjs
-        
-    - name: 部署HTML和其他文件到服务器
-      uses: burnett01/rsync-deployments@6.0.0
-      with:
-        switches: -avzr --delete --exclude="fonts/" --exclude="images/"
-        path: dist/
-        remote_path: /var/www/dongboge
-        remote_host: ${{ secrets.HOST }}
-        remote_user: ${{ secrets.USERNAME }}
-        remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
-        
-    - name: 重启Nginx
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        port: ${{ secrets.PORT || '22' }}
-        script: |
-          echo "🔄 重载Nginx..."
-          sudo systemctl reload nginx
-          echo "✅ 部署完成！"
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置Node.js环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: 缓存依赖
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: 安装依赖
+        run: |
+          echo "安装项目依赖..."
+          npm install
+
+      - name: 确保COS SDK依赖
+        run: |
+          chmod +x scripts/ensure-dependencies.cjs
+          node scripts/ensure-dependencies.cjs
+
+      - name: 缓存构建产物
+        uses: actions/cache@v3
+        with:
+          path: |
+            dist/
+            .astro/
+          key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'astro.config.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: 设置脚本权限
+        run: |
+          chmod +x scripts/incremental-upload.cjs
+
+      - name: 构建项目
+        env:
+          PUBLIC_CDN_URL: https://cdn.dongboge.cn
+          SITE_URL: https://dongboge.cn
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          echo "使用的CDN URL: $PUBLIC_CDN_URL"
+          echo "Supabase URL: $PUBLIC_SUPABASE_URL"
+          npm run build
+
+      - name: 检查构建输出
+        run: |
+          echo "检查构建输出文件..."
+          ls -la dist/
+          echo "检查CSS文件..."
+          find dist -name "*.css" | xargs ls -la
+          echo "检查HTML文件中的资源引用..."
+          grep -r "cdn.dongboge.cn" dist/index.html || echo "未找到CDN引用"
+
+      - name: 增量上传静态资源到腾讯云COS
+        run: |
+          echo "增量上传静态资源到腾讯云COS..."
+          # 设置环境变量
+          export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
+          export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
+          export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
+          export TENCENT_COS_REGION=ap-guangzhou
+          # 确保CDN_DOMAIN不包含协议前缀
+          export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
+
+          # 运行增量上传脚本
+          node scripts/incremental-upload.cjs
+
+      - name: 部署HTML和其他文件到服务器
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete --exclude="fonts/" --exclude="images/"
+          path: dist/
+          remote_path: /var/www/dongboge
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 重启Nginx
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.PORT || '22' }}
+          script: |
+            echo "🔄 重载Nginx..."
+            sudo systemctl reload nginx
+            echo "✅ 部署完成！"
