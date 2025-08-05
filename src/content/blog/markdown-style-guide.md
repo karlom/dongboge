@@ -2,8 +2,9 @@
 title: "AI技术文档写作规范：Markdown最佳实践指南"
 description: "分享AI技术文档写作中的Markdown语法规范和最佳实践，帮助技术团队创建清晰、专业的技术文档。"
 pubDate: "Jun 19 2024"
-heroImage: '../../assets/daily1.jpg'
+heroImage: "../../assets/daily1.jpg"
 tags: ["技术文档", "Markdown", "写作规范", "团队协作"]
+slug: "ai-markdown-documentation-best-practices"
 ---
 
 在 AI 技术快速发展的今天，清晰、规范的技术文档对于团队协作和知识传承至关重要。作为一名长期从事 AI 技术咨询和培训的专家，我深知良好的文档规范对项目成功的重要性。今天，我想和大家分享一些在 AI 技术文档写作中使用 Markdown 的最佳实践。

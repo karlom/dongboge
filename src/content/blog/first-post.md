@@ -2,8 +2,9 @@
 title: "AI时代的企业数字化转型：从理论到实践"
 description: "探讨人工智能如何重塑现代企业的运营模式，以及企业如何在AI浪潮中找到自己的定位和发展方向。"
 pubDate: "Jul 08 2022"
-heroImage: '../../assets/zhailu.png'
+heroImage: "../../assets/zhailu.png"
 tags: ["人工智能", "AI", "数字化转型", "企业管理"]
+slug: "ai-enterprise-digital-transformation-guide"
 ---
 
 在当今快速发展的数字化时代，人工智能已经不再是科幻小说中的概念，而是实实在在地改变着我们的工作和生活方式。作为一名深耕 AI 领域多年的技术专家，我见证了无数企业在数字化转型过程中的成功与挫折。今天，我想和大家分享一些关于 AI 时代企业数字化转型的思考和实践经验。

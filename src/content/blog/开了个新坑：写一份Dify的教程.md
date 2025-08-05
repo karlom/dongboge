@@ -4,6 +4,7 @@ description: "这周一的时候我把Dify搭建知识库+对接微信公众号�
 pubDate: "Jul 18, 2025"
 tags: ["工作"]
 heroImage: '../../assets/work.png'
+slug: "started-writing-dify-tutorial"
 ---
 
 这周一的时候我把Dify搭建知识库+对接微信公众号的服务文章发出去之后就开始着手准备写一个Dify使用教程。

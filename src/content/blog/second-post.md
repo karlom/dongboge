@@ -2,8 +2,9 @@
 title: "Dify平台实战：从零开始构建企业级智能体"
 description: "深入解析Dify平台的核心功能，分享如何利用Dify快速构建和部署企业级AI智能体的实践经验。"
 pubDate: "Jul 15 2022"
-heroImage: '../../assets/success2.png'
+heroImage: "../../assets/success2.png"
 tags: ["Dify", "智能体", "AI应用", "企业级部署"]
+slug: "dify-platform-enterprise-ai-agent-guide"
 ---
 
 随着生成式 AI 技术的快速发展，越来越多的企业开始探索如何将 AI 能力集成到自己的业务流程中。Dify 作为一个开源的 LLM 应用开发平台，为企业提供了一个低代码的解决方案。在过去的一年中，我帮助多家企业成功部署了基于 Dify 的智能体系统，今天想和大家分享一些实战经验。

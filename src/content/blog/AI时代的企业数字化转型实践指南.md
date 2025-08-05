@@ -4,6 +4,7 @@ description: "探讨人工智能如何重塑现代企业的运营模式，分享
 pubDate: "Dec 15 2024"
 tags: ["人工智能", "数字化转型", "企业管理", "AI应用"]
 heroImage: '../../assets/default1.png'
+slug: "ai-era-digital-transformation-guide"
 ---
 
 # AI时代的企业数字化转型实践指南

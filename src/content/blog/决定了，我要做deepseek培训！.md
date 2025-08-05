@@ -4,6 +4,7 @@ description: "# 从此以后请叫我：AI培训师东波哥😊。 上周六的
 pubDate: "Jul 19, 2025"
 tags: ["工作"]
 heroImage: '../../assets/work.png'
+slug: "decided-to-do-deepseek-training"
 ---
 
 \# 从此以后请叫我：AI培训师东波哥😊。

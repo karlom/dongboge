@@ -2,8 +2,9 @@
 title: "企业AI内训实战指南：如何让团队快速掌握AI工具"
 description: "分享企业AI内训的实践经验，从培训体系设计到效果评估，帮助企业建立高效的AI人才培养机制。"
 pubDate: "Jul 22 2022"
-heroImage: '../../assets/daily1.jpg'
+heroImage: "../../assets/daily1.jpg"
 tags: ["企业培训", "AI教育", "团队建设", "人才培养"]
+slug: "enterprise-ai-training-practical-guide"
 ---
 
 在 AI 技术快速发展的今天，企业面临的最大挑战不是技术本身，而是如何让团队快速掌握并有效运用 AI 工具。作为一名企业 AI 培训师，我在过去两年中为超过 50 家企业提供了 AI 内训服务，今天想和大家分享一些实战经验和心得。

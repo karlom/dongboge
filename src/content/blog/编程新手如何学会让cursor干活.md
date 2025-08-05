@@ -4,6 +4,7 @@ description: "现在假设你是公司的产品经理，你要带一个会编程
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
 heroImage: '../../assets/tech2.jpg'
+slug: "how-beginners-learn-cursor-ai-coding"
 ---
 
 现在假设你是公司的产品经理，你要带一个会编程的新手。你打算咋办？

@@ -4,6 +4,7 @@ description: "是什么决定了你的AI Agent能卖多少钱？ 记住这个公
 pubDate: "Jul 19, 2025"
 tags: ["摘录"]
 heroImage: '../../assets/zhailu2.jpg'
+slug: "what-determines-ai-agent-pricing"
 ---
 
 是什么决定了你的AI Agent能卖多少钱？

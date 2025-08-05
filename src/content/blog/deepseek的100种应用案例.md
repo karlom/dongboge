@@ -4,6 +4,7 @@ description: "# DeepSeek的100种应用场景 以下100个场景展示了DeepSee
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
 heroImage: '../../assets/tech.png'
+slug: "deepseek-100-use-cases"
 ---
 
 \# DeepSeek的100种应用场景

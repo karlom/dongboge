@@ -14,6 +14,7 @@ const blog = defineCollection({
 			updatedDate: z.coerce.date().optional(),
 			heroImage: image().optional(),
 			tags: z.array(z.string()).optional(),
+			slug: z.string().optional(), // 添加可选的 slug 字段
 		}),
 });
 

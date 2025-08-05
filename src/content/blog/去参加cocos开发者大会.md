@@ -4,6 +4,7 @@ description: "# 去参加cocos开发者大会 今天下午是老蔡喵组织的c
 pubDate: "Jul 19, 2025"
 tags: ["工作"]
 heroImage: '../../assets/work2.jpg'
+slug: "attending-cocos-developer-conference"
 ---
 
 \# 去参加cocos开发者大会

@@ -4,6 +4,7 @@ description: "# reboot and select proper boot device的第二种解决方法 今
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
 heroImage: '../../assets/tech.png'
+slug: "second-solution-boot-device-error"
 ---
 
 \# reboot and select proper boot device的第二种解决方法

@@ -18,8 +18,11 @@ export async function getStaticPaths() {
       index < sortedPosts.length - 1 ? sortedPosts[index + 1] : null;
     const nextPost = index > 0 ? sortedPosts[index - 1] : null;
 
+    // 使用自定义 slug 或者文件名作为 URL slug
+    const urlSlug = post.data.slug || post.id;
+
     return {
-      params: { slug: post.id },
+      params: { slug: urlSlug },
       props: {
         post,
         prevPost,

@@ -4,6 +4,7 @@ description: "# brew updte出错解决方法记录 今天上午看到一个推�
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
 heroImage: '../../assets/tech1.png'
+slug: "fixing-brew-update-errors"
 ---
 
 \# brew updte出错解决方法记录
