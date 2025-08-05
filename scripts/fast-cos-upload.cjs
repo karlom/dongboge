@@ -13,7 +13,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const { promisify } = require('util');
+const {
+    promisify
+} = require('util');
 
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
@@ -40,9 +42,11 @@ let fastManifest = {};
 // 快速文件扫描 - 只获取必要信息
 async function fastScanFiles(dir, baseDir = dir) {
     const files = [];
-    
+
     try {
-        const entries = await readdir(dir, { withFileTypes: true });
+        const entries = await readdir(dir, {
+            withFileTypes: true
+        });
 
         await Promise.all(entries.map(async (entry) => {
             const fullPath = path.join(dir, entry.name);
@@ -60,7 +64,7 @@ async function fastScanFiles(dir, baseDir = dir) {
                 try {
                     const stats = await stat(fullPath);
                     const relativePath = path.relative(baseDir, fullPath).replace(/\\/g, '/');
-                    
+
                     files.push({
                         path: fullPath,
                         cosPath: relativePath,
@@ -103,7 +107,7 @@ async function loadFastManifest() {
                 }
             });
         });
-        
+
         console.log(`📋 加载清单: ${Object.keys(result).length} 个文件记录`);
         return result;
     } catch (error) {
@@ -116,7 +120,7 @@ async function loadFastManifest() {
 function needsUpload(file, manifest) {
     const entry = manifest[file.cosPath];
     if (!entry) return true;
-    
+
     // 只比较文件大小和修改时间，跳过哈希计算
     return entry.size !== file.size || entry.mtime !== file.mtime;
 }
@@ -150,33 +154,44 @@ async function fastUpload(file) {
 async function ultraFastUpload(files, manifest) {
     const needUpload = files.filter(file => needsUpload(file, manifest));
     const skipCount = files.length - needUpload.length;
-    
+
     console.log(`📊 需要上传: ${needUpload.length}, 跳过: ${skipCount}`);
-    
+
     if (needUpload.length === 0) {
-        return { uploaded: 0, failed: 0, skipped: skipCount };
+        return {
+            uploaded: 0,
+            failed: 0,
+            skipped: skipCount
+        };
     }
 
     let uploaded = 0;
     let failed = 0;
-    const newManifest = { ...manifest };
+    const newManifest = {
+        ...manifest
+    };
 
     // 超大批次并行上传
     for (let i = 0; i < needUpload.length; i += batchSize) {
         const batch = needUpload.slice(i, i + batchSize);
-        
+
         console.log(`🚀 批次 ${Math.floor(i / batchSize) + 1}: ${batch.length} 个文件`);
 
         const results = await Promise.allSettled(
             batch.map(async (file) => {
                 const success = await fastUpload(file);
-                return { file, success };
+                return {
+                    file,
+                    success
+                };
             })
         );
 
         results.forEach(result => {
             if (result.status === 'fulfilled' && result.value.success) {
-                const { file } = result.value;
+                const {
+                    file
+                } = result.value;
                 uploaded++;
                 newManifest[file.cosPath] = {
                     size: file.size,
@@ -200,7 +215,9 @@ async function ultraFastUpload(files, manifest) {
                 Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
                 Key: manifestKey,
                 Body: JSON.stringify(newManifest),
-                Headers: { 'Content-Type': 'application/json' }
+                Headers: {
+                    'Content-Type': 'application/json'
+                }
             }, (err, data) => {
                 if (err) reject(err);
                 else resolve(data);
@@ -210,7 +227,11 @@ async function ultraFastUpload(files, manifest) {
         console.warn('⚠️  保存清单失败:', err.message);
     }
 
-    return { uploaded, failed, skipped: skipCount };
+    return {
+        uploaded,
+        failed,
+        skipped: skipCount
+    };
 }
 
 // 主函数
@@ -219,12 +240,14 @@ async function main() {
     console.log('⚡ 启动快速COS上传...');
 
     try {
-        // 并行加载清单和扫描文件
+        // 并行加载清单和扫描文件 - 扫描client目录下的静态资源
+        const clientPath = path.join(distPath, 'client');
         const [manifest, ...fileLists] = await Promise.all([
             loadFastManifest(),
-            fastScanFiles(path.join(distPath, 'assets'), distPath),
-            fastScanFiles(path.join(distPath, 'fonts'), distPath),
-            fastScanFiles(path.join(distPath, 'images'), distPath)
+            fastScanFiles(path.join(clientPath, 'assets'), clientPath),
+            fastScanFiles(path.join(clientPath, 'fonts'), clientPath),
+            fastScanFiles(path.join(clientPath, 'images'), clientPath),
+            fastScanFiles(path.join(clientPath, '_astro'), clientPath)
         ]);
 
         const allFiles = fileLists.flat();
@@ -236,17 +259,21 @@ async function main() {
         }
 
         // 超快速上传
-        const { uploaded, failed, skipped } = await ultraFastUpload(allFiles, manifest);
+        const {
+            uploaded,
+            failed,
+            skipped
+        } = await ultraFastUpload(allFiles, manifest);
 
         const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-        
+
         console.log('\n⚡ ===== 快速上传完成 =====');
         console.log(`⏱️  耗时: ${duration}秒`);
         console.log(`📁 总文件: ${allFiles.length}`);
         console.log(`✅ 上传: ${uploaded}`);
         console.log(`⏭️  跳过: ${skipped}`);
         console.log(`❌ 失败: ${failed}`);
-        
+
         if (uploaded > 0) {
             console.log(`🚀 速度: ${(uploaded / parseFloat(duration)).toFixed(1)} 文件/秒`);
         }
