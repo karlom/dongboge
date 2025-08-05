@@ -61,7 +61,7 @@ jobs:
       - name: 部署客户端文件到服务器
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -rltz --delete --exclude="fonts/" --exclude="images/"
+          switches: -avzr --delete --exclude="fonts/" --exclude="images/"
           path: dist/client/
           remote_path: /var/www/dongboge
           remote_host: ${{ secrets.HOST }}
@@ -72,7 +72,7 @@ jobs:
       - name: 部署服务端文件到服务器
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -rltz --delete
+          switches: -avzr --delete
           path: dist/server/
           remote_path: /var/www/dongboge/server
           remote_host: ${{ secrets.HOST }}
@@ -83,7 +83,7 @@ jobs:
       - name: 上传配置文件
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -rltz
+          switches: -avz
           path: deploy/
           remote_path: /var/www/dongboge/deploy
           remote_host: ${{ secrets.HOST }}

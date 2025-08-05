@@ -19,6 +19,6 @@ ssh $USER@$SERVER "mkdir -p $DEST"
 
 # 执行 rsync，使用 --rsync-path 参数确保目录创建
 echo "开始安全 rsync 传输..."
-rsync -rltz --delete --rsync-path="mkdir -p $DEST && rsync" "$SOURCE" "$USER@$SERVER:$DEST"
+rsync -avz --rsync-path="mkdir -p $DEST && rsync" "$SOURCE" "$USER@$SERVER:$DEST"
 
 echo "传输完成"

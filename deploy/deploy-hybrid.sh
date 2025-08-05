@@ -39,7 +39,7 @@ upload_files() {
     local source=$1
     local target=$2
     echo -e "${YELLOW}📤 上传 $source 到 $target${NC}"
-    rsync -avz --delete -e "ssh -p $SERVER_PORT" "$source" "$SERVER_USER@$SERVER_HOST:$target"
+    rsync -rltz --delete -e "ssh -p $SERVER_PORT" "$source" "$SERVER_USER@$SERVER_HOST:$target"
 }
 
 # 1. 检查本地构建文件

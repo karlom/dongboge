@@ -6,14 +6,14 @@ on:
   workflow_dispatch:
     inputs:
       deploy_type:
-        description: "部署类型"
+        description: '部署类型'
         required: true
-        default: "full"
+        default: 'full'
         type: choice
         options:
-          - full # 完整部署
-          - incremental # 增量部署
-          - blog_only # 仅博客内容
+        - full        # 完整部署
+        - incremental # 增量部署
+        - blog_only   # 仅博客内容
 
 jobs:
   deploy:
@@ -24,7 +24,7 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # 获取最近两次提交，用于比较变更
+          fetch-depth: 2  # 获取最近两次提交，用于比较变更
 
       - name: 设置Node.js环境
         uses: actions/setup-node@v4
@@ -49,12 +49,12 @@ jobs:
           npm ci --prefer-offline --no-audit --silent --no-fund
           echo "✅ 依赖安装完成"
 
-      # - name: 确保COS SDK依赖
-      #   run: |
-      #     echo "🔍 检查COS SDK依赖..."
-      #     chmod +x scripts/ensure-dependencies.cjs
-      #     node scripts/ensure-dependencies.cjs
-      #     echo "✅ COS SDK检查完成"
+      - name: 确保COS SDK依赖
+        run: |
+          echo "🔍 检查COS SDK依赖..."
+          chmod +x scripts/ensure-dependencies.cjs
+          node scripts/ensure-dependencies.cjs
+          echo "✅ COS SDK检查完成"
 
       - name: 构建项目
         env:
@@ -84,19 +84,42 @@ jobs:
         id: deploy_strategy
         run: |
           echo "🤔 分析部署策略..."
-
-          if [[ "${{ github.event.inputs.deploy_type }}" ]]; then
-            echo "strategy=${{ github.event.inputs.deploy_type }}" >> $GITHUB_OUTPUT
-            echo "📝 手动选择：${{ github.event.inputs.deploy_type }}部署"
+          
+          if [[ "${{ github.event.inputs.deploy_type }}" == "incremental" ]]; then
+            echo "strategy=incremental" >> $GITHUB_OUTPUT
+            echo "📝 手动选择：增量部署"
+          elif [[ "${{ github.event.inputs.deploy_type }}" == "blog_only" ]]; then
+            echo "strategy=blog_only" >> $GITHUB_OUTPUT
+            echo "📝 手动选择：仅博客部署"
+          elif [[ "${{ github.event.inputs.deploy_type }}" == "full" ]]; then
+            echo "strategy=full" >> $GITHUB_OUTPUT
+            echo "📝 手动选择：完整部署"
           else
-            # 简化的自动检测变更文件逻辑
+            # 自动检测变更文件
             if git diff --name-only HEAD~1 HEAD > /dev/null 2>&1; then
-              # 只检查关键文件变更
-              CORE_CHANGES=$(git diff --name-only HEAD~1 HEAD | grep -v -E "^src/content/blog/|^README\.md$|^\.md$|^docs/" || true)
+              CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+              echo "📋 变更的文件："
+              echo "$CHANGED_FILES"
               
-              if [ -z "$CORE_CHANGES" ]; then
-                echo "strategy=incremental" >> $GITHUB_OUTPUT
-                echo "🎯 自动检测：仅内容变更，使用增量部署"
+              # 检查是否有博客文件变更
+              BLOG_CHANGES=$(echo "$CHANGED_FILES" | grep -E "^src/content/blog/" || true)
+              
+              # 检查是否有核心代码变更（排除一些不影响功能的文件）
+              CORE_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E "^src/content/blog/|^README\.md$|^\.md$|^docs/|^scripts/verify-deployment\.js$" || true)
+              
+              if [ -n "$BLOG_CHANGES" ] && [ -z "$CORE_CHANGES" ]; then
+                echo "strategy=blog_only" >> $GITHUB_OUTPUT
+                echo "🎯 自动检测：仅博客内容变更，使用增量部署"
+              elif [ -n "$BLOG_CHANGES" ] && [ -n "$CORE_CHANGES" ]; then
+                # 检查核心变更是否只是部署脚本或文档
+                NON_DEPLOY_CHANGES=$(echo "$CORE_CHANGES" | grep -v -E "^\.github/workflows/|^scripts/|^docs/" || true)
+                if [ -z "$NON_DEPLOY_CHANGES" ]; then
+                  echo "strategy=blog_only" >> $GITHUB_OUTPUT
+                  echo "🎯 自动检测：博客+部署脚本变更，使用增量部署"
+                else
+                  echo "strategy=full" >> $GITHUB_OUTPUT
+                  echo "🎯 自动检测：核心代码变更，使用完整部署"
+                fi
               else
                 echo "strategy=full" >> $GITHUB_OUTPUT
                 echo "🎯 自动检测：核心代码变更，使用完整部署"
@@ -107,20 +130,28 @@ jobs:
             fi
           fi
 
-      # - name: 上传静态资源到腾讯云COS
-      #   timeout-minutes: 15
-      #   run: |
-      #     echo "☁️ 上传静态资源到腾讯云COS..."
-      #     export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
-      #     export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
-      #     export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
-      #     export TENCENT_COS_REGION=ap-guangzhou
-      #     export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
-      #
-      #     chmod +x scripts/incremental-upload.cjs
-      #     node scripts/incremental-upload.cjs
+      - name: 上传静态资源到腾讯云COS
+        timeout-minutes: 15
+        run: |
+          echo "☁️ 上传静态资源到腾讯云COS..."
+          export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
+          export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
+          export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
+          export TENCENT_COS_REGION=ap-guangzhou
+          export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
+          
+          chmod +x scripts/incremental-upload.cjs
+          node scripts/incremental-upload.cjs
 
       # ==================== 完整部署流程 ====================
+      - name: 完整部署 - 创建部署包
+        if: steps.deploy_strategy.outputs.strategy == 'full'
+        run: |
+          echo "📦 创建完整部署包..."
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          tar -czf deploy-${TIMESTAMP}.tar.gz -C dist .
+          ls -la deploy-*.tar.gz
+          echo "✅ 部署包创建完成"
 
       - name: 完整部署 - 服务器准备
         if: steps.deploy_strategy.outputs.strategy == 'full'
@@ -134,13 +165,13 @@ jobs:
           script: |
             set -e
             echo "🚀 开始服务器准备..."
-
+            
             # 创建目录结构
             mkdir -p /var/www/dongboge/{server,client,logs,backup,node_modules} >/dev/null 2>&1
             sudo chown -R $USER:$USER /var/www/dongboge >/dev/null 2>&1
             chmod -R 755 /var/www/dongboge >/dev/null 2>&1
             echo "📁 目录结构已创建"
-
+            
             # 备份现有部署
             cd /var/www
             if [ -d "dongboge/server" ] && [ -f "dongboge/server/entry.mjs" ]; then
@@ -148,35 +179,35 @@ jobs:
               cd dongboge/backup && ls -t backup-*.tar.gz | tail -n +6 | xargs rm -f >/dev/null 2>&1 || true
               echo "💾 已备份现有部署"
             fi
-
+            
             # 停止现有服务
             if command -v pm2 >/dev/null 2>&1; then
               pm2 stop dongboge >/dev/null 2>&1 || true
               pm2 delete dongboge >/dev/null 2>&1 || true
             fi
-
+            
             for pid in $(ps aux | grep 'node.*server/entry.mjs' | grep -v grep | awk '{print $2}' 2>/dev/null); do
               kill -15 $pid >/dev/null 2>&1 || true
               sleep 1
               kill -9 $pid >/dev/null 2>&1 || true
             done
             echo "🛑 已停止现有服务"
-
+            
             echo "✅ 服务器准备完成"
 
-      # - name: 完整部署 - 直接rsync传输
-      #   if: steps.deploy_strategy.outputs.strategy == 'full'
-      #   uses: burnett01/rsync-deployments@6.0.0
-      #   with:
-      #     switches: -rltz --delete --rsync-path="mkdir -p /var/www/dongboge && rsync"
-      #     path: dist/
-      #     remote_path: /var/www/dongboge
-      #     remote_host: ${{ secrets.HOST }}
-      #     remote_user: ${{ secrets.USERNAME }}
-      #     remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+      - name: 完整部署 - 上传部署包
+        if: steps.deploy_strategy.outputs.strategy == 'full'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.PORT || '22' }}
+          source: "deploy-*.tar.gz"
+          target: "/tmp/"
 
-      - name: 测试服务启动逻辑 (完整部署)
+      - name: 完整部署 - 解压和启动
         if: steps.deploy_strategy.outputs.strategy == 'full'
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -188,28 +219,27 @@ jobs:
           command_timeout: 10m
           script: |
             set -e
-            echo "🧪 测试服务启动逻辑..."
+            echo "📦 开始部署..."
             cd /var/www/dongboge
-
-            # 验证关键文件是否存在
-            if [ ! -f "server/entry.mjs" ]; then
-              echo "❌ 关键文件缺失: server/entry.mjs"
-              echo "📁 当前目录内容:"
-              ls -la
-              exit 1
-            fi
-
-            if [ ! -f "package.json" ]; then
-              echo "❌ 关键文件缺失: package.json"
-              exit 1
-            fi
-
-            echo "🔍 文件验证通过"
-
-            # 确保.env文件存在
-            if [ ! -f ".env" ]; then
-              echo "📝 创建.env文件..."
-              cat > .env << EOF
+            
+            # 解压部署包
+            tar -xzf /tmp/deploy-*.tar.gz >/dev/null 2>&1
+            rm /tmp/deploy-*.tar.gz
+            echo "📂 部署包已解压"
+            
+            # 验证关键文件
+            REQUIRED_FILES=("server/entry.mjs" "package.json")
+            for file in "${REQUIRED_FILES[@]}"; do
+              if [ ! -f "$file" ]; then
+                echo "❌ 关键文件缺失: $file"
+                exit 1
+              fi
+            done
+            echo "🔍 文件验证通过 ($(find server -name '*.mjs' | wc -l) 个.mjs文件)"
+            
+            # 安装依赖和设置环境
+            npm install --production --silent >/dev/null 2>&1
+            cat > .env << EOF
             PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
             PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
             PUBLIC_CDN_URL=https://cdn.dongboge.cn
@@ -218,34 +248,54 @@ jobs:
             HOST=127.0.0.1
             PORT=3000
             EOF
-              echo "✅ .env文件已创建"
+            echo "📦 依赖安装完成，环境变量已设置"
+            
+            # 启动服务
+            mkdir -p logs
+            if ! command -v pm2 >/dev/null 2>&1; then
+              npm install -g pm2 >/dev/null 2>&1
             fi
-
-            # 使用专门的启动脚本测试服务启动
-            echo "🚀 测试PM2启动脚本..."
-            if [ -f "deploy/start-service-with-pm2.sh" ]; then
-              chmod +x deploy/start-service-with-pm2.sh
-              ./deploy/start-service-with-pm2.sh
-              echo "✅ 服务启动测试成功！"
+            
+            pm2 start server/entry.mjs --name dongboge --log logs/server.log --error logs/error.log --out logs/out.log >/dev/null 2>&1
+            pm2 save >/dev/null 2>&1
+            sleep 5
+            
+            # 检查服务状态
+            if ps aux | grep "node.*server/entry.mjs" | grep -v grep >/dev/null; then
+              if netstat -tlnp | grep :3000 >/dev/null; then
+                echo "✅ 服务启动成功，端口3000正在监听"
+              else
+                echo "⚠️ 服务已启动但端口未监听"
+              fi
             else
-              echo "❌ 启动脚本不存在: deploy/start-service-with-pm2.sh"
-              exit 1
+              echo "⚠️ PM2启动失败，尝试直接启动..."
+              nohup node server/entry.mjs > logs/server.log 2>&1 &
+              sleep 3
+              if ps aux | grep "node.*server/entry.mjs" | grep -v grep >/dev/null; then
+                echo "✅ 直接启动成功"
+              else
+                echo "❌ 服务启动失败"
+                tail -10 logs/server.log 2>/dev/null || echo "无法读取日志"
+                exit 1
+              fi
             fi
+            
+            echo "✅ 完整部署成功！"
 
       # ==================== 增量部署流程 ====================
-      # - name: 增量部署 - rsync传输
-      #   if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
-      #   uses: burnett01/rsync-deployments@6.0.0
-      #   with:
-      #     switches: -rltz --delete --rsync-path="mkdir -p /var/www/dongboge/client && rsync"
-      #     path: dist/
-      #     remote_path: /var/www/dongboge/client
-      #     remote_host: ${{ secrets.HOST }}
-      #     remote_user: ${{ secrets.USERNAME }}
-      #     remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+      - name: 增量部署 - rsync传输
+        if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avz --checksum --delete --rsync-path="mkdir -p /var/www/dongboge/client && rsync"
+          path: dist/
+          remote_path: /var/www/dongboge/client
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
 
-      - name: 测试服务重启逻辑 (增量部署)
+      - name: 增量部署 - 重启服务
         if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -255,38 +305,26 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
           script: |
-            echo "🧪 测试服务重启逻辑..."
+            echo "🔄 重启服务..."
             cd /var/www/dongboge
-
-            # 验证关键文件是否存在
-            if [ ! -f "server/entry.mjs" ]; then
-              echo "❌ 关键文件缺失: server/entry.mjs"
-              exit 1
-            fi
-
-            # 确保.env文件存在
-            if [ ! -f ".env" ]; then
-              echo "📝 创建.env文件..."
-              cat > .env << EOF
-            PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
-            PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
-            PUBLIC_CDN_URL=https://cdn.dongboge.cn
-            SITE_URL=https://dongboge.cn
-            NODE_ENV=production
-            HOST=127.0.0.1
-            PORT=3000
-            EOF
-              echo "✅ .env文件已创建"
-            fi
-
-            # 使用专门的启动脚本测试服务重启
-            echo "🚀 测试PM2重启脚本..."
-            if [ -f "deploy/start-service-with-pm2.sh" ]; then
-              chmod +x deploy/start-service-with-pm2.sh
-              ./deploy/start-service-with-pm2.sh
-              echo "✅ 服务重启测试成功！"
+            
+            # 安装依赖
+            npm install --production --silent >/dev/null 2>&1
+            echo "📦 依赖更新完成"
+            
+            # 重启服务
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 restart dongboge >/dev/null 2>&1 || pm2 start server/entry.mjs --name dongboge --log logs/server.log >/dev/null 2>&1
             else
-              echo "❌ 启动脚本不存在: deploy/start-service-with-pm2.sh"
+              pkill -f "node.*server/entry.mjs" >/dev/null 2>&1 || true
+              nohup node server/entry.mjs > logs/server.log 2>&1 &
+            fi
+            
+            sleep 3
+            if ps aux | grep "node.*server/entry.mjs" | grep -v grep >/dev/null; then
+              echo "✅ 服务重启成功"
+            else
+              echo "❌ 服务重启失败"
               exit 1
             fi
 
@@ -302,32 +340,32 @@ jobs:
           script: |
             echo "🧪 验证部署结果..."
             cd /var/www/dongboge
-
+            
             # 文件验证
             MJS_COUNT=$(find server -name '*.mjs' 2>/dev/null | wc -l)
             echo "📁 服务端文件: $MJS_COUNT 个.mjs文件"
-
+            
             # 进程验证
             if ps aux | grep "node.*server/entry.mjs" | grep -v grep >/dev/null; then
               echo "✅ Node.js进程运行正常"
             else
               echo "❌ Node.js进程未运行"
             fi
-
+            
             # 端口验证
             if netstat -tlnp | grep :3000 >/dev/null; then
               echo "✅ 端口3000正在监听"
             else
               echo "❌ 端口3000未监听"
             fi
-
+            
             # 服务响应验证
             sleep 2
             LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ 2>/dev/null || echo "ERROR")
             EXTERNAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ 2>/dev/null || echo "ERROR")
-
+            
             echo "🌐 本地响应: $LOCAL_RESPONSE | 外部响应: $EXTERNAL_RESPONSE"
-
+            
             if [ "$LOCAL_RESPONSE" = "200" ] && [ "$EXTERNAL_RESPONSE" = "200" ]; then
               echo "🎉 部署验证成功！"
               echo "📊 部署策略: ${{ steps.deploy_strategy.outputs.strategy }} | 时间: $(date '+%H:%M:%S')"

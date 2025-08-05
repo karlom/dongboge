@@ -1,0 +1,203 @@
+name: 完整部署到服务器
+
+on:
+  workflow_dispatch: # 手动触发
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置Node.js环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: 安装依赖
+        run: |
+          echo "📦 安装项目依赖..."
+          npm ci --prefer-offline --no-audit --silent
+
+      - name: 确保COS SDK依赖
+        run: |
+          echo "🔧 检查COS SDK..."
+          chmod +x scripts/ensure-dependencies.cjs
+          node scripts/ensure-dependencies.cjs
+
+      - name: 构建项目
+        env:
+          PUBLIC_CDN_URL: https://cdn.dongboge.cn
+          SITE_URL: https://dongboge.cn
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+          NODE_ENV: production
+        run: |
+          echo "🏗️ 构建项目..."
+          npm run build
+
+      - name: 验证构建输出
+        run: |
+          echo "🔍 验证构建输出..."
+          echo "=== 构建目录结构 ==="
+          ls -la dist/
+          echo ""
+          echo "=== 客户端文件 ==="
+          ls -la dist/client/ | head -10
+          echo ""
+          echo "=== 服务端文件 ==="
+          ls -la dist/server/ | head -10
+          echo ""
+          echo "=== 检查关键文件 ==="
+          echo "package.json: $([ -f package.json ] && echo '✅ 存在' || echo '❌ 缺失')"
+          echo "server/entry.mjs: $([ -f dist/server/entry.mjs ] && echo '✅ 存在' || echo '❌ 缺失')"
+
+      - name: 准备部署文件
+        run: |
+          echo "📋 准备部署文件..."
+          # 创建部署目录
+          mkdir -p deploy-package
+
+          # 复制构建输出
+          cp -r dist/* deploy-package/
+
+          # 复制项目配置文件
+          cp package.json deploy-package/
+          cp package-lock.json deploy-package/ || echo "⚠️ package-lock.json 不存在"
+
+          # 复制部署脚本
+          cp -r deploy deploy-package/
+
+          echo "=== 部署包内容 ==="
+          ls -la deploy-package/
+
+      - name: 上传静态资源到CDN
+        timeout-minutes: 10
+        run: |
+          echo "☁️ 上传静态资源到CDN..."
+          export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
+          export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
+          export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
+          export TENCENT_COS_REGION=ap-guangzhou
+          export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
+
+          node scripts/incremental-upload.cjs
+
+      - name: 部署完整项目到服务器
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete --progress
+          path: deploy-package/
+          remote_path: /var/www/dongboge
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 服务器端配置和启动
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: ${{ secrets.PORT || '22' }}
+          command_timeout: 10m
+          script: |
+            set -e
+            cd /var/www/dongboge
+
+            echo "🔍 验证部署文件..."
+            echo "=== 当前目录内容 ==="
+            ls -la
+            echo ""
+            echo "=== 检查关键文件 ==="
+            echo "package.json: $([ -f package.json ] && echo '✅ 存在' || echo '❌ 缺失')"
+            echo "server/entry.mjs: $([ -f server/entry.mjs ] && echo '✅ 存在' || echo '❌ 缺失')"
+            echo "client目录: $([ -d client ] && echo '✅ 存在' || echo '❌ 缺失')"
+
+            if [ ! -f package.json ]; then
+              echo "❌ package.json 缺失，部署失败"
+              exit 1
+            fi
+
+            echo "📦 安装生产依赖..."
+            npm install --production --silent
+
+            echo "🔧 更新Nginx配置..."
+            if [ -f "deploy/nginx-fixed-routing.conf" ]; then
+              sudo cp deploy/nginx-fixed-routing.conf /etc/nginx/sites-available/dongboge.conf
+              sudo ln -sf /etc/nginx/sites-available/dongboge.conf /etc/nginx/sites-enabled/dongboge.conf
+              echo "✅ Nginx配置已更新"
+            else
+              echo "⚠️ 使用现有Nginx配置"
+            fi
+
+            echo "🧪 测试Nginx配置..."
+            sudo nginx -t
+
+            echo "🔄 设置环境变量..."
+            cat > .env << EOF
+            PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
+            PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+            PUBLIC_CDN_URL=https://cdn.dongboge.cn
+            SITE_URL=https://dongboge.cn
+            NODE_ENV=production
+            HOST=127.0.0.1
+            PORT=3000
+            EOF
+
+            echo "🛑 停止旧的Node.js进程..."
+            pkill -f "node.*server/entry.mjs" || echo "没有运行的进程"
+
+            echo "🚀 启动Node.js服务器..."
+            nohup node server/entry.mjs > server.log 2>&1 &
+
+            echo "⏳ 等待服务器启动..."
+            sleep 5
+
+            echo "🔍 检查服务器状态..."
+            if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
+              echo "✅ Node.js服务器启动成功"
+              
+              # 测试本地响应
+              echo "🧪 测试本地服务器响应..."
+              LOCAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/contact 2>/dev/null || echo "ERROR")
+              echo "本地响应: $LOCAL_RESPONSE"
+              
+              if [ "$LOCAL_RESPONSE" = "200" ]; then
+                echo "✅ 本地服务器响应正常"
+              else
+                echo "⚠️ 本地服务器响应异常，查看日志:"
+                tail -10 server.log
+              fi
+            else
+              echo "❌ Node.js服务器启动失败"
+              echo "错误日志:"
+              tail -20 server.log
+              exit 1
+            fi
+
+            echo "🔄 重载Nginx..."
+            sudo systemctl reload nginx
+
+            echo "✅ 部署完成！"
+
+            echo ""
+            echo "🧪 最终测试..."
+            sleep 3
+            EXTERNAL_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/contact 2>/dev/null || echo "ERROR")
+            echo "外部访问响应: $EXTERNAL_RESPONSE"
+
+            echo ""
+            echo "📊 部署状态总结:"
+            echo "Node.js进程: $(ps aux | grep 'node.*server/entry.mjs' | grep -v grep | wc -l) 个"
+            echo "端口3000监听: $(netstat -tlnp 2>/dev/null | grep :3000 | wc -l) 个"
+            echo "首页状态: $(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ 2>/dev/null || echo 'ERROR')"
+            echo "Contact页面: $(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/contact 2>/dev/null || echo 'ERROR')"
