@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>页面未找到 - 东波哥</title>
+    <link rel="icon" type="image/png" href="/Favicon.png" />
+    <meta name="robots" content="noindex, nofollow" />
+    <style>
+        :root {
+            --accent: #2337ff;
+            --accent-dark: #000d8a;
+            --black: 15, 18, 25;
+            --gray: 96, 115, 159;
+            --gray-light: 229, 233, 240;
+            --gray-dark: 34, 41, 57;
+            --gray-gradient: rgba(var(--gray-light), 50%), #fff;
+            --box-shadow: 0 2px 6px rgba(var(--gray), 25%),
+                0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            background: linear-gradient(var(--gray-gradient)) no-repeat;
+            background-size: 100% 600px;
+            color: rgb(var(--gray-dark));
+            font-size: 18px;
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .error-container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--gray-light), 0.8);
+        }
+
+        .error-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .error-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        }
+
+        .error-code {
+            font-size: 6rem;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(var(--gray), 0.3);
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .error-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: rgb(var(--black));
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .error-message {
+            font-size: 1.2rem;
+            color: rgb(var(--gray));
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .error-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(var(--accent), 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(var(--accent), 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .search-container {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(var(--gray-light), 0.8);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(var(--gray-light), 0.8);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+        }
+
+        .search-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+        }
+
+        .helpful-links {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(var(--gray-light), 0.8);
+        }
+
+        .helpful-links h3 {
+            font-size: 1.2rem;
+            color: rgb(var(--black));
+            margin-bottom: 1rem;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .link-item {
+            padding: 0.75rem 1rem;
+            background: rgba(var(--gray-light), 0.3);
+            border-radius: 8px;
+            text-decoration: none;
+            color: rgb(var(--gray-dark));
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .link-item:hover {
+            background: rgba(var(--accent), 0.1);
+            color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .footer-info {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(var(--gray-light), 0.8);
+            font-size: 0.9rem;
+            color: rgb(var(--gray));
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .error-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+
+            .error-code {
+                font-size: 4rem;
+            }
+
+            .error-title {
+                font-size: 2rem;
+            }
+
+            .error-message {
+                font-size: 1.1rem;
+            }
+
+            .error-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-btn {
+                padding: 0.75rem;
+            }
+
+            .links-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .error-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .error-code {
+                font-size: 3rem;
+            }
+
+            .error-title {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        /* 动画效果 */
+        .error-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon floating">
+            🔍
+        </div>
+        
+        <div class="error-code">404</div>
+        
+        <h1 class="error-title">页面走丢了</h1>
+        
+        <p class="error-message">
+            抱歉，您访问的页面不存在或已被移动。<br>
+            让我们帮您找到想要的内容吧！
+        </p>
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">
+                🏠 返回首页
+            </a>
+            <button onclick="history.back()" class="btn btn-secondary">
+                ← 返回上页
+            </button>
+        </div>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="搜索您想要的内容..."
+                    id="searchInput"
+                    onkeypress="handleSearch(event)"
+                >
+                <button class="search-btn" onclick="performSearch()">
+                    搜索
+                </button>
+            </div>
+        </div>
+        
+        <div class="helpful-links">
+            <h3>您可能在寻找</h3>
+            <div class="links-grid">
+                <a href="/blog" class="link-item">📝 博客文章</a>
+                <a href="/training-cases" class="link-item">💼 培训案例</a>
+                <a href="/services" class="link-item">🛠️ 我的服务</a>
+                <a href="/about" class="link-item">👨‍💻 关于我</a>
+            </div>
+        </div>
+        
+        <div class="footer-info">
+            <p>如果问题持续存在，请联系网站管理员</p>
+            <p>错误代码：404 | 时间：<span id="currentTime"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // 显示当前时间
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        // 搜索功能
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (query) {
+                // 这里可以集成实际的搜索功能
+                // 目前重定向到首页并添加搜索参数
+                window.location.href = `/?search=${encodeURIComponent(query)}`;
+            }
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // 自动聚焦搜索框
+            document.getElementById('searchInput').focus();
+        });
+
+        // 添加键盘快捷键
+        document.addEventListener('keydown', function(event) {
+            // ESC键返回首页
+            if (event.key === 'Escape') {
+                window.location.href = '/';
+            }
+            // Ctrl/Cmd + K 聚焦搜索框
+            if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+                event.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+    </script>
+</body>
+</html>

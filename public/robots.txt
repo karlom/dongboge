@@ -1,0 +1,40 @@
+User-agent: *
+Allow: /
+
+# 优先抓取重要页面
+Allow: /
+Allow: /about/
+Allow: /services/
+Allow: /contact/
+Allow: /training-cases/
+Allow: /blog/
+
+# 禁止抓取管理页面和API
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_astro/
+Disallow: /node_modules/
+
+# 网站地图位置
+Sitemap: https://dongboge.com/sitemap.xml
+Sitemap: https://dongboge.com/sitemap-index.xml
+
+# 针对百度搜索引擎的特殊设置
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 1
+
+# 针对Google搜索引擎的特殊设置  
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# 针对搜狗搜索引擎的特殊设置
+User-agent: Sogou web spider
+Allow: /
+Crawl-delay: 1
+
+# 针对360搜索引擎的特殊设置
+User-agent: 360Spider
+Allow: /
+Crawl-delay: 1

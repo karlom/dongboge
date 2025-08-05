@@ -4,11 +4,13 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 import node from '@astrojs/node';
-import { defineConfig } from 'astro/config';
+import {
+	defineConfig
+} from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://www.dongboge.cn',
+	site: 'https://dongboge.com',
 	output: 'server', // 服务端渲染模式
 	adapter: node({
 		mode: 'standalone'

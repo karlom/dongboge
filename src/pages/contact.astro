@@ -17,6 +17,7 @@ const industryOptions = [
 
 // 预算选项
 const budgetOptions = [
+  { value: "5000以下", label: "5000以下" },
   { value: "5000-1万", label: "5000-1万" },
   { value: "1-3万", label: "1-3万" },
   { value: "3-5万", label: "3-5万" },
@@ -377,57 +378,78 @@ const budgetOptions = [
             <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">
               联系方式
             </h3>
-            <div class="space-y-3 sm:space-y-4">
-              <div class="flex items-center">
-                <svg
-                  class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mr-3 sm:mr-4 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div class="flex flex-col lg:flex-row lg:items-start lg:space-x-6">
+              <!-- 左侧联系信息 -->
+              <div class="space-y-3 sm:space-y-4 flex-1">
+                <a
+                  href="mailto:yangdongbo@tacod.com?subject=企业AI咨询申请&body=您好，我想咨询企业AI相关服务，请联系我。%0D%0A%0D%0A企业名称：%0D%0A联系人：%0D%0A联系电话：%0D%0A具体需求：%0D%0A"
+                  class="flex items-center hover:bg-blue-50 p-2 rounded-lg transition-colors duration-200 cursor-pointer group"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  ></path>
-                </svg>
-                <span class="text-sm sm:text-base text-gray-700">邮箱咨询</span>
+                  <svg
+                    class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mr-3 sm:mr-4 flex-shrink-0 group-hover:text-blue-700"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                  <span
+                    class="text-sm sm:text-base text-gray-700 group-hover:text-blue-700"
+                    >邮箱咨询</span
+                  >
+                </a>
+                <div class="flex items-center">
+                  <svg
+                    class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mr-3 sm:mr-4 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    ></path>
+                  </svg>
+                  <span class="text-sm sm:text-base text-gray-700"
+                    >微信咨询</span
+                  >
+                </div>
+                <div class="flex items-center">
+                  <svg
+                    class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mr-3 sm:mr-4 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span class="text-sm sm:text-base text-gray-700"
+                    >响应时间：24小时内回复</span
+                  >
+                </div>
               </div>
-              <div class="flex items-center">
-                <svg
-                  class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mr-3 sm:mr-4 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  ></path>
-                </svg>
-                <span class="text-sm sm:text-base text-gray-700"
-                  >微信咨询（扫描页眉二维码）</span
-                >
-              </div>
-              <div class="flex items-center">
-                <svg
-                  class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mr-3 sm:mr-4 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span class="text-sm sm:text-base text-gray-700"
-                  >响应时间：24小时内回复</span
-                >
+
+              <!-- 右侧微信二维码 -->
+              <div class="mt-4 lg:mt-0 flex-shrink-0">
+                <div class="text-center">
+                  <img
+                    src="/yangdongbo.jpg"
+                    alt="东波哥微信二维码"
+                    class="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-lg shadow-md"
+                  />
+                  <p class="text-xs text-gray-500 mt-2">扫码添加微信</p>
+                </div>
               </div>
             </div>
           </div>

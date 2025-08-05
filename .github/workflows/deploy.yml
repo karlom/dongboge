@@ -275,6 +275,15 @@ jobs:
               exit 1
             fi
 
+            # 设置错误页面
+            echo "📄 设置错误页面..."
+            if [ -f "deploy/setup-error-pages.sh" ]; then
+              chmod +x deploy/setup-error-pages.sh
+              ./deploy/setup-error-pages.sh
+            else
+              echo "⚠️ 错误页面设置脚本不存在，跳过设置"
+            fi
+
             # 更新Nginx配置 (完整部署)
             echo "🔧 更新Nginx配置..."
             if [ -f "deploy/deploy-nginx-config.sh" ]; then
@@ -405,6 +414,15 @@ jobs:
             else
               echo "❌ 启动脚本不存在: deploy/start-service-with-pm2.sh"
               exit 1
+            fi
+
+            # 设置错误页面
+            echo "📄 设置错误页面..."
+            if [ -f "deploy/setup-error-pages.sh" ]; then
+              chmod +x deploy/setup-error-pages.sh
+              ./deploy/setup-error-pages.sh
+            else
+              echo "⚠️ 错误页面设置脚本不存在，跳过设置"
             fi
 
             # 更新Nginx配置 (增量部署)

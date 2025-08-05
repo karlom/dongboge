@@ -3,8 +3,8 @@ import "../styles/global.css";
 import { cdnUrl } from "../cdnConfig";
 
 export interface Props {
-	title: string;
-	description?: string;
+  title: string;
+  description?: string;
 }
 
 const { title, description } = Astro.props;
@@ -12,37 +12,166 @@ const { title, description } = Astro.props;
 
 <!doctype html>
 <html lang="zh-CN">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/png" href={cdnUrl("/Favicon.png")} />
-		<meta name="generator" content={Astro.generator} />
-		<!-- 移除直接引入的CSS，让Astro处理样式加载 -->
-		<meta name="theme-color" content="#3B82F6" />
-		<meta name="robots" content="index, follow" />
-		<meta property="og:title" content={title} />
-		<meta property="og:description" content={description} />
-		<meta property="og:type" content="website" />
-		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:title" content={title} />
-		<meta name="twitter:description" content={description} />
-		<title>{title}</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href={cdnUrl("/Favicon.png")} />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO优化 -->
+    <meta
+      name="keywords"
+      content="东波哥,企业培训,AI培训,企业AI培训,广州AI培训,AI创业,人工智能培训,Dify,智能体开发,AI技术咨询,杨东波,塔哥科技"
+    />
+    <meta name="author" content="东波哥 杨东波" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta name="theme-color" content="#fbbf24" />
+    <link rel="canonical" href={Astro.url} />
+
+    <!-- 地理位置SEO -->
+    <meta name="geo.region" content="CN-GD" />
+    <meta name="geo.placename" content="广州" />
+    <meta name="geo.position" content="23.129163;113.264435" />
+    <meta name="ICBM" content="23.129163, 113.264435" />
+
+    <!-- Open Graph优化 -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:site_name" content="东波哥 - 企业AI培训专家" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta
+      property="og:image"
+      content={new URL(cdnUrl("/images/hero1.png"), Astro.url)}
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="东波哥 - 广州企业AI培训专家" />
+
+    <!-- Twitter Card优化 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta
+      name="twitter:image"
+      content={new URL(cdnUrl("/images/hero1.png"), Astro.url)}
+    />
+    <meta name="twitter:image:alt" content="东波哥 - 广州企业AI培训专家" />
+    <meta name="twitter:creator" content="@dongboge" />
+    <meta name="twitter:site" content="@dongboge" />
+
+    <!-- 结构化数据 - 个人/组织 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "杨东波",
+        "alternateName": "东波哥",
+        "description": "广州企业AI培训专家，AI创业导师",
+        "url": "https://dongboge.com",
+        "image": "https://dongboge.com/images/hero1.png",
+        "sameAs": [
+          "https://www.xiaobot.net/p/dify?refer=29497055-5c20-4575-a26a-ff2cb81a7aa5"
+        ],
+        "jobTitle": "创始人兼CEO",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "广州塔哥科技有限公司",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "广州",
+            "addressRegion": "广东省",
+            "addressCountry": "CN"
+          }
+        },
+        "knowsAbout": [
+          "企业AI培训",
+          "人工智能技术咨询",
+          "Dify智能体开发",
+          "AI创业指导",
+          "企业数字化转型"
+        ],
+        "memberOf": [
+          {
+            "@type": "Organization",
+            "name": "iTechClub华南区广州分会",
+            "description": "副秘书长"
+          },
+          {
+            "@type": "Organization",
+            "name": "广州市游戏行业协会技术与创新委员会",
+            "description": "副主任"
+          },
+          {
+            "@type": "Organization",
+            "name": "天河软件协会专家库",
+            "description": "专家"
+          },
+          {
+            "@type": "Organization",
+            "name": "广东省人工智能产业协会AI讲师库",
+            "description": "讲师"
+          }
+        ]
+      }
+    </script>
+
+    <!-- 结构化数据 - 服务 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "企业AI培训服务",
+        "description": "专业的企业AI培训、AI技术咨询和智能体定制开发服务",
+        "provider": {
+          "@type": "Person",
+          "name": "杨东波",
+          "alternateName": "东波哥"
+        },
+        "areaServed": {
+          "@type": "Place",
+          "name": "广州",
+          "containedInPlace": {
+            "@type": "Place",
+            "name": "广东省"
+          }
+        },
+        "serviceType": [
+          "企业AI培训",
+          "AI技术咨询",
+          "智能体定制开发",
+          "Dify私有化部署",
+          "AI创业指导"
+        ],
+        "offers": {
+          "@type": "Offer",
+          "availability": "https://schema.org/InStock",
+          "priceRange": "面议"
+        }
+      }
+    </script>
+
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
 </html>
 
 <style is:global>
-	html {
-		font-family: system-ui, sans-serif;
-		background: #fff;
-		background-size: 224px;
-	}
-	code {
-		background-color: #f3f4f6;
-		border-radius: 0.25rem;
-		padding: 0.125rem 0.25rem;
-	}
+  html {
+    font-family: system-ui, sans-serif;
+    background: #fff;
+    background-size: 224px;
+  }
+  code {
+    background-color: #f3f4f6;
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.25rem;
+  }
 </style>
