@@ -49,12 +49,12 @@ jobs:
           npm ci --prefer-offline --no-audit --silent --no-fund
           echo "✅ 依赖安装完成"
 
-      # - name: 确保COS SDK依赖
-      #   run: |
-      #     echo "🔍 检查COS SDK依赖..."
-      #     chmod +x scripts/ensure-dependencies.cjs
-      #     node scripts/ensure-dependencies.cjs
-      #     echo "✅ COS SDK检查完成"
+      - name: 确保COS SDK依赖
+        run: |
+          echo "🔍 检查COS SDK依赖..."
+          chmod +x scripts/ensure-dependencies.cjs
+          node scripts/ensure-dependencies.cjs
+          echo "✅ COS SDK检查完成"
 
       - name: 构建项目
         env:
@@ -107,18 +107,18 @@ jobs:
             fi
           fi
 
-      # - name: 上传静态资源到腾讯云COS
-      #   timeout-minutes: 15
-      #   run: |
-      #     echo "☁️ 上传静态资源到腾讯云COS..."
-      #     export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
-      #     export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
-      #     export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
-      #     export TENCENT_COS_REGION=ap-guangzhou
-      #     export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
-      #
-      #     chmod +x scripts/incremental-upload.cjs
-      #     node scripts/incremental-upload.cjs
+      - name: 上传静态资源到腾讯云COS
+        timeout-minutes: 15
+        run: |
+          echo "☁️ 上传静态资源到腾讯云COS..."
+          export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
+          export TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }}
+          export TENCENT_COS_BUCKET=${{ secrets.TENCENT_COS_BUCKET }}
+          export TENCENT_COS_REGION=ap-guangzhou
+          export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
+
+          chmod +x scripts/incremental-upload.cjs
+          node scripts/incremental-upload.cjs
 
       # ==================== 完整部署流程 ====================
 
@@ -164,19 +164,31 @@ jobs:
 
             echo "✅ 服务器准备完成"
 
-      # - name: 完整部署 - 直接rsync传输
-      #   if: steps.deploy_strategy.outputs.strategy == 'full'
-      #   uses: burnett01/rsync-deployments@6.0.0
-      #   with:
-      #     switches: -rltz --delete --rsync-path="mkdir -p /var/www/dongboge && rsync"
-      #     path: dist/
-      #     remote_path: /var/www/dongboge
-      #     remote_host: ${{ secrets.HOST }}
-      #     remote_user: ${{ secrets.USERNAME }}
-      #     remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+      - name: 完整部署 - 直接rsync传输
+        if: steps.deploy_strategy.outputs.strategy == 'full'
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -rltz --delete --rsync-path="mkdir -p /var/www/dongboge && rsync"
+          path: dist/
+          remote_path: /var/www/dongboge
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
 
-      - name: 测试服务启动逻辑 (完整部署)
+      - name: 完整部署 - 传输部署脚本
+        if: steps.deploy_strategy.outputs.strategy == 'full'
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -rltz --rsync-path="mkdir -p /var/www/dongboge/deploy && rsync"
+          path: deploy/
+          remote_path: /var/www/dongboge/deploy
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 完整部署 - 启动服务
         if: steps.deploy_strategy.outputs.strategy == 'full'
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -188,7 +200,7 @@ jobs:
           command_timeout: 10m
           script: |
             set -e
-            echo "🧪 测试服务启动逻辑..."
+            echo "📦 开始部署..."
             cd /var/www/dongboge
 
             # 验证关键文件是否存在
@@ -221,31 +233,57 @@ jobs:
               echo "✅ .env文件已创建"
             fi
 
-            # 使用专门的启动脚本测试服务启动
-            echo "🚀 测试PM2启动脚本..."
+            # 使用专门的启动脚本启动服务
+            echo "🚀 启动PM2服务..."
             if [ -f "deploy/start-service-with-pm2.sh" ]; then
               chmod +x deploy/start-service-with-pm2.sh
               ./deploy/start-service-with-pm2.sh
-              echo "✅ 服务启动测试成功！"
+              echo "✅ 服务启动成功！"
             else
               echo "❌ 启动脚本不存在: deploy/start-service-with-pm2.sh"
               exit 1
             fi
 
-      # ==================== 增量部署流程 ====================
-      # - name: 增量部署 - rsync传输
-      #   if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
-      #   uses: burnett01/rsync-deployments@6.0.0
-      #   with:
-      #     switches: -rltz --delete --rsync-path="mkdir -p /var/www/dongboge/client && rsync"
-      #     path: dist/
-      #     remote_path: /var/www/dongboge/client
-      #     remote_host: ${{ secrets.HOST }}
-      #     remote_user: ${{ secrets.USERNAME }}
-      #     remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+            # 更新Nginx配置
+            echo "🔧 更新Nginx配置..."
+            if [ -f "deploy/deploy-nginx-config.sh" ]; then
+              chmod +x deploy/deploy-nginx-config.sh
+              ./deploy/deploy-nginx-config.sh
+              
+              # 重载Nginx
+              echo "🔄 重载Nginx..."
+              sudo systemctl reload nginx
+              echo "✅ Nginx配置更新完成"
+            else
+              echo "⚠️ Nginx配置脚本不存在，跳过配置更新"
+            fi
 
-      - name: 测试服务重启逻辑 (增量部署)
+      # ==================== 增量部署流程 ====================
+      - name: 增量部署 - rsync传输
+        if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -rltz --delete --rsync-path="mkdir -p /var/www/dongboge/client && rsync"
+          path: dist/
+          remote_path: /var/www/dongboge/client
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 增量部署 - 传输部署脚本
+        if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -rltz --rsync-path="mkdir -p /var/www/dongboge/deploy && rsync"
+          path: deploy/
+          remote_path: /var/www/dongboge/deploy
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
+      - name: 增量部署 - 重启服务
         if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -255,7 +293,7 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
           script: |
-            echo "🧪 测试服务重启逻辑..."
+            echo "🔄 重启服务..."
             cd /var/www/dongboge
 
             # 验证关键文件是否存在
@@ -279,15 +317,29 @@ jobs:
               echo "✅ .env文件已创建"
             fi
 
-            # 使用专门的启动脚本测试服务重启
-            echo "🚀 测试PM2重启脚本..."
+            # 使用专门的启动脚本重启服务
+            echo "🚀 重启PM2服务..."
             if [ -f "deploy/start-service-with-pm2.sh" ]; then
               chmod +x deploy/start-service-with-pm2.sh
               ./deploy/start-service-with-pm2.sh
-              echo "✅ 服务重启测试成功！"
+              echo "✅ 服务重启成功！"
             else
               echo "❌ 启动脚本不存在: deploy/start-service-with-pm2.sh"
               exit 1
+            fi
+
+            # 更新Nginx配置
+            echo "🔧 更新Nginx配置..."
+            if [ -f "deploy/deploy-nginx-config.sh" ]; then
+              chmod +x deploy/deploy-nginx-config.sh
+              ./deploy/deploy-nginx-config.sh
+              
+              # 重载Nginx
+              echo "🔄 重载Nginx..."
+              sudo systemctl reload nginx
+              echo "✅ Nginx配置更新完成"
+            else
+              echo "⚠️ Nginx配置脚本不存在，跳过配置更新"
             fi
 
       # ==================== 部署验证 ====================
