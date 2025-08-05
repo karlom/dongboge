@@ -1,0 +1,35 @@
+{
+  "uploadStrategies": {
+    "default": {
+      "script": "incremental-upload.cjs",
+      "description": "默认增量上传，安全但较慢",
+      "batchSize": 10,
+      "useHashCheck": true,
+      "maxRetries": 3
+    },
+    "optimized": {
+      "script": "optimized-cos-upload.cjs",
+      "description": "优化版本，平衡速度和安全性",
+      "batchSize": 20,
+      "useHashCheck": true,
+      "maxRetries": 2
+    },
+    "fast": {
+      "script": "fast-cos-upload.cjs",
+      "description": "快速上传，最大化速度",
+      "batchSize": 50,
+      "useHashCheck": false,
+      "maxRetries": 1
+    }
+  },
+  "fileFilters": {
+    "skipExtensions": [".map", ".txt", ".md"],
+    "priorityExtensions": [".css", ".js", ".woff2", ".woff"],
+    "maxFileSize": "10MB"
+  },
+  "performance": {
+    "concurrentUploads": 20,
+    "chunkSize": "64KB",
+    "timeout": 30000
+  }
+}

@@ -78,7 +78,7 @@ jobs:
           ls -la deploy-package/
 
       - name: 上传静态资源到CDN
-        timeout-minutes: 10
+        timeout-minutes: 8
         run: |
           echo "☁️ 上传静态资源到CDN..."
           export TENCENT_SECRET_ID=${{ secrets.TENCENT_SECRET_ID }}
@@ -87,7 +87,10 @@ jobs:
           export TENCENT_COS_REGION=ap-guangzhou
           export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
 
-          node scripts/incremental-upload.cjs
+          # 使用快速上传策略
+          chmod +x scripts/fast-cos-upload.cjs
+          echo "🚀 使用快速上传策略..."
+          node scripts/fast-cos-upload.cjs
 
       - name: 部署完整项目到服务器
         uses: burnett01/rsync-deployments@6.0.0
@@ -125,6 +128,13 @@ jobs:
             if [ ! -f server/entry.mjs ]; then
               echo "❌ 关键文件缺失: server/entry.mjs，无法测试服务启动"
               exit 1
+            fi
+
+            # 运行文件修复脚本（如果需要）
+            if [ -f "deploy/fix-missing-files.sh" ]; then
+              echo "🔧 运行文件修复脚本..."
+              chmod +x deploy/fix-missing-files.sh
+              ./deploy/fix-missing-files.sh
             fi
 
             # 确保.env文件存在
