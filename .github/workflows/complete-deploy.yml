@@ -137,6 +137,16 @@ jobs:
               ./deploy/fix-missing-files.sh
             fi
 
+            # 安装Node.js依赖
+            echo "📦 安装生产依赖..."
+            if [ -f "package.json" ]; then
+              npm install --production --silent >/dev/null 2>&1
+              echo "✅ 依赖安装完成"
+            else
+              echo "❌ package.json不存在，无法安装依赖"
+              exit 1
+            fi
+
             # 确保.env文件存在
             if [ ! -f ".env" ]; then
               echo "📝 创建.env文件..."
@@ -167,12 +177,31 @@ jobs:
             echo "🔧 更新Nginx配置..."
             if [ -f "deploy/deploy-nginx-config.sh" ]; then
               chmod +x deploy/deploy-nginx-config.sh
-              ./deploy/deploy-nginx-config.sh
-              
-              # 重载Nginx
-              echo "🔄 重载Nginx..."
-              sudo systemctl reload nginx
-              echo "✅ Nginx配置更新完成"
+              echo "📋 执行Nginx配置更新脚本..."
+              if ./deploy/deploy-nginx-config.sh; then
+                # 重载Nginx
+                echo "🔄 重载Nginx..."
+                if sudo systemctl reload nginx; then
+                  echo "✅ Nginx配置更新完成"
+                  
+                  # 验证配置是否正确
+                  echo "🔍 验证Nginx配置..."
+                  ROOT_DIR=$(grep -E "^\s*root\s+" /etc/nginx/sites-available/dongboge.conf | head -1 | awk '{print $2}' | sed 's/;//')
+                  echo "📁 当前Nginx根目录: $ROOT_DIR"
+                  
+                  if [ "$ROOT_DIR" = "/var/www/dongboge/client" ]; then
+                    echo "✅ Nginx根目录配置正确"
+                  else
+                    echo "⚠️ Nginx根目录配置可能不正确"
+                  fi
+                else
+                  echo "❌ Nginx重载失败"
+                  exit 1
+                fi
+              else
+                echo "❌ Nginx配置更新失败"
+                exit 1
+              fi
             else
               echo "⚠️ Nginx配置脚本不存在，跳过配置更新"
             fi

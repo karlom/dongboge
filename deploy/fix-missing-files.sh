@@ -68,9 +68,16 @@ if [ ${#MISSING_FILES[@]} -gt 0 ]; then
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node server/entry.mjs"
+    "start": "node server/entry.mjs",
+    "dev": "node server/entry.mjs"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@astrojs/node": "^8.0.0",
+    "astro": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
 EOF
         echo "✅ 创建了基本的 package.json"
