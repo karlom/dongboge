@@ -238,26 +238,7 @@ async function getAllFiles(dir, baseDir = dir) {
     return files.sort((a, b) => a.size - b.size);
 }
 
-// 智能跳过策略 - 基于文件大小和修改时间
-function shouldSkipFile(file, manifest, cosPath) {
-    const manifestEntry = manifest[cosPath];
-
-    if (!manifestEntry) return false;
-
-    // 如果是字符串（旧格式），只比较哈希
-    if (typeof manifestEntry === 'string') {
-        return false; // 需要重新计算哈希
-    }
-
-    // 新格式包含哈希、大小和修改时间
-    if (manifestEntry.size === file.size &&
-        new Date(manifestEntry.mtime).getTime() === file.mtime.getTime()) {
-        console.log(`⏭️  跳过未修改的文件: ${cosPath}`);
-        return true;
-    }
-
-    return false;
-}
+// 注意：智能跳过逻辑已整合到批量上传函数中，主要基于文件大小和内容哈希比较
 
 // 优化的批量上传
 async function uploadBatch(files, manifest) {
@@ -278,31 +259,44 @@ async function uploadBatch(files, manifest) {
             try {
                 const cosPath = file.relativePath.replace(/\\/g, '/');
 
-                // 智能跳过检查
-                if (shouldSkipFile(file, manifest, cosPath)) {
-                    skippedCount++;
-                    return {
-                        success: true,
-                        path: cosPath,
-                        skipped: true
-                    };
+                // 检查清单中是否存在该文件
+                const manifestEntry = manifest[cosPath];
+                let fileHash = null;
+                let shouldUpload = true;
+
+                if (manifestEntry) {
+                    // 如果文件大小不同，直接上传
+                    if (manifestEntry.size && manifestEntry.size !== file.size) {
+                        console.log(`📏 文件大小变化: ${cosPath} (${manifestEntry.size} -> ${file.size})`);
+                        shouldUpload = true;
+                    } else {
+                        // 大小相同或未记录大小，计算哈希进行比较
+                        fileHash = await calculateFileHash(file.path);
+
+                        // 检查哈希是否相同
+                        const existingHash = typeof manifestEntry === 'string' ? manifestEntry : manifestEntry.hash;
+                        if (existingHash === fileHash) {
+                            console.log(`⏭️  跳过未修改的文件: ${cosPath} (大小: ${file.size}, 哈希: ${fileHash.substring(0, 8)}...)`);
+                            skippedCount++;
+                            return {
+                                success: true,
+                                path: cosPath,
+                                hash: fileHash,
+                                skipped: true
+                            };
+                        } else {
+                            console.log(`🔄 文件内容变化: ${cosPath} (大小: ${file.size} 未变, 哈希: ${existingHash?.substring(0, 8)}... -> ${fileHash.substring(0, 8)}...)`);
+                            shouldUpload = true;
+                        }
+                    }
+                } else {
+                    console.log(`🆕 新文件: ${cosPath} (大小: ${file.size})`);
+                    shouldUpload = true;
                 }
 
-                // 计算文件哈希
-                const fileHash = await calculateFileHash(file.path);
-
-                // 检查哈希是否相同
-                const manifestEntry = manifest[cosPath];
-                if (manifestEntry &&
-                    (typeof manifestEntry === 'string' ? manifestEntry === fileHash : manifestEntry.hash === fileHash)) {
-                    console.log(`⏭️  跳过未修改的文件: ${cosPath}`);
-                    skippedCount++;
-                    return {
-                        success: true,
-                        path: cosPath,
-                        hash: fileHash,
-                        skipped: true
-                    };
+                // 如果需要上传且还没计算哈希，现在计算
+                if (shouldUpload && !fileHash) {
+                    fileHash = await calculateFileHash(file.path);
                 }
 
                 // 上传文件
