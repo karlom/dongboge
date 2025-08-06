@@ -2,7 +2,6 @@ User-agent: *
 Allow: /
 
 # 优先抓取重要页面
-Allow: /
 Allow: /about/
 Allow: /services/
 Allow: /contact/
@@ -21,11 +20,6 @@ Sitemap: https://dongboge.com/sitemap-index.xml
 
 # 针对百度搜索引擎的特殊设置
 User-agent: Baiduspider
-Allow: /
-Crawl-delay: 1
-
-# 针对Google搜索引擎的特殊设置  
-User-agent: Googlebot
 Allow: /
 Crawl-delay: 1
 
