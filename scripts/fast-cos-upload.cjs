@@ -5,10 +5,11 @@
  * 
  * 极致优化版本，专注于速度：
  * 1. 大幅增加并行数量
- * 2. 跳过哈希计算（基于文件大小和修改时间）
+ * 2. 跳过哈希计算（只基于文件大小判断）
  * 3. 简化清单结构
  * 4. 减少API调用
  * 5. 智能文件过滤
+ * 6. 修复：不再依赖修改时间，避免构建过程中的重复上传
  */
 
 const fs = require('fs');
@@ -68,8 +69,7 @@ async function fastScanFiles(dir, baseDir = dir) {
                     files.push({
                         path: fullPath,
                         cosPath: relativePath,
-                        size: stats.size,
-                        mtime: stats.mtimeMs // 使用毫秒时间戳，更精确
+                        size: stats.size
                     });
                 } catch (err) {
                     // 忽略无法访问的文件
@@ -116,7 +116,7 @@ async function loadFastManifest() {
     }
 }
 
-// 快速判断是否需要上传
+// 快速判断是否需要上传 - 修复：只基于文件大小判断
 function needsUpload(file, manifest) {
     const entry = manifest[file.cosPath];
     if (!entry) {
@@ -124,15 +124,15 @@ function needsUpload(file, manifest) {
         return true;
     }
 
-    // 只比较文件大小和修改时间，跳过哈希计算
+    // 只比较文件大小，不比较修改时间（避免构建过程中时间变化导致重复上传）
     const sizeChanged = entry.size !== file.size;
-    const timeChanged = entry.mtime !== file.mtime;
 
-    if (sizeChanged || timeChanged) {
-        console.log(`🔄 文件变更: ${file.cosPath} (大小: ${entry.size} -> ${file.size}, 时间: ${sizeChanged ? '变更' : '未变'}, 修改时间: ${timeChanged ? '变更' : '未变'})`);
+    if (sizeChanged) {
+        console.log(`🔄 文件大小变更: ${file.cosPath} (${entry.size} -> ${file.size})`);
         return true;
     }
 
+    // 文件大小相同，跳过上传
     return false;
 }
 
@@ -207,7 +207,7 @@ async function ultraFastUpload(files, manifest) {
                 uploaded++;
                 newManifest[file.cosPath] = {
                     size: file.size,
-                    mtime: file.mtime
+                    uploadTime: new Date().toISOString()
                 };
                 process.stdout.write('✅');
             } else {
