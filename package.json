@@ -8,7 +8,12 @@
     "preview": "astro preview",
     "astro": "astro",
     "migrate": "node migrate-wordpress.js",
-    "migrate:sample": "node migrate-simple.js"
+    "migrate:sample": "node migrate-simple.js",
+    "seo:sitemap": "node scripts/generate-complete-sitemap.js",
+    "seo:submit": "node scripts/submit-to-search-engines.js",
+    "seo:check": "node scripts/seo-health-check.js",
+    "seo:online": "node scripts/check-online-status.js",
+    "seo:all": "npm run seo:sitemap && npm run seo:online && npm run seo:submit"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
