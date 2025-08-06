@@ -190,6 +190,18 @@ jobs:
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
 
+      - name: 完整部署 - 传输 scripts 脚本
+        if: steps.deploy_strategy.outputs.strategy == 'full'
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -rltzv --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --rsync-path="rsync"
+          path: scripts/
+          remote_path: /var/www/dongboge/scripts
+          remote_host: ${{ secrets.HOST }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+
       - name: 完整部署 - 准备目录结构
         if: steps.deploy_strategy.outputs.strategy == 'full'
         uses: appleboy/ssh-action@v1.0.3
