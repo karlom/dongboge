@@ -190,11 +190,24 @@ jobs:
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
 
+      - name: 完整部署 - 准备目录结构
+        if: steps.deploy_strategy.outputs.strategy == 'full'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            sudo mkdir -p /var/www/dongboge/deploy
+            sudo chown -R ${{ secrets.USERNAME }}:${{ secrets.USERNAME }} /var/www/dongboge
+            sudo chmod -R 755 /var/www/dongboge
+
       - name: 完整部署 - 传输部署脚本
         if: steps.deploy_strategy.outputs.strategy == 'full'
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -rltz --rsync-path="mkdir -p /var/www/dongboge/deploy && rsync"
+          switches: -rltzv --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --rsync-path="rsync"
           path: deploy/
           remote_path: /var/www/dongboge/deploy
           remote_host: ${{ secrets.HOST }}
@@ -212,6 +225,7 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.PORT || '22' }}
           command_timeout: 10m
+          envs: PUBLIC_SUPABASE_URL,PUBLIC_SUPABASE_ANON_KEY
           script: |
             set -e
             echo "📦 开始部署..."
@@ -318,11 +332,24 @@ jobs:
             fi
 
       # ==================== 增量部署流程 ====================
+      - name: 增量部署 - 准备目录结构
+        if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            sudo mkdir -p /var/www/dongboge/client
+            sudo chown -R ${{ secrets.USERNAME }}:${{ secrets.USERNAME }} /var/www/dongboge
+            sudo chmod -R 755 /var/www/dongboge
+
       - name: 增量部署 - rsync传输
         if: steps.deploy_strategy.outputs.strategy == 'incremental' || steps.deploy_strategy.outputs.strategy == 'blog_only'
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -rltz --delete --rsync-path="mkdir -p /var/www/dongboge/client && rsync"
+          switches: -rltzv --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --rsync-path="rsync"
           path: dist/
           remote_path: /var/www/dongboge/client
           remote_host: ${{ secrets.HOST }}
