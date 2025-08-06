@@ -1,4 +1,4 @@
-name: 智能混合部署策略 - 解决rsync和404错误
+name: 日常更新博客
 
 on:
   push:

@@ -391,6 +391,27 @@ async function main() {
             {
                 path: path.join(distPath, 'images'),
                 name: 'images'
+            },
+            {
+                path: path.join(distPath, '_astro'),
+                name: '_astro'
+            },
+            // 如果有client目录，也扫描它
+            {
+                path: path.join(distPath, 'client', 'assets'),
+                name: 'client/assets'
+            },
+            {
+                path: path.join(distPath, 'client', 'fonts'),
+                name: 'client/fonts'
+            },
+            {
+                path: path.join(distPath, 'client', 'images'),
+                name: 'client/images'
+            },
+            {
+                path: path.join(distPath, 'client', '_astro'),
+                name: 'client/_astro'
             }
         ];
 

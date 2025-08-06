@@ -31,7 +31,7 @@ const cos = new COS({
 });
 
 const distPath = path.join(process.cwd(), 'dist');
-const manifestKey = '.fast-manifest.json';
+const manifestKey = '.upload-manifest.json';
 const maxRetries = 1; // 只重试一次
 const batchSize = 50; // 大幅增加并行数量
 const skipHashCheck = true; // 跳过哈希检查，只基于文件大小和修改时间
@@ -119,10 +119,21 @@ async function loadFastManifest() {
 // 快速判断是否需要上传
 function needsUpload(file, manifest) {
     const entry = manifest[file.cosPath];
-    if (!entry) return true;
+    if (!entry) {
+        console.log(`🆕 新文件: ${file.cosPath}`);
+        return true;
+    }
 
     // 只比较文件大小和修改时间，跳过哈希计算
-    return entry.size !== file.size || entry.mtime !== file.mtime;
+    const sizeChanged = entry.size !== file.size;
+    const timeChanged = entry.mtime !== file.mtime;
+
+    if (sizeChanged || timeChanged) {
+        console.log(`🔄 文件变更: ${file.cosPath} (大小: ${entry.size} -> ${file.size}, 时间: ${sizeChanged ? '变更' : '未变'}, 修改时间: ${timeChanged ? '变更' : '未变'})`);
+        return true;
+    }
+
+    return false;
 }
 
 // 快速上传文件
@@ -152,6 +163,7 @@ async function fastUpload(file) {
 
 // 超快速批量上传
 async function ultraFastUpload(files, manifest) {
+    console.log(`🔍 检查文件变更...`);
     const needUpload = files.filter(file => needsUpload(file, manifest));
     const skipCount = files.length - needUpload.length;
 
@@ -207,24 +219,32 @@ async function ultraFastUpload(files, manifest) {
         console.log(` (${uploaded + failed}/${needUpload.length})`);
     }
 
-    // 快速保存清单
-    try {
-        await new Promise((resolve, reject) => {
-            cos.putObject({
-                Bucket: process.env.TENCENT_COS_BUCKET,
-                Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
-                Key: manifestKey,
-                Body: JSON.stringify(newManifest),
-                Headers: {
-                    'Content-Type': 'application/json'
-                }
-            }, (err, data) => {
-                if (err) reject(err);
-                else resolve(data);
+    // 保存清单到COS
+    if (uploaded > 0) {
+        try {
+            console.log('\n💾 保存上传清单到COS...');
+            await new Promise((resolve, reject) => {
+                cos.putObject({
+                    Bucket: process.env.TENCENT_COS_BUCKET,
+                    Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
+                    Key: manifestKey,
+                    Body: JSON.stringify(newManifest, null, 2),
+                    Headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                }, (err, data) => {
+                    if (err) reject(err);
+                    else resolve(data);
+                });
             });
-        });
-    } catch (err) {
-        console.warn('⚠️  保存清单失败:', err.message);
+            console.log(`✅ 清单已保存 (${Object.keys(newManifest).length} 个文件记录)`);
+        } catch (err) {
+            console.error('❌ 保存清单失败:', err.message);
+            console.error('⚠️  下次部署可能会重新上传所有文件');
+        }
+    } else {
+        console.log('📋 没有新文件上传，跳过清单更新');
     }
 
     return {
@@ -240,17 +260,54 @@ async function main() {
     console.log('⚡ 启动快速COS上传...');
 
     try {
-        // 并行加载清单和扫描文件 - 扫描client目录下的静态资源
-        const clientPath = path.join(distPath, 'client');
-        const [manifest, ...fileLists] = await Promise.all([
-            loadFastManifest(),
-            fastScanFiles(path.join(clientPath, 'assets'), clientPath),
-            fastScanFiles(path.join(clientPath, 'fonts'), clientPath),
-            fastScanFiles(path.join(clientPath, 'images'), clientPath),
-            fastScanFiles(path.join(clientPath, '_astro'), clientPath)
-        ]);
+        // 加载清单
+        const manifest = await loadFastManifest();
 
-        const allFiles = fileLists.flat();
+        // 扫描静态资源目录 - 根据实际构建输出结构
+        const scanPaths = [{
+                path: path.join(distPath, 'assets'),
+                name: 'assets'
+            },
+            {
+                path: path.join(distPath, 'fonts'),
+                name: 'fonts'
+            },
+            {
+                path: path.join(distPath, 'images'),
+                name: 'images'
+            },
+            {
+                path: path.join(distPath, '_astro'),
+                name: '_astro'
+            },
+            // 如果有client目录，也扫描它
+            {
+                path: path.join(distPath, 'client', 'assets'),
+                name: 'client/assets'
+            },
+            {
+                path: path.join(distPath, 'client', 'fonts'),
+                name: 'client/fonts'
+            },
+            {
+                path: path.join(distPath, 'client', 'images'),
+                name: 'client/images'
+            },
+            {
+                path: path.join(distPath, 'client', '_astro'),
+                name: 'client/_astro'
+            }
+        ];
+
+        const allFiles = [];
+        for (const scanPath of scanPaths) {
+            if (fs.existsSync(scanPath.path)) {
+                const files = await fastScanFiles(scanPath.path, distPath);
+                console.log(`📂 ${scanPath.name}: ${files.length} 个文件`);
+                allFiles.push(...files);
+            }
+        }
+
         console.log(`📁 扫描到 ${allFiles.length} 个文件`);
 
         if (allFiles.length === 0) {
