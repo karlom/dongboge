@@ -14,19 +14,19 @@ Slug 是 URL 中用来标识特定页面的部分，它应该是：
 ### 优化前
 
 ```
-https://dongboge.cn/blog/2025年应该怎么用大模型
+https://dongboge.com/blog/2025年应该怎么用大模型
 ```
 
 实际 URL 会被编码成：
 
 ```
-https://dongboge.cn/blog/2025%E5%B9%B4%E5%BA%94%E8%AF%A5%E6%80%8E%E4%B9%88%E7%94%A8%E5%A4%A7%E6%A8%A1%E5%9E%8B
+https://dongboge.com/blog/2025%E5%B9%B4%E5%BA%94%E8%AF%A5%E6%80%8E%E4%B9%88%E7%94%A8%E5%A4%A7%E6%A8%A1%E5%9E%8B
 ```
 
 ### 优化后
 
 ```
-https://dongboge.cn/blog/how-to-use-ai-models-in-2025
+https://dongboge.com/blog/how-to-use-ai-models-in-2025
 ```
 
 ## 实现方式

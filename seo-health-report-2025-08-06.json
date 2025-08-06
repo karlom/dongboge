@@ -1,29 +1,29 @@
 {
-  "timestamp": "2025-08-06T04:37:28.899Z",
+  "timestamp": "2025-08-06T05:31:37.790Z",
   "localFiles": {
     "public/robots.txt": {
       "exists": true,
-      "size": 735,
-      "content": "User-agent: *\nAllow: /\n\n# 优先抓取重要页面\nAllow: /\nAllow: /about/\nAllow: /services/\nAllow: /contact/\nAllow: /training-cases/\nAllow: /blog/\n\n# 禁止抓取管理页面和API\nDisallow: /admin/\nDisallow: /api/\nDisallow: /_astro/...",
-      "lastModified": "2025-08-05T06:06:09.935Z"
+      "size": 633,
+      "content": "User-agent: *\nAllow: /\n\n# 优先抓取重要页面\nAllow: /about/\nAllow: /services/\nAllow: /contact/\nAllow: /training-cases/\nAllow: /blog/\n\n# 禁止抓取管理页面和API\nDisallow: /admin/\nDisallow: /api/\nDisallow: /_astro/\nDisallow...",
+      "lastModified": "2025-08-06T05:28:15.706Z"
     },
     "public/sitemap.xml": {
       "exists": true,
-      "size": 43314,
+      "size": 43024,
       "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"\n        xmlns:image=\"http://www.google.com/schemas/sitemap-image/1.1\">\n    \n    <!-- 首页 - 最高优先级 -->\n ...",
-      "lastModified": "2025-08-06T04:21:52.246Z"
+      "lastModified": "2025-08-06T05:28:15.704Z"
     },
     "public/sitemap-index.xml": {
       "exists": true,
-      "size": 240,
-      "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n    <sitemap>\n        <loc>https://dongboge.com/sitemap.xml</loc>\n        <lastmod>2025-08-06<...",
-      "lastModified": "2025-08-06T04:21:52.248Z"
+      "size": 239,
+      "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n    <sitemap>\n        <loc>https://dongboge.cn/sitemap.xml</loc>\n        <lastmod>2025-08-06</...",
+      "lastModified": "2025-08-06T05:28:15.704Z"
     },
     "public/rss.xml": {
       "exists": true,
-      "size": 1235,
+      "size": 1229,
       "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n    <channel>\n        <title>东波哥 - AI培训专家</title>\n        <description>东波哥（杨东波），广州塔哥科技创始人，专业企业AI培训师，...",
-      "lastModified": "2025-08-06T04:37:14.355Z"
+      "lastModified": "2025-08-06T05:28:15.708Z"
     }
   },
   "onlineAccess": {
@@ -32,14 +32,14 @@
       "status": 200,
       "headers": {
         "server": "nginx/1.18.0 (Ubuntu)",
-        "date": "Wed, 06 Aug 2025 04:37:25 GMT",
+        "date": "Wed, 06 Aug 2025 05:31:34 GMT",
         "content-type": "text/html",
         "content-length": "59093",
-        "last-modified": "Wed, 06 Aug 2025 03:59:32 GMT",
+        "last-modified": "Wed, 06 Aug 2025 04:52:48 GMT",
         "connection": "keep-alive",
         "vary": "Accept-Encoding",
-        "etag": "\"6892d324-e6d5\"",
-        "expires": "Wed, 06 Aug 2025 05:37:25 GMT",
+        "etag": "\"6892dfa0-e6d5\"",
+        "expires": "Wed, 06 Aug 2025 06:31:34 GMT",
         "cache-control": "max-age=3600, public",
         "accept-ranges": "bytes"
       },
@@ -50,12 +50,12 @@
       "status": 200,
       "headers": {
         "server": "nginx/1.18.0 (Ubuntu)",
-        "date": "Wed, 06 Aug 2025 04:37:25 GMT",
+        "date": "Wed, 06 Aug 2025 05:31:34 GMT",
         "content-type": "text/plain",
-        "content-length": "735",
-        "last-modified": "Wed, 06 Aug 2025 03:59:32 GMT",
+        "content-length": "635",
+        "last-modified": "Wed, 06 Aug 2025 04:52:48 GMT",
         "connection": "keep-alive",
-        "etag": "\"6892d324-2df\"",
+        "etag": "\"6892dfa0-27b\"",
         "x-frame-options": "SAMEORIGIN",
         "x-content-type-options": "nosniff",
         "accept-ranges": "bytes"
@@ -67,13 +67,13 @@
       "status": 200,
       "headers": {
         "server": "nginx/1.18.0 (Ubuntu)",
-        "date": "Wed, 06 Aug 2025 04:37:25 GMT",
+        "date": "Wed, 06 Aug 2025 05:31:34 GMT",
         "content-type": "text/xml",
-        "content-length": "2260",
-        "last-modified": "Wed, 06 Aug 2025 03:59:32 GMT",
+        "content-length": "43314",
+        "last-modified": "Wed, 06 Aug 2025 04:52:48 GMT",
         "connection": "keep-alive",
         "vary": "Accept-Encoding",
-        "etag": "\"6892d324-8d4\"",
+        "etag": "\"6892dfa0-a932\"",
         "x-frame-options": "SAMEORIGIN",
         "x-content-type-options": "nosniff",
         "accept-ranges": "bytes"
@@ -85,12 +85,12 @@
       "status": 200,
       "headers": {
         "server": "nginx/1.18.0 (Ubuntu)",
-        "date": "Wed, 06 Aug 2025 04:37:27 GMT",
+        "date": "Wed, 06 Aug 2025 05:31:34 GMT",
         "content-type": "text/xml",
         "content-length": "183",
-        "last-modified": "Wed, 06 Aug 2025 03:59:32 GMT",
+        "last-modified": "Wed, 06 Aug 2025 04:52:48 GMT",
         "connection": "keep-alive",
-        "etag": "\"6892d324-b7\"",
+        "etag": "\"6892dfa0-b7\"",
         "x-frame-options": "SAMEORIGIN",
         "x-content-type-options": "nosniff",
         "accept-ranges": "bytes"
@@ -99,31 +99,35 @@
     },
     "https://dongboge.cn/rss.xml": {
       "url": "https://dongboge.cn/rss.xml",
-      "status": 404,
+      "status": 200,
       "headers": {
         "server": "nginx/1.18.0 (Ubuntu)",
-        "date": "Wed, 06 Aug 2025 04:37:27 GMT",
-        "content-type": "text/html",
-        "content-length": "12790",
+        "date": "Wed, 06 Aug 2025 05:31:34 GMT",
+        "content-type": "text/xml",
+        "content-length": "1235",
+        "last-modified": "Wed, 06 Aug 2025 04:52:48 GMT",
         "connection": "keep-alive",
         "vary": "Accept-Encoding",
-        "etag": "\"6892d324-31f6\""
+        "etag": "\"6892dfa0-4d3\"",
+        "x-frame-options": "SAMEORIGIN",
+        "x-content-type-options": "nosniff",
+        "accept-ranges": "bytes"
       },
-      "success": false
+      "success": true
     },
     "https://dongboge.cn/about/": {
       "url": "https://dongboge.cn/about/",
       "status": 200,
       "headers": {
         "server": "nginx/1.18.0 (Ubuntu)",
-        "date": "Wed, 06 Aug 2025 04:37:27 GMT",
+        "date": "Wed, 06 Aug 2025 05:31:34 GMT",
         "content-type": "text/html",
         "content-length": "25310",
-        "last-modified": "Wed, 06 Aug 2025 03:59:32 GMT",
+        "last-modified": "Wed, 06 Aug 2025 04:52:48 GMT",
         "connection": "keep-alive",
         "vary": "Accept-Encoding",
-        "etag": "\"6892d324-62de\"",
-        "expires": "Wed, 06 Aug 2025 05:37:27 GMT",
+        "etag": "\"6892dfa0-62de\"",
+        "expires": "Wed, 06 Aug 2025 06:31:34 GMT",
         "cache-control": "max-age=3600, public",
         "accept-ranges": "bytes"
       },
@@ -134,14 +138,14 @@
       "status": 200,
       "headers": {
         "server": "nginx/1.18.0 (Ubuntu)",
-        "date": "Wed, 06 Aug 2025 04:37:27 GMT",
+        "date": "Wed, 06 Aug 2025 05:31:36 GMT",
         "content-type": "text/html",
         "content-length": "37791",
-        "last-modified": "Wed, 06 Aug 2025 03:59:32 GMT",
+        "last-modified": "Wed, 06 Aug 2025 04:52:48 GMT",
         "connection": "keep-alive",
         "vary": "Accept-Encoding",
-        "etag": "\"6892d324-939f\"",
-        "expires": "Wed, 06 Aug 2025 05:37:27 GMT",
+        "etag": "\"6892dfa0-939f\"",
+        "expires": "Wed, 06 Aug 2025 06:31:36 GMT",
         "cache-control": "max-age=3600, public",
         "accept-ranges": "bytes"
       },
@@ -152,12 +156,12 @@
       "status": 404,
       "headers": {
         "server": "nginx/1.18.0 (Ubuntu)",
-        "date": "Wed, 06 Aug 2025 04:37:27 GMT",
+        "date": "Wed, 06 Aug 2025 05:31:36 GMT",
         "content-type": "text/html",
         "content-length": "12790",
         "connection": "keep-alive",
         "vary": "Accept-Encoding",
-        "etag": "\"6892d324-31f6\""
+        "etag": "\"6892dfa0-31f6\""
       },
       "success": false
     },
@@ -166,14 +170,14 @@
       "status": 200,
       "headers": {
         "server": "nginx/1.18.0 (Ubuntu)",
-        "date": "Wed, 06 Aug 2025 04:37:28 GMT",
+        "date": "Wed, 06 Aug 2025 05:31:36 GMT",
         "content-type": "text/html",
         "content-length": "80276",
-        "last-modified": "Wed, 06 Aug 2025 03:59:32 GMT",
+        "last-modified": "Wed, 06 Aug 2025 04:52:48 GMT",
         "connection": "keep-alive",
         "vary": "Accept-Encoding",
-        "etag": "\"6892d324-13994\"",
-        "expires": "Wed, 06 Aug 2025 05:37:28 GMT",
+        "etag": "\"6892dfa0-13994\"",
+        "expires": "Wed, 06 Aug 2025 06:31:36 GMT",
         "cache-control": "max-age=3600, public",
         "accept-ranges": "bytes"
       },
@@ -184,6 +188,6 @@
     "localFilesCount": 4,
     "localFilesSuccess": 4,
     "onlineUrlsCount": 9,
-    "onlineUrlsSuccess": 7
+    "onlineUrlsSuccess": 8
   }
 }

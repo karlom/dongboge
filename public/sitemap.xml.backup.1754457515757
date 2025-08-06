@@ -4,12 +4,12 @@
     
     <!-- 首页 - 最高优先级 -->
     <url>
-        <loc>https://dongboge.cn/</loc>
+        <loc>https://dongboge.com/</loc>
         <lastmod>2025-08-06</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
         <image:image>
-            <image:loc>https://dongboge.cn/images/hero1.png</image:loc>
+            <image:loc>https://dongboge.com/images/hero1.png</image:loc>
             <image:title>东波哥 - 广州企业AI培训专家</image:title>
             <image:caption>东波哥（杨东波），广州塔哥科技创始人，专业企业AI培训师</image:caption>
         </image:image>
@@ -17,7 +17,7 @@
     
     <!-- 关于页面 -->
     <url>
-        <loc>https://dongboge.cn/about/</loc>
+        <loc>https://dongboge.com/about/</loc>
         <lastmod>2025-08-06</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
@@ -25,7 +25,7 @@
     
     <!-- 服务页面 -->
     <url>
-        <loc>https://dongboge.cn/services/</loc>
+        <loc>https://dongboge.com/services/</loc>
         <lastmod>2025-08-06</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
@@ -33,7 +33,7 @@
     
     <!-- 联系页面 -->
     <url>
-        <loc>https://dongboge.cn/contact/</loc>
+        <loc>https://dongboge.com/contact/</loc>
         <lastmod>2025-08-06</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
@@ -41,7 +41,7 @@
     
     <!-- 培训案例页面 -->
     <url>
-        <loc>https://dongboge.cn/training-cases/</loc>
+        <loc>https://dongboge.com/training-cases/</loc>
         <lastmod>2025-08-06</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
@@ -49,7 +49,7 @@
     
     <!-- 博客首页 -->
     <url>
-        <loc>https://dongboge.cn/blog/</loc>
+        <loc>https://dongboge.com/blog/</loc>
         <lastmod>2025-08-06</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
@@ -57,7 +57,7 @@
     
     <!-- RSS订阅 -->
     <url>
-        <loc>https://dongboge.cn/rss.xml</loc>
+        <loc>https://dongboge.com/rss.xml</loc>
         <lastmod>2025-08-06</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.5</priority>
@@ -65,12 +65,12 @@
     
     <!-- 博客文章: 2023年终总结 -->
     <url>
-        <loc>https://dongboge.cn/blog/2023-year-end-summary/</loc>
+        <loc>https://dongboge.com/blog/2023年终总结/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life1.png</image:loc>
             <image:title>2023年终总结</image:title>
             <image:caption># 2023年终总结 在2023年的最后一天，我突然知道俄乌战争、美国CIA、国际局势和原油价格跟我的关系是这 [&hellip;]</image:caption>
         </image:image>
@@ -78,12 +78,12 @@
     
     <!-- 博客文章: 2024-8-19今天就只写了一篇公众号文章并发表了 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-08-19-wrote-wechat-article/</loc>
+        <loc>https://dongboge.com/blog/2024-8-19今天就只写了一篇公众号文章并发表了/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life.png</image:loc>
             <image:title>2024-8-19今天就只写了一篇公众号文章并发表了</image:title>
             <image:caption># 8-19今天就只写了一篇公众号文章并发表了 从昨天中午开始，我把想法写到effie里，然后让AI帮我写文章 [&hellip;]</image:caption>
         </image:image>
@@ -91,12 +91,12 @@
     
     <!-- 博客文章: 20241210人生作业 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-12-10-life-homework/</loc>
+        <loc>https://dongboge.com/blog/20241210人生作业/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life1.png</image:loc>
             <image:title>20241210人生作业</image:title>
             <image:caption>今天约了敏捷云的赵秋松在广州塔的星巴克见面，聊了聊敏捷云的业务和现状，他带了他的同事张泽彬过来，因为他上周才换 [&hellip;]</image:caption>
         </image:image>
@@ -104,12 +104,12 @@
     
     <!-- 博客文章: 20241222日人生作业 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-12-22-life-homework/</loc>
+        <loc>https://dongboge.com/blog/20241222日人生作业/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life1.png</image:loc>
             <image:title>20241222日人生作业</image:title>
             <image:caption>2024-12-22-weekend-family-time-and-dental-visit 今天是周日，昨 [&hellip;]</image:caption>
         </image:image>
@@ -117,12 +117,12 @@
     
     <!-- 博客文章: 2024年10月14日星期一 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-10-14-monday/</loc>
+        <loc>https://dongboge.com/blog/2024年10月14日星期一/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/life2.jpg</image:loc>
             <image:title>2024年10月14日星期一</image:title>
             <image:caption>自从上周开始决定洗心革面之后，我就一直使用工具来让自己能更专注，更有执行力。目前看来这些工具的作用有限，人一旦 [&hellip;]</image:caption>
         </image:image>
@@ -130,12 +130,12 @@
     
     <!-- 博客文章: 2024年10月9日我恢复了跑步 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-10-09-resumed-running/</loc>
+        <loc>https://dongboge.com/blog/2024年10月9日我恢复了跑步/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/life2.jpg</image:loc>
             <image:title>2024年10月9日我恢复了跑步</image:title>
             <image:caption>在测过了体重确实恢复到130之后我决定还是要开始运动，饭后的散步运动量还是不足以达到有氧的级别，慢跑还是一个比 [&hellip;]</image:caption>
         </image:image>
@@ -143,12 +143,12 @@
     
     <!-- 博客文章: 2024年11月21日塔哥科技的业务慢慢步入正轨 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-11-21-tage-tech-business-on-track/</loc>
+        <loc>https://dongboge.com/blog/2024年11月21日塔哥科技的业务慢慢步入正轨/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/work.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/work.png</image:loc>
             <image:title>2024年11月21日塔哥科技的业务慢慢步入正轨</image:title>
             <image:caption>不知不觉这周已经到了周四了，在上个月国庆后的工作习惯应该要执行起来了，早上的时候用trello来梳理一下工作， [&hellip;]</image:caption>
         </image:image>
@@ -156,12 +156,12 @@
     
     <!-- 博客文章: 2024年12月4日老婆又辞职了 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-12-04-wife-quit-job-again/</loc>
+        <loc>https://dongboge.com/blog/2024年12月4日老婆又辞职了/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/life2.jpg</image:loc>
             <image:title>2024年12月4日老婆又辞职了</image:title>
             <image:caption>早上送儿子去上学之前我照例叫老婆起床，因为平时都是要我送她去坐地铁的，她上周天天都要我等，我有点不耐烦了，不过 [&hellip;]</image:caption>
         </image:image>
@@ -169,12 +169,12 @@
     
     <!-- 博客文章: 2024年9月28日周六日记 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-09-28-saturday-diary/</loc>
+        <loc>https://dongboge.com/blog/2024年9月28日周六日记/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life1.png</image:loc>
             <image:title>2024年9月28日周六日记</image:title>
             <image:caption>今天是国庆假期前最后一个休息日，今天娃们都不上学，但是老婆要上班。其实对我来说娃们不上学只有我一个人的时候是比 [&hellip;]</image:caption>
         </image:image>
@@ -182,12 +182,12 @@
     
     <!-- 博客文章: 2024年9月30日爸爸想打官司 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-09-30-dad-lawsuit/</loc>
+        <loc>https://dongboge.com/blog/2024年9月30日爸爸想打官司/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life.png</image:loc>
             <image:title>2024年9月30日爸爸想打官司</image:title>
             <image:caption>昨天我在外面的时候爸爸给我发了一张截图，是他和一个律师的聊天对话，对方给了他一个定位，他就开始吵着要上来广州和 [&hellip;]</image:caption>
         </image:image>
@@ -195,12 +195,12 @@
     
     <!-- 博客文章: 2024年中秋节小记 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-mid-autumn-festival-notes/</loc>
+        <loc>https://dongboge.com/blog/2024年中秋节小记/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life1.png</image:loc>
             <image:title>2024年中秋节小记</image:title>
             <image:caption>今天是中秋节，这个三天小长假的最后一天。感觉三天假期一下子就过去了，一天一天的都是十一点儿子和老婆才起床，自己 [&hellip;]</image:caption>
         </image:image>
@@ -208,12 +208,12 @@
     
     <!-- 博客文章: 2024年十月重新出发 -->
     <url>
-        <loc>https://dongboge.cn/blog/2024-october-fresh-start/</loc>
+        <loc>https://dongboge.com/blog/2024年十月重新出发/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/life2.jpg</image:loc>
             <image:title>2024年十月重新出发</image:title>
             <image:caption>这个国庆假期一直都在广州，一来是因为没有旅游的预算，二来是因为老婆的工作原因她经常要打电话做销售。所以就在广州 [&hellip;]</image:caption>
         </image:image>
@@ -221,12 +221,12 @@
     
     <!-- 博客文章: 2025年7月19日成功记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-07-19-success-record/</loc>
+        <loc>https://dongboge.com/blog/2025年7月19日成功记录/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/default.png</image:loc>
             <image:title>2025年7月19日成功记录</image:title>
             <image:caption>1、今天成功把wordpress部署好了，把memcached也加上了，首页布局也设置成和以前差不多的样子。 [&hellip;]</image:caption>
         </image:image>
@@ -234,12 +234,12 @@
     
     <!-- 博客文章: 2025年7月20日成功日记 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-07-20-success-diary/</loc>
+        <loc>https://dongboge.com/blog/2025年7月20日成功日记/</loc>
         <lastmod>2025-07-20</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/default2.jpg</image:loc>
             <image:title>2025年7月20日成功日记</image:title>
             <image:caption>1、今天早上成功收到了妈妈和爸爸寄过来的家里摘的龙眼，包装得很好的一箱子。爸爸还跟我语音强调了寄这箱水果还不如 [&hellip;]</image:caption>
         </image:image>
@@ -247,12 +247,12 @@
     
     <!-- 博客文章: 2025年7月21日成功日记 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-07-21-success-diary/</loc>
+        <loc>https://dongboge.com/blog/2025年7月21日成功日记/</loc>
         <lastmod>2025-07-20</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/default2.jpg</image:loc>
             <image:title>2025年7月21日成功日记</image:title>
             <image:caption>1、今天重新把个人博客调整完成了，调整成了可以看的样式，大部分也是按我的意愿去设计了。 2、跟进了高要小程序项 [&hellip;]</image:caption>
         </image:image>
@@ -260,12 +260,12 @@
     
     <!-- 博客文章: 2025年7月23日成功记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-07-23-success-record/</loc>
+        <loc>https://dongboge.com/blog/2025年7月23日成功记录/</loc>
         <lastmod>2025-07-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/default1.png</image:loc>
             <image:title>2025年7月23日成功记录</image:title>
             <image:caption>1、提交一份社群AI课程的方案。待提交六周课程交付物清单。 2、提交一份合作业务列表给麒麟子。 3、发送活动海 [&hellip;]</image:caption>
         </image:image>
@@ -273,12 +273,12 @@
     
     <!-- 博客文章: 2025年7月27成功日记 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-07-27-success-diary/</loc>
+        <loc>https://dongboge.com/blog/2025年7月27成功日记/</loc>
         <lastmod>2025-07-27</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/default.png</image:loc>
             <image:title>2025年7月27成功日记</image:title>
             <image:caption>昨天忘记记录了，今天一起记录了吧。 26日成功记录 1、完成了线下沙龙的准备工作：打印签到名单、打印会场指引、 [&hellip;]</image:caption>
         </image:image>
@@ -286,12 +286,12 @@
     
     <!-- 博客文章: 2025年7月28日成功记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-07-28-success-record/</loc>
+        <loc>https://dongboge.com/blog/2025年7月28日成功记录/</loc>
         <lastmod>2025-07-27</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/default2.jpg</image:loc>
             <image:title>2025年7月28日成功记录</image:title>
             <image:caption>1、早上成功做了炒饭当早餐 2、根据下午培训目标客户群做了PPT的调整 3、中午做的汤受到娃们的喜欢。 4、成 [&hellip;]</image:caption>
         </image:image>
@@ -299,12 +299,12 @@
     
     <!-- 博客文章: 2025年7月30日成功记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-07-30-success-record/</loc>
+        <loc>https://dongboge.com/blog/2025年7月30日成功记录/</loc>
         <lastmod>2025-07-29</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/default.png</image:loc>
             <image:title>2025年7月30日成功记录</image:title>
             <image:caption>29日成功记录 1、成功把公积金交了。 2、成功在12点前睡觉了。 30日成功记录 1、成功在8点前起床去买菜 [&hellip;]</image:caption>
         </image:image>
@@ -312,12 +312,12 @@
     
     <!-- 博客文章: 2025年7月31日成功记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-07-31-success-record/</loc>
+        <loc>https://dongboge.com/blog/2025年7月31日成功记录/</loc>
         <lastmod>2025-07-31</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/default2.jpg</image:loc>
             <image:title>2025年7月31日成功记录</image:title>
             <image:caption># 2025年7月31日成功记录 1、今天最主要的任务是把holden的任务完成：通过苹果手机的siri用语音 [&hellip;]</image:caption>
         </image:image>
@@ -325,12 +325,12 @@
     
     <!-- 博客文章: 2025年8月2日成功记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-08-02-success-record/</loc>
+        <loc>https://dongboge.com/blog/2025年8月2日成功记录/</loc>
         <lastmod>2025-08-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/success1.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/success1.jpg</image:loc>
             <image:title>2025年8月2日成功记录</image:title>
             <image:caption>今天最主要的任务是把dongboge.cn个人网站全部开发完成并部署到服务器</image:caption>
         </image:image>
@@ -338,12 +338,12 @@
     
     <!-- 博客文章: 2025年8月4日成功记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-08-04-success-record/</loc>
+        <loc>https://dongboge.com/blog/2025年8月4日成功记录/</loc>
         <lastmod>2025-08-03</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/success2.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/success2.png</image:loc>
             <image:title>2025年8月4日成功记录</image:title>
             <image:caption>今天最主要的任务是把dongboge.cn个人网站全部开发完成并部署到服务器</image:caption>
         </image:image>
@@ -351,12 +351,12 @@
     
     <!-- 博客文章: 2025年8月5日失败记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-08-05-fail-record/</loc>
+        <loc>https://dongboge.com/blog/2025年8月5日失败记录/</loc>
         <lastmod>2025-08-05</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/default.png</image:loc>
             <image:title>2025年8月5日失败记录</image:title>
             <image:caption>成功记录写多了，写点失败的记录</image:caption>
         </image:image>
@@ -364,12 +364,12 @@
     
     <!-- 博客文章: 2025年8月5日成功记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-08-05-success-record/</loc>
+        <loc>https://dongboge.com/blog/2025年8月5日成功记录/</loc>
         <lastmod>2025-08-05</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/default2.jpg</image:loc>
             <image:title>2025年8月5日成功记录</image:title>
             <image:caption>今天最主要的任务是把dongboge.cn个人网站的自动化部署脚本优化</image:caption>
         </image:image>
@@ -377,12 +377,12 @@
     
     <!-- 博客文章: 2025年元旦 -->
     <url>
-        <loc>https://dongboge.cn/blog/2025-new-year/</loc>
+        <loc>https://dongboge.com/blog/2025年元旦/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/life2.jpg</image:loc>
             <image:title>2025年元旦</image:title>
             <image:caption>今天是元旦节，今年很特殊地不调休，因为这一天刚好是周三，它不好调！ 周三这个时间点真是绝妙，它充分地满足了人们 [&hellip;]</image:caption>
         </image:image>
@@ -390,12 +390,12 @@
     
     <!-- 博客文章: 2025年应该怎么用大模型 -->
     <url>
-        <loc>https://dongboge.cn/blog/how-to-use-ai-models-in-2025/</loc>
+        <loc>https://dongboge.com/blog/2025年应该怎么用大模型/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/tech1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/tech1.png</image:loc>
             <image:title>2025年应该怎么用大模型</image:title>
             <image:caption># 2025年应该怎么用大模型 2025年了，模型能力上升了一个台阶，更不需要去记提示词技巧和框架了，写提示词 [&hellip;]</image:caption>
         </image:image>
@@ -403,12 +403,12 @@
     
     <!-- 博客文章: AI时代的企业数字化转型实践指南 -->
     <url>
-        <loc>https://dongboge.cn/blog/ai-era-digital-transformation-guide/</loc>
+        <loc>https://dongboge.com/blog/AI时代的企业数字化转型实践指南/</loc>
         <lastmod>2024-12-14</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/default1.png</image:loc>
             <image:title>AI时代的企业数字化转型实践指南</image:title>
             <image:caption>探讨人工智能如何重塑现代企业的运营模式，分享数字化转型的实践经验和成功案例。</image:caption>
         </image:image>
@@ -416,12 +416,12 @@
     
     <!-- 博客文章: brew updte出错解决方法记录 -->
     <url>
-        <loc>https://dongboge.cn/blog/fixing-brew-update-errors/</loc>
+        <loc>https://dongboge.com/blog/brew-updte出错解决方法记录/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/tech1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/tech1.png</image:loc>
             <image:title>brew updte出错解决方法记录</image:title>
             <image:caption># brew updte出错解决方法记录 今天上午看到一个推说要brew更新，于是我也终于想起来要为安装的应用 [&hellip;]</image:caption>
         </image:image>
@@ -429,12 +429,12 @@
     
     <!-- 博客文章: deepseek的100种应用案例 -->
     <url>
-        <loc>https://dongboge.cn/blog/deepseek-100-use-cases/</loc>
+        <loc>https://dongboge.com/blog/deepseek的100种应用案例/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/tech.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/tech.png</image:loc>
             <image:title>deepseek的100种应用案例</image:title>
             <image:caption># DeepSeek的100种应用场景 以下100个场景展示了DeepSeek在不同领域的广泛应用，体现了其强 [&hellip;]</image:caption>
         </image:image>
@@ -442,12 +442,12 @@
     
     <!-- 博客文章: AI时代的企业数字化转型：从理论到实践 -->
     <url>
-        <loc>https://dongboge.cn/blog/ai-enterprise-digital-transformation-guide/</loc>
+        <loc>https://dongboge.com/blog/first-post/</loc>
         <lastmod>2022-07-07</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu.png</image:loc>
             <image:title>AI时代的企业数字化转型：从理论到实践</image:title>
             <image:caption>探讨人工智能如何重塑现代企业的运营模式，以及企业如何在AI浪潮中找到自己的定位和发展方向。</image:caption>
         </image:image>
@@ -455,12 +455,12 @@
     
     <!-- 博客文章: AI技术文档写作规范：Markdown最佳实践指南 -->
     <url>
-        <loc>https://dongboge.cn/blog/ai-markdown-documentation-best-practices/</loc>
+        <loc>https://dongboge.com/blog/markdown-style-guide/</loc>
         <lastmod>2024-06-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/daily1.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/daily1.jpg</image:loc>
             <image:title>AI技术文档写作规范：Markdown最佳实践指南</image:title>
             <image:caption>分享AI技术文档写作中的Markdown语法规范和最佳实践，帮助技术团队创建清晰、专业的技术文档。</image:caption>
         </image:image>
@@ -468,12 +468,12 @@
     
     <!-- 博客文章: reboot and select proper boot device的第二种解决方法 -->
     <url>
-        <loc>https://dongboge.cn/blog/second-solution-boot-device-error/</loc>
+        <loc>https://dongboge.com/blog/reboot-and-select-proper-boot-device的第二种解决方法/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/tech.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/tech.png</image:loc>
             <image:title>reboot and select proper boot device的第二种解决方法</image:title>
             <image:caption># reboot and select proper boot device的第二种解决方法 今天下午，我看w [&hellip;]</image:caption>
         </image:image>
@@ -481,12 +481,12 @@
     
     <!-- 博客文章: Dify平台实战：从零开始构建企业级智能体 -->
     <url>
-        <loc>https://dongboge.cn/blog/dify-platform-enterprise-ai-agent-guide/</loc>
+        <loc>https://dongboge.com/blog/second-post/</loc>
         <lastmod>2022-07-14</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/success2.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/success2.png</image:loc>
             <image:title>Dify平台实战：从零开始构建企业级智能体</image:title>
             <image:caption>深入解析Dify平台的核心功能，分享如何利用Dify快速构建和部署企业级AI智能体的实践经验。</image:caption>
         </image:image>
@@ -494,12 +494,12 @@
     
     <!-- 博客文章: 企业AI内训实战指南：如何让团队快速掌握AI工具 -->
     <url>
-        <loc>https://dongboge.cn/blog/enterprise-ai-training-practical-guide/</loc>
+        <loc>https://dongboge.com/blog/third-post/</loc>
         <lastmod>2022-07-21</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/daily1.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/daily1.jpg</image:loc>
             <image:title>企业AI内训实战指南：如何让团队快速掌握AI工具</image:title>
             <image:caption>分享企业AI内训的实践经验，从培训体系设计到效果评估，帮助企业建立高效的AI人才培养机制。</image:caption>
         </image:image>
@@ -507,12 +507,12 @@
     
     <!-- 博客文章: 技术博客写作利器：MDX在AI内容创作中的应用 -->
     <url>
-        <loc>https://dongboge.cn/blog/using-mdx/</loc>
+        <loc>https://dongboge.com/blog/using-mdx/</loc>
         <lastmod>2024-05-31</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/blog-placeholder-5.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/blog-placeholder-5.jpg</image:loc>
             <image:title>技术博客写作利器：MDX在AI内容创作中的应用</image:title>
             <image:caption>探索如何使用MDX格式创建更丰富、更互动的技术博客内容，特别是在AI技术分享中的实践应用。</image:caption>
         </image:image>
@@ -520,12 +520,12 @@
     
     <!-- 博客文章: 一早上纠结了输入法的问题 -->
     <url>
-        <loc>https://dongboge.cn/blog/morning-input-method-struggles/</loc>
+        <loc>https://dongboge.com/blog/一早上纠结了输入法的问题/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life1.png</image:loc>
             <image:title>一早上纠结了输入法的问题</image:title>
             <image:caption># 一早上纠结了输入法的问题 前几天我发现工作电脑中了一个搜索引擎劫持的蠕虫病毒，找网管看了之后推荐使用火绒进 [&hellip;]</image:caption>
         </image:image>
@@ -533,12 +533,12 @@
     
     <!-- 博客文章: 东波哥语录 -->
     <url>
-        <loc>https://dongboge.cn/blog/dongboge-quotes/</loc>
+        <loc>https://dongboge.com/blog/东波哥语录/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/default.png</image:loc>
             <image:title>东波哥语录</image:title>
             <image:caption>裁员了，很严重，收藏这 35 条人生建议，应该会对你有帮助！ 最近公众号的更新不稳定，主要是有很多输出的东西已 [&hellip;]</image:caption>
         </image:image>
@@ -546,12 +546,12 @@
     
     <!-- 博客文章: 人生升维主题视频摘录2024年12月23日 -->
     <url>
-        <loc>https://dongboge.cn/blog/life-upgrade-video-excerpts-2024-12-23/</loc>
+        <loc>https://dongboge.com/blog/人生升维主题视频摘录2024年12月23日/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu1.png</image:loc>
             <image:title>人生升维主题视频摘录2024年12月23日</image:title>
             <image:caption>今天是周一，早上刷到一个视频，说人生升维的，我觉得不错，然后去找到了他的完整版视频 在B站上花了一个多小时看完 [&hellip;]</image:caption>
         </image:image>
@@ -559,12 +559,12 @@
     
     <!-- 博客文章: 会不会考察候选人的『AI能力』 -->
     <url>
-        <loc>https://dongboge.cn/blog/will-companies-test-ai-skills/</loc>
+        <loc>https://dongboge.com/blog/会不会考察候选人的『AI能力』/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/tech2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/tech2.jpg</image:loc>
             <image:title>会不会考察候选人的『AI能力』</image:title>
             <image:caption>根据前些天 X 友们的讨论，总结了一下：《不会考察候选人的「AI能力」？你可能招不到未来的人才！》 你有没有发 [&hellip;]</image:caption>
         </image:image>
@@ -572,12 +572,12 @@
     
     <!-- 博客文章: 你的AI agent能卖多少钱是由什么决定的 -->
     <url>
-        <loc>https://dongboge.cn/blog/what-determines-ai-agent-pricing/</loc>
+        <loc>https://dongboge.com/blog/你的AI-agent能卖多少钱是由什么决定的/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu2.jpg</image:loc>
             <image:title>你的AI agent能卖多少钱是由什么决定的</image:title>
             <image:caption>是什么决定了你的AI Agent能卖多少钱？ 记住这个公式： 场景价值=人数*单位时间用人成本*使用频率*单次 [&hellip;]</image:caption>
         </image:image>
@@ -585,12 +585,12 @@
     
     <!-- 博客文章: 做自媒体的路径 -->
     <url>
-        <loc>https://dongboge.cn/blog/path-to-self-media-success/</loc>
+        <loc>https://dongboge.com/blog/做自媒体的路径/</loc>
         <lastmod>2025-07-27</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu2.jpg</image:loc>
             <image:title>做自媒体的路径</image:title>
             <image:caption>1、如何找赛道： 找到你可以降为打击80%的人的赛道 你把这个赛道，赚钱最多的流量最大的，从头看到尾，看完，如 [&hellip;]</image:caption>
         </image:image>
@@ -598,12 +598,12 @@
     
     <!-- 博客文章: 决定了，我要做deepseek培训！ -->
     <url>
-        <loc>https://dongboge.cn/blog/decided-to-do-deepseek-training/</loc>
+        <loc>https://dongboge.com/blog/决定了，我要做deepseek培训！/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/work.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/work.png</image:loc>
             <image:title>决定了，我要做deepseek培训！</image:title>
             <image:caption># 从此以后请叫我：AI培训师东波哥😊。 上周六的早上醒来后躺在床上冥想，突然想通了一件事：**我要做ai培训 [&hellip;]</image:caption>
         </image:image>
@@ -611,12 +611,12 @@
     
     <!-- 博客文章: 十个人们害怕开始赚钱的借口 -->
     <url>
-        <loc>https://dongboge.cn/blog/ten-excuses-people-afraid-making-money/</loc>
+        <loc>https://dongboge.com/blog/十个人们害怕开始赚钱的借口/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu1.png</image:loc>
             <image:title>十个人们害怕开始赚钱的借口</image:title>
             <image:caption>十个人们害怕开始赚钱的借口，有没有哪个击中了你？ \</image:caption>
         </image:image>
@@ -624,12 +624,12 @@
     
     <!-- 博客文章: 去参加cocos开发者大会 -->
     <url>
-        <loc>https://dongboge.cn/blog/attending-cocos-developer-conference/</loc>
+        <loc>https://dongboge.com/blog/去参加cocos开发者大会/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/work2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/work2.jpg</image:loc>
             <image:title>去参加cocos开发者大会</image:title>
             <image:caption># 去参加cocos开发者大会 今天下午是老蔡喵组织的cocos开发者大会的日子，我昨天晚上就跟老婆说过这个安 [&hellip;]</image:caption>
         </image:image>
@@ -637,12 +637,12 @@
     
     <!-- 博客文章: 嘴炮式写代码的流程 -->
     <url>
-        <loc>https://dongboge.cn/blog/talk-driven-coding-process/</loc>
+        <loc>https://dongboge.com/blog/嘴炮式写代码的流程/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu1.png</image:loc>
             <image:title>嘴炮式写代码的流程</image:title>
             <image:caption>现代用ai写代码的推荐流程</image:caption>
         </image:image>
@@ -650,12 +650,12 @@
     
     <!-- 博客文章: 因为穷，我逃过了万门的镰刀 -->
     <url>
-        <loc>https://dongboge.cn/blog/escaped-wanmen-scam-because-poor/</loc>
+        <loc>https://dongboge.com/blog/因为穷，我逃过了万门的镰刀/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life.png</image:loc>
             <image:title>因为穷，我逃过了万门的镰刀</image:title>
             <image:caption># 因为穷，我逃过了万门的镰刀 今天早上看公众号文章的时候“差评”公众号写了万门大学疑似跑路的事，然后在微信中 [&hellip;]</image:caption>
         </image:image>
@@ -663,12 +663,12 @@
     
     <!-- 博客文章: 在我说要当AI培训师两周后直接起飞了 -->
     <url>
-        <loc>https://dongboge.cn/blog/ai-trainer-career-took-off-after-two-weeks/</loc>
+        <loc>https://dongboge.com/blog/在我说要当AI培训师两周后直接起飞了/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/work2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/work2.jpg</image:loc>
             <image:title>在我说要当AI培训师两周后直接起飞了</image:title>
             <image:caption>不知不觉这周已经过去两天了，昨天下午去见了老甘之后回来路上去花城汇吃了个黑山牛肉汤，因为上午已经收到了周日的课 [&hellip;]</image:caption>
         </image:image>
@@ -676,12 +676,12 @@
     
     <!-- 博客文章: 大语言模型在企业应用中的最佳实践 -->
     <url>
-        <loc>https://dongboge.cn/blog/llm-enterprise-best-practices/</loc>
+        <loc>https://dongboge.com/blog/大语言模型在企业应用中的最佳实践/</loc>
         <lastmod>2024-12-09</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/default.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/default.png</image:loc>
             <image:title>大语言模型在企业应用中的最佳实践</image:title>
             <image:caption>深入分析大语言模型在企业级应用中的部署策略、性能优化和安全考虑。</image:caption>
         </image:image>
@@ -689,12 +689,12 @@
     
     <!-- 博客文章: 如何在24小时内拥有自己的生意并开始盈利！ -->
     <url>
-        <loc>https://dongboge.cn/blog/start-profitable-business-in-24-hours/</loc>
+        <loc>https://dongboge.com/blog/如何在24小时内拥有自己的生意并开始盈利！/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu.png</image:loc>
             <image:title>如何在24小时内拥有自己的生意并开始盈利！</image:title>
             <image:caption>首先判断一下，自己是否愿意在当下，把赚钱当成最重要的事情，没有之一。 这意味着，你要做市场需要你做的任何事情。 [&hellip;]</image:caption>
         </image:image>
@@ -702,12 +702,12 @@
     
     <!-- 博客文章: 如何讲好故事 -->
     <url>
-        <loc>https://dongboge.cn/blog/how-to-tell-good-stories/</loc>
+        <loc>https://dongboge.com/blog/如何讲好故事/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu1.png</image:loc>
             <image:title>如何讲好故事</image:title>
             <image:caption># 讲故事是最重要的人生技能！ Matthew Dicks著有九本书，包括小说、摇滚歌剧，甚至漫画书。他的日常 [&hellip;]</image:caption>
         </image:image>
@@ -715,12 +715,12 @@
     
     <!-- 博客文章: 如何零成本用车 -->
     <url>
-        <loc>https://dongboge.cn/blog/zero-cost-car-usage-tips/</loc>
+        <loc>https://dongboge.com/blog/如何零成本用车/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/life2.jpg</image:loc>
             <image:title>如何零成本用车</image:title>
             <image:caption># 如何零成本用车 又临近月底，我的车放在停车场已经二十多天没动了。自从搬到市区之后就很少开车了，至于我为什么 [&hellip;]</image:caption>
         </image:image>
@@ -728,12 +728,12 @@
     
     <!-- 博客文章: 富人不会说 -->
     <url>
-        <loc>https://dongboge.cn/blog/what-rich-people-wont-tell-you/</loc>
+        <loc>https://dongboge.com/blog/富人不会说/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu2.jpg</image:loc>
             <image:title>富人不会说</image:title>
             <image:caption># 为什么富人永远不会告诉穷人赚钱的秘密？ 你有没有遇到过这样的人？ 他们聪明、知识渊博、思维敏捷... 但就 [&hellip;]</image:caption>
         </image:image>
@@ -741,12 +741,12 @@
     
     <!-- 博客文章: 开了个新坑：写一份Dify的教程 -->
     <url>
-        <loc>https://dongboge.cn/blog/started-writing-dify-tutorial/</loc>
+        <loc>https://dongboge.com/blog/开了个新坑：写一份Dify的教程/</loc>
         <lastmod>2025-07-17</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/work.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/work.png</image:loc>
             <image:title>开了个新坑：写一份Dify的教程</image:title>
             <image:caption>这周一的时候我把Dify搭建知识库+对接微信公众号的服务文章发出去之后就开始着手准备写一个Dify使用教程。 [&hellip;]</image:caption>
         </image:image>
@@ -754,12 +754,12 @@
     
     <!-- 博客文章: 怎么样才能发财？ -->
     <url>
-        <loc>https://dongboge.cn/blog/how-to-get-rich/</loc>
+        <loc>https://dongboge.com/blog/怎么样才能发财？/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu.png</image:loc>
             <image:title>怎么样才能发财？</image:title>
             <image:caption>刚才刷推看到一篇不错的文章，转载过来，以后还能复习： 发财不是先有钱而是先有胆 ## 一、其实所有的穷人，都是 [&hellip;]</image:caption>
         </image:image>
@@ -767,12 +767,12 @@
     
     <!-- 博客文章: 我拉黑了一个我帮助过的微信网友 -->
     <url>
-        <loc>https://dongboge.cn/blog/blocked-someone-i-helped-on-wechat/</loc>
+        <loc>https://dongboge.com/blog/我拉黑了一个我帮助过的微信网友/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/life1.png</image:loc>
             <image:title>我拉黑了一个我帮助过的微信网友</image:title>
             <image:caption># 我拉黑了一个我帮助过的微信网友 我最近拉黑了一个我帮助过的微信网友。 他是我在一个技术群里认识的人，由于某 [&hellip;]</image:caption>
         </image:image>
@@ -780,12 +780,12 @@
     
     <!-- 博客文章: 我没有赚到认知以外的钱 -->
     <url>
-        <loc>https://dongboge.cn/blog/cant-earn-money-beyond-cognition/</loc>
+        <loc>https://dongboge.com/blog/我没有赚到认知以外的钱/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/life2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/life2.jpg</image:loc>
             <image:title>我没有赚到认知以外的钱</image:title>
             <image:caption># 我没有赚到认知以外的钱 最近在从事和数字货币相关的业务，花了些时间去学习和研究数字货币相关的东西。越学习越 [&hellip;]</image:caption>
         </image:image>
@@ -793,12 +793,12 @@
     
     <!-- 博客文章: 本站被黑记 -->
     <url>
-        <loc>https://dongboge.cn/blog/website-hacked-incident-report/</loc>
+        <loc>https://dongboge.com/blog/本站被黑记/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/tech2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/tech2.jpg</image:loc>
             <image:title>本站被黑记</image:title>
             <image:caption># 本站被黑记 昨天我朋友找我要简历的时候我想把我网站上的个人介绍丢给他让他自己云摘取，但是却反馈说我的网站报 [&hellip;]</image:caption>
         </image:image>
@@ -806,12 +806,12 @@
     
     <!-- 博客文章: 每天一个做小生意的小技巧 -->
     <url>
-        <loc>https://dongboge.cn/blog/daily-small-business-tips/</loc>
+        <loc>https://dongboge.com/blog/每天一个做小生意的小技巧/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu.png</image:loc>
             <image:title>每天一个做小生意的小技巧</image:title>
             <image:caption># 每天一个做小生意的小技巧 粉丝里有很多想做小生意的朋友分享几个自己做生意的小经验，或许可以少走点儿弯路1、 [&hellip;]</image:caption>
         </image:image>
@@ -819,12 +819,12 @@
     
     <!-- 博客文章: 生意好不好做是人的问题 -->
     <url>
-        <loc>https://dongboge.cn/blog/business-success-depends-on-people/</loc>
+        <loc>https://dongboge.com/blog/生意好不好做是人的问题/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/zhailu1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/zhailu1.png</image:loc>
             <image:title>生意好不好做是人的问题</image:title>
             <image:caption>生意好不好做，不是生意的问题，是人的问题 行业卷不卷，不是行业的问题，还是人的问题 流量小的地方干不了，流量大 [&hellip;]</image:caption>
         </image:image>
@@ -832,12 +832,12 @@
     
     <!-- 博客文章: 编程新手如何学会让cursor干活 -->
     <url>
-        <loc>https://dongboge.cn/blog/how-beginners-learn-cursor-ai-coding/</loc>
+        <loc>https://dongboge.com/blog/编程新手如何学会让cursor干活/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/tech2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/tech2.jpg</image:loc>
             <image:title>编程新手如何学会让cursor干活</image:title>
             <image:caption>现在假设你是公司的产品经理，你要带一个会编程的新手。你打算咋办？ 是给他下个：\</image:caption>
         </image:image>
@@ -845,12 +845,12 @@
     
     <!-- 博客文章: 解决更新插件失败的问题 -->
     <url>
-        <loc>https://dongboge.cn/blog/solving-plugin-update-failures/</loc>
+        <loc>https://dongboge.com/blog/解决更新插件失败的问题/</loc>
         <lastmod>2025-07-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/tech1.png</image:loc>
+            <image:loc>https://dongboge.com../../assets/tech1.png</image:loc>
             <image:title>解决更新插件失败的问题</image:title>
             <image:caption>今天打开wordpress后台想看看有没有可以实现像微博这样的插件，然后就看到有两个插件有更新，于是我顺手就点 [&hellip;]</image:caption>
         </image:image>
@@ -858,12 +858,12 @@
     
     <!-- 博客文章: 重新做一遍个人网站这件事 -->
     <url>
-        <loc>https://dongboge.cn/blog/rebuilding-personal-website-again/</loc>
+        <loc>https://dongboge.com/blog/重新做一遍个人网站这件事/</loc>
         <lastmod>2025-07-17</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
         <image:image>
-            <image:loc>https://dongboge.cn../../assets/tech2.jpg</image:loc>
+            <image:loc>https://dongboge.com../../assets/tech2.jpg</image:loc>
             <image:title>重新做一遍个人网站这件事</image:title>
             <image:caption>在过去的大半年时间里，我的自媒体一直都是处于沉默的状态，这其中的原因是2020年中我换了一份工作，在换工作之前 [&hellip;]</image:caption>
         </image:image>

@@ -1,0 +1,283 @@
+{
+  "timestamp": "2025-08-06T05:28:15.763Z",
+  "summary": {
+    "totalFiles": 29,
+    "fixedFiles": 18,
+    "totalReplaces": 222
+  },
+  "details": [
+    {
+      "fixed": true,
+      "replaceCount": 132,
+      "backupPath": "public/sitemap.xml.backup.1754458095703",
+      "reason": "domain fixed",
+      "filePath": "public/sitemap.xml"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 1,
+      "backupPath": "public/sitemap-index.xml.backup.1754458095704",
+      "reason": "domain fixed",
+      "filePath": "public/sitemap-index.xml"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 2,
+      "backupPath": "public/robots.txt.backup.1754458095705",
+      "reason": "domain fixed",
+      "filePath": "public/robots.txt"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 6,
+      "backupPath": "public/rss.xml.backup.1754458095707",
+      "reason": "domain fixed",
+      "filePath": "public/rss.xml"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 1,
+      "backupPath": "astro.config.mjs.backup.1754458095707",
+      "reason": "domain fixed",
+      "filePath": "astro.config.mjs"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "src/pages/rss.xml.js"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 6,
+      "backupPath": "scripts/fix-sitemap-urls.cjs.backup.1754458095709",
+      "reason": "domain fixed",
+      "filePath": "scripts/fix-sitemap-urls.cjs"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "scripts/test-blog-urls.cjs"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "scripts/seo-health-check.cjs"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "scripts/validate-robots.cjs"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "deploy-seo-files.sh"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "diagnose-seo-files.sh"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "verify-robots-fix.sh"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 6,
+      "backupPath": "fix-seo-files-access.sh.backup.1754458095710",
+      "reason": "domain fixed",
+      "filePath": "fix-seo-files-access.sh"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "SEO-SUBMISSION-GUIDE.md"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "SITEMAP-URL-FIX-SUMMARY.md"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "ROBOTS-FIX-DEPLOYMENT.md"
+    },
+    {
+      "fixed": false,
+      "reason": "no changes needed",
+      "filePath": "SEO-FILES-FIXED.md"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 3,
+      "backupPath": "BLOG-SLUG-OPTIMIZATION.md.backup.1754458095759",
+      "reason": "domain fixed",
+      "filePath": "BLOG-SLUG-OPTIMIZATION.md"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 14,
+      "backupPath": "SEO重新收录执行总结.md.backup.1754458095760",
+      "reason": "domain fixed",
+      "filePath": "SEO重新收录执行总结.md"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 3,
+      "backupPath": "scripts/check-online-status.js.backup.1754458095760",
+      "reason": "domain fixed",
+      "filePath": "scripts/check-online-status.js"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 6,
+      "backupPath": "scripts/fix-domain-name.cjs.backup.1754458095761",
+      "reason": "domain fixed",
+      "filePath": "scripts/fix-domain-name.cjs"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 1,
+      "backupPath": "scripts/generate-complete-sitemap.js.backup.1754458095761",
+      "reason": "domain fixed",
+      "filePath": "scripts/generate-complete-sitemap.js"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 2,
+      "backupPath": "scripts/seo-health-check.js.backup.1754458095761",
+      "reason": "domain fixed",
+      "filePath": "scripts/seo-health-check.js"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 1,
+      "backupPath": "scripts/submit-to-search-engines.js.backup.1754458095762",
+      "reason": "domain fixed",
+      "filePath": "scripts/submit-to-search-engines.js"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 13,
+      "backupPath": "当前状态分析与行动计划.md.backup.1754458095762",
+      "reason": "domain fixed",
+      "filePath": "当前状态分析与行动计划.md"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 9,
+      "backupPath": "搜索引擎重新收录指南.md.backup.1754458095762",
+      "reason": "domain fixed",
+      "filePath": "搜索引擎重新收录指南.md"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 14,
+      "backupPath": "立即执行清单.md.backup.1754458095762",
+      "reason": "domain fixed",
+      "filePath": "立即执行清单.md"
+    },
+    {
+      "fixed": true,
+      "replaceCount": 2,
+      "backupPath": "src/layouts/Layout.astro.backup.1754458095763",
+      "reason": "domain fixed",
+      "filePath": "src/layouts/Layout.astro"
+    }
+  ],
+  "fixedFiles": [
+    {
+      "file": "public/sitemap.xml",
+      "replaces": 132,
+      "backup": "public/sitemap.xml.backup.1754458095703"
+    },
+    {
+      "file": "public/sitemap-index.xml",
+      "replaces": 1,
+      "backup": "public/sitemap-index.xml.backup.1754458095704"
+    },
+    {
+      "file": "public/robots.txt",
+      "replaces": 2,
+      "backup": "public/robots.txt.backup.1754458095705"
+    },
+    {
+      "file": "public/rss.xml",
+      "replaces": 6,
+      "backup": "public/rss.xml.backup.1754458095707"
+    },
+    {
+      "file": "astro.config.mjs",
+      "replaces": 1,
+      "backup": "astro.config.mjs.backup.1754458095707"
+    },
+    {
+      "file": "scripts/fix-sitemap-urls.cjs",
+      "replaces": 6,
+      "backup": "scripts/fix-sitemap-urls.cjs.backup.1754458095709"
+    },
+    {
+      "file": "fix-seo-files-access.sh",
+      "replaces": 6,
+      "backup": "fix-seo-files-access.sh.backup.1754458095710"
+    },
+    {
+      "file": "BLOG-SLUG-OPTIMIZATION.md",
+      "replaces": 3,
+      "backup": "BLOG-SLUG-OPTIMIZATION.md.backup.1754458095759"
+    },
+    {
+      "file": "SEO重新收录执行总结.md",
+      "replaces": 14,
+      "backup": "SEO重新收录执行总结.md.backup.1754458095760"
+    },
+    {
+      "file": "scripts/check-online-status.js",
+      "replaces": 3,
+      "backup": "scripts/check-online-status.js.backup.1754458095760"
+    },
+    {
+      "file": "scripts/fix-domain-name.cjs",
+      "replaces": 6,
+      "backup": "scripts/fix-domain-name.cjs.backup.1754458095761"
+    },
+    {
+      "file": "scripts/generate-complete-sitemap.js",
+      "replaces": 1,
+      "backup": "scripts/generate-complete-sitemap.js.backup.1754458095761"
+    },
+    {
+      "file": "scripts/seo-health-check.js",
+      "replaces": 2,
+      "backup": "scripts/seo-health-check.js.backup.1754458095761"
+    },
+    {
+      "file": "scripts/submit-to-search-engines.js",
+      "replaces": 1,
+      "backup": "scripts/submit-to-search-engines.js.backup.1754458095762"
+    },
+    {
+      "file": "当前状态分析与行动计划.md",
+      "replaces": 13,
+      "backup": "当前状态分析与行动计划.md.backup.1754458095762"
+    },
+    {
+      "file": "搜索引擎重新收录指南.md",
+      "replaces": 9,
+      "backup": "搜索引擎重新收录指南.md.backup.1754458095762"
+    },
+    {
+      "file": "立即执行清单.md",
+      "replaces": 14,
+      "backup": "立即执行清单.md.backup.1754458095762"
+    },
+    {
+      "file": "src/layouts/Layout.astro",
+      "replaces": 2,
+      "backup": "src/layouts/Layout.astro.backup.1754458095763"
+    }
+  ]
+}

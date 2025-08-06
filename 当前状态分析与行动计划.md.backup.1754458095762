@@ -28,8 +28,8 @@
 npm run seo:online
 
 # 或者手动检查
-curl -I https://dongboge.cn
-ping dongboge.cn
+curl -I https://dongboge.com
+ping dongboge.com
 ```
 
 ### 第二步：如果网站正常，立即提交sitemap
@@ -46,10 +46,10 @@ npm run seo:submit
 
 在浏览器中访问以下页面，确认都能正常打开：
 
-- https://dongboge.cn/
-- https://dongboge.cn/sitemap.xml
-- https://dongboge.cn/sitemap-index.xml
-- https://dongboge.cn/robots.txt
+- https://dongboge.com/
+- https://dongboge.com/sitemap.xml
+- https://dongboge.com/sitemap-index.xml
+- https://dongboge.com/robots.txt
 
 ## 📋 搜索引擎提交清单
 
@@ -69,11 +69,11 @@ npm run seo:submit
    - 移除 → 新请求 → 暂时移除网址
    - 添加旧的URL模式：
      ```
-     dongboge.cn/2024/*
-     dongboge.cn/2023/*
-     dongboge.cn/category/*
-     dongboge.cn/tag/*
-     dongboge.cn/wp-*
+     dongboge.com/2024/*
+     dongboge.com/2023/*
+     dongboge.com/category/*
+     dongboge.com/tag/*
+     dongboge.com/wp-*
      ```
 
 ### 百度搜索资源平台
@@ -81,7 +81,7 @@ npm run seo:submit
 1. **提交sitemap**
    - 访问 https://ziyuan.baidu.com/
    - 数据引入 → 链接提交 → sitemap
-   - 提交：`https://dongboge.cn/sitemap-index.xml`
+   - 提交：`https://dongboge.com/sitemap-index.xml`
 
 2. **主动推送重要页面**
    - 使用主动推送功能
@@ -115,7 +115,7 @@ npm run seo:sitemap
 
 ```bash
 # 编辑nginx配置
-sudo nano /etc/nginx/sites-available/dongboge.cn
+sudo nano /etc/nginx/sites-available/dongboge.com
 
 # 添加 nginx-redirects.conf 中的重定向规则
 # 然后重启nginx

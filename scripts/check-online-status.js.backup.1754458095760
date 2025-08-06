@@ -1,7 +1,7 @@
 // 检查网站在线状态的脚本
 import fetch from 'node-fetch';
 
-const SITE_URL = 'https://dongboge.cn';
+const SITE_URL = 'https://dongboge.com';
 
 // 重要页面列表
 const pages = [{
@@ -139,8 +139,8 @@ async function checkAllPages() {
         console.log('   3. 防火墙设置是否正确');
         console.log('   4. SSL证书是否有效');
         console.log('\n💡 可以尝试的诊断命令:');
-        console.log(`   ping dongboge.cn`);
-        console.log(`   nslookup dongboge.cn`);
+        console.log(`   ping dongboge.com`);
+        console.log(`   nslookup dongboge.com`);
         console.log(`   curl -I ${SITE_URL}`);
     } else if (summary.success < summary.total) {
         console.log('\n💡 部分页面无法访问，建议:');

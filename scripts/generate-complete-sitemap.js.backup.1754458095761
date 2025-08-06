@@ -45,7 +45,7 @@ async function generateCompleteSitemap() {
             }
         }
 
-        const baseUrl = 'https://dongboge.cn';
+        const baseUrl = 'https://dongboge.com';
         const currentDate = new Date().toISOString().split('T')[0];
 
         console.log(`找到 ${posts.length} 篇博客文章`);

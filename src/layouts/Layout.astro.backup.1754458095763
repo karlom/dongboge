@@ -73,8 +73,8 @@ const { title, description } = Astro.props;
         "name": "杨东波",
         "alternateName": "东波哥",
         "description": "广州企业AI培训专家，AI创业导师",
-        "url": "https://dongboge.cn",
-        "image": "https://dongboge.cn/images/hero1.png",
+        "url": "https://dongboge.com",
+        "image": "https://dongboge.com/images/hero1.png",
         "sameAs": [
           "https://www.xiaobot.net/p/dify?refer=29497055-5c20-4575-a26a-ff2cb81a7aa5"
         ],

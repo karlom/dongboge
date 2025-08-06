@@ -1,7 +1,7 @@
 // 自动提交sitemap到各大搜索引擎的脚本
 import fetch from 'node-fetch';
 
-const SITE_URL = 'https://dongboge.cn';
+const SITE_URL = 'https://dongboge.com';
 const SITEMAP_URL = `${SITE_URL}/sitemap-index.xml`;
 
 // 搜索引擎提交配置

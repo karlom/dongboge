@@ -10,7 +10,7 @@ import {
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://dongboge.cn',
+	site: 'https://dongboge.com',
 	output: 'server', // 服务端渲染模式
 	adapter: node({
 		mode: 'standalone'

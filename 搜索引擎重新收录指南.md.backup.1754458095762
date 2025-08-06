@@ -2,7 +2,7 @@
 
 ## 当前情况分析
 
-你的网站已经完成重构，从WordPress迁移到了Astro框架，域名为 `dongboge.cn`。现在需要让搜索引擎删除旧的错误链接，重新收录新的页面结构。
+你的网站已经完成重构，从WordPress迁移到了Astro框架，域名为 `dongboge.com`。现在需要让搜索引擎删除旧的错误链接，重新收录新的页面结构。
 
 ## 一、立即执行的紧急措施
 
@@ -59,7 +59,7 @@ location ~ ^/wp-admin/(.*)$ {
    - 登录 [Google Search Console](https://search.google.com/search-console)
    - 选择你的网站属性
    - 左侧菜单 → 站点地图
-   - 添加新的sitemap：`https://dongboge.cn/sitemap-index.xml`
+   - 添加新的sitemap：`https://dongboge.com/sitemap-index.xml`
 
 2. **请求重新抓取重要页面**
    - 左侧菜单 → 网址检查
@@ -71,9 +71,9 @@ location ~ ^/wp-admin/(.*)$ {
    - 点击"新请求"
    - 选择"暂时移除网址"
    - 输入需要移除的旧URL模式，如：
-     - `dongboge.cn/2024/*`
-     - `dongboge.cn/category/*`
-     - `dongboge.cn/tag/*`
+     - `dongboge.com/2024/*`
+     - `dongboge.com/category/*`
+     - `dongboge.com/tag/*`
 
 ### 2. 百度搜索资源平台
 
@@ -83,7 +83,7 @@ location ~ ^/wp-admin/(.*)$ {
    - 登录 [百度搜索资源平台](https://ziyuan.baidu.com/)
    - 选择网站 → 数据引入 → 链接提交
    - 选择"sitemap"方式
-   - 提交：`https://dongboge.cn/sitemap-index.xml`
+   - 提交：`https://dongboge.com/sitemap-index.xml`
 
 2. **主动推送重要页面**
    - 使用"主动推送"功能
@@ -126,8 +126,8 @@ Disallow: /wp-*
 Disallow: /*.php$
 
 # 网站地图位置
-Sitemap: https://dongboge.cn/sitemap.xml
-Sitemap: https://dongboge.cn/sitemap-index.xml
+Sitemap: https://dongboge.com/sitemap.xml
+Sitemap: https://dongboge.com/sitemap-index.xml
 
 # 针对百度搜索引擎的特殊设置
 User-agent: Baiduspider
@@ -161,7 +161,7 @@ import fs from "fs";
 
 async function generateSitemap() {
   const posts = await getCollection("blog");
-  const baseUrl = "https://dongboge.cn";
+  const baseUrl = "https://dongboge.com";
 
   let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -15,8 +15,8 @@ Disallow: /_astro/
 Disallow: /node_modules/
 
 # 网站地图位置
-Sitemap: https://dongboge.cn/sitemap.xml
-Sitemap: https://dongboge.cn/sitemap-index.xml
+Sitemap: https://dongboge.com/sitemap.xml
+Sitemap: https://dongboge.com/sitemap-index.xml
 
 # 针对百度搜索引擎的特殊设置
 User-agent: Baiduspider

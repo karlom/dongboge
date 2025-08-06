@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 
-const SITE_URL = 'https://dongboge.cn';
+const SITE_URL = 'https://dongboge.com';
 
 class SEOHealthChecker {
     constructor() {
@@ -176,7 +176,7 @@ class SEOHealthChecker {
                 this.log('failed', 'Astro配置缺少sitemap插件');
             }
 
-            if (content.includes("site: 'https://dongboge.cn'")) {
+            if (content.includes("site: 'https://dongboge.com'")) {
                 this.log('passed', 'Astro配置包含正确的网站URL');
             } else {
                 this.log('warnings', 'Astro配置的网站URL可能不正确');

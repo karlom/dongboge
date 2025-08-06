@@ -1,0 +1,435 @@
+{
+  "timestamp": "2025-08-06T05:18:35.772Z",
+  "totalFiles": 61,
+  "fixes": [
+    {
+      "fileName": "2023年终总结",
+      "slug": "2023-year-end-summary",
+      "oldUrl": "https://dongboge.com/blog/2023年终总结/",
+      "newUrl": "https://dongboge.com/blog/2023-year-end-summary/"
+    },
+    {
+      "fileName": "2024-8-19今天就只写了一篇公众号文章并发表了",
+      "slug": "2024-08-19-wrote-wechat-article",
+      "oldUrl": "https://dongboge.com/blog/2024-8-19今天就只写了一篇公众号文章并发表了/",
+      "newUrl": "https://dongboge.com/blog/2024-08-19-wrote-wechat-article/"
+    },
+    {
+      "fileName": "20241210人生作业",
+      "slug": "2024-12-10-life-homework",
+      "oldUrl": "https://dongboge.com/blog/20241210人生作业/",
+      "newUrl": "https://dongboge.com/blog/2024-12-10-life-homework/"
+    },
+    {
+      "fileName": "20241222日人生作业",
+      "slug": "2024-12-22-life-homework",
+      "oldUrl": "https://dongboge.com/blog/20241222日人生作业/",
+      "newUrl": "https://dongboge.com/blog/2024-12-22-life-homework/"
+    },
+    {
+      "fileName": "2024年10月14日星期一",
+      "slug": "2024-10-14-monday",
+      "oldUrl": "https://dongboge.com/blog/2024年10月14日星期一/",
+      "newUrl": "https://dongboge.com/blog/2024-10-14-monday/"
+    },
+    {
+      "fileName": "2024年10月9日我恢复了跑步",
+      "slug": "2024-10-09-resumed-running",
+      "oldUrl": "https://dongboge.com/blog/2024年10月9日我恢复了跑步/",
+      "newUrl": "https://dongboge.com/blog/2024-10-09-resumed-running/"
+    },
+    {
+      "fileName": "2024年11月21日塔哥科技的业务慢慢步入正轨",
+      "slug": "2024-11-21-tage-tech-business-on-track",
+      "oldUrl": "https://dongboge.com/blog/2024年11月21日塔哥科技的业务慢慢步入正轨/",
+      "newUrl": "https://dongboge.com/blog/2024-11-21-tage-tech-business-on-track/"
+    },
+    {
+      "fileName": "2024年12月4日老婆又辞职了",
+      "slug": "2024-12-04-wife-quit-job-again",
+      "oldUrl": "https://dongboge.com/blog/2024年12月4日老婆又辞职了/",
+      "newUrl": "https://dongboge.com/blog/2024-12-04-wife-quit-job-again/"
+    },
+    {
+      "fileName": "2024年9月28日周六日记",
+      "slug": "2024-09-28-saturday-diary",
+      "oldUrl": "https://dongboge.com/blog/2024年9月28日周六日记/",
+      "newUrl": "https://dongboge.com/blog/2024-09-28-saturday-diary/"
+    },
+    {
+      "fileName": "2024年9月30日爸爸想打官司",
+      "slug": "2024-09-30-dad-lawsuit",
+      "oldUrl": "https://dongboge.com/blog/2024年9月30日爸爸想打官司/",
+      "newUrl": "https://dongboge.com/blog/2024-09-30-dad-lawsuit/"
+    },
+    {
+      "fileName": "2024年中秋节小记",
+      "slug": "2024-mid-autumn-festival-notes",
+      "oldUrl": "https://dongboge.com/blog/2024年中秋节小记/",
+      "newUrl": "https://dongboge.com/blog/2024-mid-autumn-festival-notes/"
+    },
+    {
+      "fileName": "2024年十月重新出发",
+      "slug": "2024-october-fresh-start",
+      "oldUrl": "https://dongboge.com/blog/2024年十月重新出发/",
+      "newUrl": "https://dongboge.com/blog/2024-october-fresh-start/"
+    },
+    {
+      "fileName": "2025年7月19日成功记录",
+      "slug": "2025-07-19-success-record",
+      "oldUrl": "https://dongboge.com/blog/2025年7月19日成功记录/",
+      "newUrl": "https://dongboge.com/blog/2025-07-19-success-record/"
+    },
+    {
+      "fileName": "2025年7月20日成功日记",
+      "slug": "2025-07-20-success-diary",
+      "oldUrl": "https://dongboge.com/blog/2025年7月20日成功日记/",
+      "newUrl": "https://dongboge.com/blog/2025-07-20-success-diary/"
+    },
+    {
+      "fileName": "2025年7月21日成功日记",
+      "slug": "2025-07-21-success-diary",
+      "oldUrl": "https://dongboge.com/blog/2025年7月21日成功日记/",
+      "newUrl": "https://dongboge.com/blog/2025-07-21-success-diary/"
+    },
+    {
+      "fileName": "2025年7月23日成功记录",
+      "slug": "2025-07-23-success-record",
+      "oldUrl": "https://dongboge.com/blog/2025年7月23日成功记录/",
+      "newUrl": "https://dongboge.com/blog/2025-07-23-success-record/"
+    },
+    {
+      "fileName": "2025年7月27成功日记",
+      "slug": "2025-07-27-success-diary",
+      "oldUrl": "https://dongboge.com/blog/2025年7月27成功日记/",
+      "newUrl": "https://dongboge.com/blog/2025-07-27-success-diary/"
+    },
+    {
+      "fileName": "2025年7月28日成功记录",
+      "slug": "2025-07-28-success-record",
+      "oldUrl": "https://dongboge.com/blog/2025年7月28日成功记录/",
+      "newUrl": "https://dongboge.com/blog/2025-07-28-success-record/"
+    },
+    {
+      "fileName": "2025年7月30日成功记录",
+      "slug": "2025-07-30-success-record",
+      "oldUrl": "https://dongboge.com/blog/2025年7月30日成功记录/",
+      "newUrl": "https://dongboge.com/blog/2025-07-30-success-record/"
+    },
+    {
+      "fileName": "2025年7月31日成功记录",
+      "slug": "2025-07-31-success-record",
+      "oldUrl": "https://dongboge.com/blog/2025年7月31日成功记录/",
+      "newUrl": "https://dongboge.com/blog/2025-07-31-success-record/"
+    },
+    {
+      "fileName": "2025年8月2日成功记录",
+      "slug": "2025-08-02-success-record",
+      "oldUrl": "https://dongboge.com/blog/2025年8月2日成功记录/",
+      "newUrl": "https://dongboge.com/blog/2025-08-02-success-record/"
+    },
+    {
+      "fileName": "2025年8月4日成功记录",
+      "slug": "2025-08-04-success-record",
+      "oldUrl": "https://dongboge.com/blog/2025年8月4日成功记录/",
+      "newUrl": "https://dongboge.com/blog/2025-08-04-success-record/"
+    },
+    {
+      "fileName": "2025年8月5日失败记录",
+      "slug": "2025-08-05-fail-record",
+      "oldUrl": "https://dongboge.com/blog/2025年8月5日失败记录/",
+      "newUrl": "https://dongboge.com/blog/2025-08-05-fail-record/"
+    },
+    {
+      "fileName": "2025年8月5日成功记录",
+      "slug": "2025-08-05-success-record",
+      "oldUrl": "https://dongboge.com/blog/2025年8月5日成功记录/",
+      "newUrl": "https://dongboge.com/blog/2025-08-05-success-record/"
+    },
+    {
+      "fileName": "2025年元旦",
+      "slug": "2025-new-year",
+      "oldUrl": "https://dongboge.com/blog/2025年元旦/",
+      "newUrl": "https://dongboge.com/blog/2025-new-year/"
+    },
+    {
+      "fileName": "2025年应该怎么用大模型",
+      "slug": "how-to-use-ai-models-in-2025",
+      "oldUrl": "https://dongboge.com/blog/2025年应该怎么用大模型/",
+      "newUrl": "https://dongboge.com/blog/how-to-use-ai-models-in-2025/"
+    },
+    {
+      "fileName": "AI时代的企业数字化转型实践指南",
+      "slug": "ai-era-digital-transformation-guide",
+      "oldUrl": "https://dongboge.com/blog/AI时代的企业数字化转型实践指南/",
+      "newUrl": "https://dongboge.com/blog/ai-era-digital-transformation-guide/"
+    },
+    {
+      "fileName": "brew-updte出错解决方法记录",
+      "slug": "fixing-brew-update-errors",
+      "oldUrl": "https://dongboge.com/blog/brew-updte出错解决方法记录/",
+      "newUrl": "https://dongboge.com/blog/fixing-brew-update-errors/"
+    },
+    {
+      "fileName": "deepseek的100种应用案例",
+      "slug": "deepseek-100-use-cases",
+      "oldUrl": "https://dongboge.com/blog/deepseek的100种应用案例/",
+      "newUrl": "https://dongboge.com/blog/deepseek-100-use-cases/"
+    },
+    {
+      "fileName": "first-post",
+      "slug": "ai-enterprise-digital-transformation-guide",
+      "oldUrl": "https://dongboge.com/blog/first-post/",
+      "newUrl": "https://dongboge.com/blog/ai-enterprise-digital-transformation-guide/"
+    },
+    {
+      "fileName": "markdown-style-guide",
+      "slug": "ai-markdown-documentation-best-practices",
+      "oldUrl": "https://dongboge.com/blog/markdown-style-guide/",
+      "newUrl": "https://dongboge.com/blog/ai-markdown-documentation-best-practices/"
+    },
+    {
+      "fileName": "reboot-and-select-proper-boot-device的第二种解决方法",
+      "slug": "second-solution-boot-device-error",
+      "oldUrl": "https://dongboge.com/blog/reboot-and-select-proper-boot-device的第二种解决方法/",
+      "newUrl": "https://dongboge.com/blog/second-solution-boot-device-error/"
+    },
+    {
+      "fileName": "second-post",
+      "slug": "dify-platform-enterprise-ai-agent-guide",
+      "oldUrl": "https://dongboge.com/blog/second-post/",
+      "newUrl": "https://dongboge.com/blog/dify-platform-enterprise-ai-agent-guide/"
+    },
+    {
+      "fileName": "third-post",
+      "slug": "enterprise-ai-training-practical-guide",
+      "oldUrl": "https://dongboge.com/blog/third-post/",
+      "newUrl": "https://dongboge.com/blog/enterprise-ai-training-practical-guide/"
+    },
+    {
+      "fileName": "一早上纠结了输入法的问题",
+      "slug": "morning-input-method-struggles",
+      "oldUrl": "https://dongboge.com/blog/一早上纠结了输入法的问题/",
+      "newUrl": "https://dongboge.com/blog/morning-input-method-struggles/"
+    },
+    {
+      "fileName": "东波哥语录",
+      "slug": "dongboge-quotes",
+      "oldUrl": "https://dongboge.com/blog/东波哥语录/",
+      "newUrl": "https://dongboge.com/blog/dongboge-quotes/"
+    },
+    {
+      "fileName": "人生升维主题视频摘录2024年12月23日",
+      "slug": "life-upgrade-video-excerpts-2024-12-23",
+      "oldUrl": "https://dongboge.com/blog/人生升维主题视频摘录2024年12月23日/",
+      "newUrl": "https://dongboge.com/blog/life-upgrade-video-excerpts-2024-12-23/"
+    },
+    {
+      "fileName": "会不会考察候选人的『AI能力』",
+      "slug": "will-companies-test-ai-skills",
+      "oldUrl": "https://dongboge.com/blog/会不会考察候选人的『AI能力』/",
+      "newUrl": "https://dongboge.com/blog/will-companies-test-ai-skills/"
+    },
+    {
+      "fileName": "你的AI-agent能卖多少钱是由什么决定的",
+      "slug": "what-determines-ai-agent-pricing",
+      "oldUrl": "https://dongboge.com/blog/你的AI-agent能卖多少钱是由什么决定的/",
+      "newUrl": "https://dongboge.com/blog/what-determines-ai-agent-pricing/"
+    },
+    {
+      "fileName": "做自媒体的路径",
+      "slug": "path-to-self-media-success",
+      "oldUrl": "https://dongboge.com/blog/做自媒体的路径/",
+      "newUrl": "https://dongboge.com/blog/path-to-self-media-success/"
+    },
+    {
+      "fileName": "决定了，我要做deepseek培训！",
+      "slug": "decided-to-do-deepseek-training",
+      "oldUrl": "https://dongboge.com/blog/决定了，我要做deepseek培训！/",
+      "newUrl": "https://dongboge.com/blog/decided-to-do-deepseek-training/"
+    },
+    {
+      "fileName": "十个人们害怕开始赚钱的借口",
+      "slug": "ten-excuses-people-afraid-making-money",
+      "oldUrl": "https://dongboge.com/blog/十个人们害怕开始赚钱的借口/",
+      "newUrl": "https://dongboge.com/blog/ten-excuses-people-afraid-making-money/"
+    },
+    {
+      "fileName": "去参加cocos开发者大会",
+      "slug": "attending-cocos-developer-conference",
+      "oldUrl": "https://dongboge.com/blog/去参加cocos开发者大会/",
+      "newUrl": "https://dongboge.com/blog/attending-cocos-developer-conference/"
+    },
+    {
+      "fileName": "嘴炮式写代码的流程",
+      "slug": "talk-driven-coding-process",
+      "oldUrl": "https://dongboge.com/blog/嘴炮式写代码的流程/",
+      "newUrl": "https://dongboge.com/blog/talk-driven-coding-process/"
+    },
+    {
+      "fileName": "因为穷，我逃过了万门的镰刀",
+      "slug": "escaped-wanmen-scam-because-poor",
+      "oldUrl": "https://dongboge.com/blog/因为穷，我逃过了万门的镰刀/",
+      "newUrl": "https://dongboge.com/blog/escaped-wanmen-scam-because-poor/"
+    },
+    {
+      "fileName": "在我说要当AI培训师两周后直接起飞了",
+      "slug": "ai-trainer-career-took-off-after-two-weeks",
+      "oldUrl": "https://dongboge.com/blog/在我说要当AI培训师两周后直接起飞了/",
+      "newUrl": "https://dongboge.com/blog/ai-trainer-career-took-off-after-two-weeks/"
+    },
+    {
+      "fileName": "大语言模型在企业应用中的最佳实践",
+      "slug": "llm-enterprise-best-practices",
+      "oldUrl": "https://dongboge.com/blog/大语言模型在企业应用中的最佳实践/",
+      "newUrl": "https://dongboge.com/blog/llm-enterprise-best-practices/"
+    },
+    {
+      "fileName": "如何在24小时内拥有自己的生意并开始盈利！",
+      "slug": "start-profitable-business-in-24-hours",
+      "oldUrl": "https://dongboge.com/blog/如何在24小时内拥有自己的生意并开始盈利！/",
+      "newUrl": "https://dongboge.com/blog/start-profitable-business-in-24-hours/"
+    },
+    {
+      "fileName": "如何讲好故事",
+      "slug": "how-to-tell-good-stories",
+      "oldUrl": "https://dongboge.com/blog/如何讲好故事/",
+      "newUrl": "https://dongboge.com/blog/how-to-tell-good-stories/"
+    },
+    {
+      "fileName": "如何零成本用车",
+      "slug": "zero-cost-car-usage-tips",
+      "oldUrl": "https://dongboge.com/blog/如何零成本用车/",
+      "newUrl": "https://dongboge.com/blog/zero-cost-car-usage-tips/"
+    },
+    {
+      "fileName": "富人不会说",
+      "slug": "what-rich-people-wont-tell-you",
+      "oldUrl": "https://dongboge.com/blog/富人不会说/",
+      "newUrl": "https://dongboge.com/blog/what-rich-people-wont-tell-you/"
+    },
+    {
+      "fileName": "开了个新坑：写一份Dify的教程",
+      "slug": "started-writing-dify-tutorial",
+      "oldUrl": "https://dongboge.com/blog/开了个新坑：写一份Dify的教程/",
+      "newUrl": "https://dongboge.com/blog/started-writing-dify-tutorial/"
+    },
+    {
+      "fileName": "怎么样才能发财？",
+      "slug": "how-to-get-rich",
+      "oldUrl": "https://dongboge.com/blog/怎么样才能发财？/",
+      "newUrl": "https://dongboge.com/blog/how-to-get-rich/"
+    },
+    {
+      "fileName": "我拉黑了一个我帮助过的微信网友",
+      "slug": "blocked-someone-i-helped-on-wechat",
+      "oldUrl": "https://dongboge.com/blog/我拉黑了一个我帮助过的微信网友/",
+      "newUrl": "https://dongboge.com/blog/blocked-someone-i-helped-on-wechat/"
+    },
+    {
+      "fileName": "我没有赚到认知以外的钱",
+      "slug": "cant-earn-money-beyond-cognition",
+      "oldUrl": "https://dongboge.com/blog/我没有赚到认知以外的钱/",
+      "newUrl": "https://dongboge.com/blog/cant-earn-money-beyond-cognition/"
+    },
+    {
+      "fileName": "本站被黑记",
+      "slug": "website-hacked-incident-report",
+      "oldUrl": "https://dongboge.com/blog/本站被黑记/",
+      "newUrl": "https://dongboge.com/blog/website-hacked-incident-report/"
+    },
+    {
+      "fileName": "每天一个做小生意的小技巧",
+      "slug": "daily-small-business-tips",
+      "oldUrl": "https://dongboge.com/blog/每天一个做小生意的小技巧/",
+      "newUrl": "https://dongboge.com/blog/daily-small-business-tips/"
+    },
+    {
+      "fileName": "生意好不好做是人的问题",
+      "slug": "business-success-depends-on-people",
+      "oldUrl": "https://dongboge.com/blog/生意好不好做是人的问题/",
+      "newUrl": "https://dongboge.com/blog/business-success-depends-on-people/"
+    },
+    {
+      "fileName": "编程新手如何学会让cursor干活",
+      "slug": "how-beginners-learn-cursor-ai-coding",
+      "oldUrl": "https://dongboge.com/blog/编程新手如何学会让cursor干活/",
+      "newUrl": "https://dongboge.com/blog/how-beginners-learn-cursor-ai-coding/"
+    },
+    {
+      "fileName": "解决更新插件失败的问题",
+      "slug": "solving-plugin-update-failures",
+      "oldUrl": "https://dongboge.com/blog/解决更新插件失败的问题/",
+      "newUrl": "https://dongboge.com/blog/solving-plugin-update-failures/"
+    },
+    {
+      "fileName": "重新做一遍个人网站这件事",
+      "slug": "rebuilding-personal-website-again",
+      "oldUrl": "https://dongboge.com/blog/重新做一遍个人网站这件事/",
+      "newUrl": "https://dongboge.com/blog/rebuilding-personal-website-again/"
+    }
+  ],
+  "testUrls": [
+    "https://dongboge.com/blog/2023-year-end-summary/",
+    "https://dongboge.com/blog/2024-08-19-wrote-wechat-article/",
+    "https://dongboge.com/blog/2024-12-10-life-homework/",
+    "https://dongboge.com/blog/2024-12-22-life-homework/",
+    "https://dongboge.com/blog/2024-10-14-monday/",
+    "https://dongboge.com/blog/2024-10-09-resumed-running/",
+    "https://dongboge.com/blog/2024-11-21-tage-tech-business-on-track/",
+    "https://dongboge.com/blog/2024-12-04-wife-quit-job-again/",
+    "https://dongboge.com/blog/2024-09-28-saturday-diary/",
+    "https://dongboge.com/blog/2024-09-30-dad-lawsuit/",
+    "https://dongboge.com/blog/2024-mid-autumn-festival-notes/",
+    "https://dongboge.com/blog/2024-october-fresh-start/",
+    "https://dongboge.com/blog/2025-07-19-success-record/",
+    "https://dongboge.com/blog/2025-07-20-success-diary/",
+    "https://dongboge.com/blog/2025-07-21-success-diary/",
+    "https://dongboge.com/blog/2025-07-23-success-record/",
+    "https://dongboge.com/blog/2025-07-27-success-diary/",
+    "https://dongboge.com/blog/2025-07-28-success-record/",
+    "https://dongboge.com/blog/2025-07-30-success-record/",
+    "https://dongboge.com/blog/2025-07-31-success-record/",
+    "https://dongboge.com/blog/2025-08-02-success-record/",
+    "https://dongboge.com/blog/2025-08-04-success-record/",
+    "https://dongboge.com/blog/2025-08-05-fail-record/",
+    "https://dongboge.com/blog/2025-08-05-success-record/",
+    "https://dongboge.com/blog/2025-new-year/",
+    "https://dongboge.com/blog/how-to-use-ai-models-in-2025/",
+    "https://dongboge.com/blog/ai-era-digital-transformation-guide/",
+    "https://dongboge.com/blog/fixing-brew-update-errors/",
+    "https://dongboge.com/blog/deepseek-100-use-cases/",
+    "https://dongboge.com/blog/ai-enterprise-digital-transformation-guide/",
+    "https://dongboge.com/blog/ai-markdown-documentation-best-practices/",
+    "https://dongboge.com/blog/second-solution-boot-device-error/",
+    "https://dongboge.com/blog/dify-platform-enterprise-ai-agent-guide/",
+    "https://dongboge.com/blog/enterprise-ai-training-practical-guide/",
+    "https://dongboge.com/blog/morning-input-method-struggles/",
+    "https://dongboge.com/blog/dongboge-quotes/",
+    "https://dongboge.com/blog/life-upgrade-video-excerpts-2024-12-23/",
+    "https://dongboge.com/blog/will-companies-test-ai-skills/",
+    "https://dongboge.com/blog/what-determines-ai-agent-pricing/",
+    "https://dongboge.com/blog/path-to-self-media-success/",
+    "https://dongboge.com/blog/decided-to-do-deepseek-training/",
+    "https://dongboge.com/blog/ten-excuses-people-afraid-making-money/",
+    "https://dongboge.com/blog/attending-cocos-developer-conference/",
+    "https://dongboge.com/blog/talk-driven-coding-process/",
+    "https://dongboge.com/blog/escaped-wanmen-scam-because-poor/",
+    "https://dongboge.com/blog/ai-trainer-career-took-off-after-two-weeks/",
+    "https://dongboge.com/blog/llm-enterprise-best-practices/",
+    "https://dongboge.com/blog/start-profitable-business-in-24-hours/",
+    "https://dongboge.com/blog/how-to-tell-good-stories/",
+    "https://dongboge.com/blog/zero-cost-car-usage-tips/",
+    "https://dongboge.com/blog/what-rich-people-wont-tell-you/",
+    "https://dongboge.com/blog/started-writing-dify-tutorial/",
+    "https://dongboge.com/blog/how-to-get-rich/",
+    "https://dongboge.com/blog/blocked-someone-i-helped-on-wechat/",
+    "https://dongboge.com/blog/cant-earn-money-beyond-cognition/",
+    "https://dongboge.com/blog/website-hacked-incident-report/",
+    "https://dongboge.com/blog/daily-small-business-tips/",
+    "https://dongboge.com/blog/business-success-depends-on-people/",
+    "https://dongboge.com/blog/how-beginners-learn-cursor-ai-coding/",
+    "https://dongboge.com/blog/solving-plugin-update-failures/",
+    "https://dongboge.com/blog/rebuilding-personal-website-again/"
+  ]
+}

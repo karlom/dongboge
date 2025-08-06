@@ -33,19 +33,19 @@
 1. 访问：https://ziyuan.baidu.com/
 2. 登录后选择网站 → 数据引入 → 链接提交
 3. 选择"sitemap"方式
-4. 提交：`https://dongboge.cn/sitemap-index.xml`
+4. 提交：`https://dongboge.com/sitemap-index.xml`
 
 #### 搜狗站长平台
 
 1. 访问：http://zhanzhang.sogou.com/
 2. 网站管理 → 数据提交 → sitemap提交
-3. 提交：`https://dongboge.cn/sitemap-index.xml`
+3. 提交：`https://dongboge.com/sitemap-index.xml`
 
 #### 360搜索站长平台
 
 1. 访问：http://zhanzhang.so.com/
 2. 数据提交 → sitemap提交
-3. 提交：`https://dongboge.cn/sitemap-index.xml`
+3. 提交：`https://dongboge.com/sitemap-index.xml`
 
 ### 2. Google Search Console配置
 
@@ -60,22 +60,22 @@
 
 在"网址检查"中逐个检查并请求编入索引：
 
-- `https://dongboge.cn/`
-- `https://dongboge.cn/about/`
-- `https://dongboge.cn/services/`
-- `https://dongboge.cn/contact/`
-- `https://dongboge.cn/blog/`
+- `https://dongboge.com/`
+- `https://dongboge.com/about/`
+- `https://dongboge.com/services/`
+- `https://dongboge.com/contact/`
+- `https://dongboge.com/blog/`
 
 #### 移除旧内容
 
 在"移除"功能中添加需要移除的URL模式：
 
 ```
-dongboge.cn/2024/*
-dongboge.cn/2023/*
-dongboge.cn/category/*
-dongboge.cn/tag/*
-dongboge.cn/wp-*
+dongboge.com/2024/*
+dongboge.com/2023/*
+dongboge.com/category/*
+dongboge.com/tag/*
+dongboge.com/wp-*
 ```
 
 ### 3. 设置301重定向
@@ -84,7 +84,7 @@ dongboge.cn/wp-*
 
 ```bash
 # 编辑nginx配置
-sudo nano /etc/nginx/sites-available/dongboge.cn
+sudo nano /etc/nginx/sites-available/dongboge.com
 
 # 在server块中添加重定向规则
 # 然后测试并重启nginx

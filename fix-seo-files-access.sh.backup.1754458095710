@@ -28,20 +28,20 @@ if [ ! -f "public/rss.xml" ]; then
     <channel>
         <title>东波哥 - AI培训专家</title>
         <description>东波哥（杨东波），广州塔哥科技创始人，专业企业AI培训师，分享AI技术、企业数字化转型和个人成长心得</description>
-        <link>https://dongboge.cn/</link>
-        <atom:link href="https://dongboge.cn/rss.xml" rel="self" type="application/rss+xml"/>
+        <link>https://dongboge.com/</link>
+        <atom:link href="https://dongboge.com/rss.xml" rel="self" type="application/rss+xml"/>
         <language>zh-CN</language>
         <lastBuildDate>$(date -R)</lastBuildDate>
         <pubDate>$(date -R)</pubDate>
         <ttl>60</ttl>
-        <managingEditor>yangdongbo@dongboge.cn (东波哥)</managingEditor>
-        <webMaster>yangdongbo@dongboge.cn (东波哥)</webMaster>
+        <managingEditor>yangdongbo@dongboge.com (东波哥)</managingEditor>
+        <webMaster>yangdongbo@dongboge.com (东波哥)</webMaster>
         
         <item>
             <title>欢迎来到东波哥的博客</title>
             <description>东波哥专注于AI培训和企业数字化转型，分享最新的AI技术应用和实践经验</description>
-            <link>https://dongboge.cn/blog/</link>
-            <guid>https://dongboge.cn/blog/</guid>
+            <link>https://dongboge.com/blog/</link>
+            <guid>https://dongboge.com/blog/</guid>
             <pubDate>$(date -R)</pubDate>
         </item>
     </channel>

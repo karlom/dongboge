@@ -22,19 +22,19 @@ npm run seo:check
 1. 访问：https://ziyuan.baidu.com/
 2. 登录 → 网站管理 → 选择你的网站
 3. 数据引入 → 链接提交 → sitemap
-4. 提交：`https://dongboge.cn/sitemap-index.xml`
+4. 提交：`https://dongboge.com/sitemap-index.xml`
 
 #### 搜狗站长平台
 
 1. 访问：http://zhanzhang.sogou.com/
 2. 网站管理 → 数据提交 → sitemap提交
-3. 提交：`https://dongboge.cn/sitemap-index.xml`
+3. 提交：`https://dongboge.com/sitemap-index.xml`
 
 #### 360搜索站长平台
 
 1. 访问：http://zhanzhang.so.com/
 2. 数据提交 → sitemap提交
-3. 提交：`https://dongboge.cn/sitemap-index.xml`
+3. 提交：`https://dongboge.com/sitemap-index.xml`
 
 ### 3. Google Search Console 紧急操作
 
@@ -43,22 +43,22 @@ npm run seo:check
 1. 登录 [Google Search Console](https://search.google.com/search-console)
 2. 站点地图 → 添加新的站点地图：`sitemap-index.xml`
 3. 网址检查 → 逐个检查重要页面：
-   - `https://dongboge.cn/`
-   - `https://dongboge.cn/about/`
-   - `https://dongboge.cn/services/`
-   - `https://dongboge.cn/contact/`
-   - `https://dongboge.cn/blog/`
+   - `https://dongboge.com/`
+   - `https://dongboge.com/about/`
+   - `https://dongboge.com/services/`
+   - `https://dongboge.com/contact/`
+   - `https://dongboge.com/blog/`
 
 #### 移除旧内容
 
 1. 移除 → 新请求 → 暂时移除网址
 2. 添加需要移除的URL模式：
    ```
-   dongboge.cn/2024/*
-   dongboge.cn/2023/*
-   dongboge.cn/category/*
-   dongboge.cn/tag/*
-   dongboge.cn/wp-*
+   dongboge.com/2024/*
+   dongboge.com/2023/*
+   dongboge.com/category/*
+   dongboge.com/tag/*
+   dongboge.com/wp-*
    ```
 
 ### 4. 设置301重定向
@@ -67,7 +67,7 @@ npm run seo:check
 
 ```bash
 # 编辑nginx配置
-sudo nano /etc/nginx/sites-available/dongboge.cn
+sudo nano /etc/nginx/sites-available/dongboge.com
 
 # 在server块中添加重定向规则
 # 然后重启nginx

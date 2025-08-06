@@ -1,0 +1,72 @@
+{
+  "timestamp": "2025-08-06T05:19:50.166Z",
+  "totalTested": 10,
+  "results": {
+    "success": 0,
+    "redirect": 0,
+    "error": 10
+  },
+  "details": [
+    {
+      "url": "https://dongboge.com/blog/2023-year-end-summary/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    },
+    {
+      "url": "https://dongboge.com/blog/2024-08-19-wrote-wechat-article/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    },
+    {
+      "url": "https://dongboge.com/blog/2024-12-10-life-homework/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    },
+    {
+      "url": "https://dongboge.com/blog/2024-12-22-life-homework/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    },
+    {
+      "url": "https://dongboge.com/blog/2024-10-14-monday/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    },
+    {
+      "url": "https://dongboge.com/blog/2024-10-09-resumed-running/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    },
+    {
+      "url": "https://dongboge.com/blog/2024-11-21-tage-tech-business-on-track/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    },
+    {
+      "url": "https://dongboge.com/blog/2024-12-04-wife-quit-job-again/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    },
+    {
+      "url": "https://dongboge.com/blog/2024-09-28-saturday-diary/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    },
+    {
+      "url": "https://dongboge.com/blog/2024-09-30-dad-lawsuit/",
+      "status": "ERROR",
+      "error": "read ECONNRESET",
+      "success": false
+    }
+  ],
+  "recommendations": "investigate"
+}
