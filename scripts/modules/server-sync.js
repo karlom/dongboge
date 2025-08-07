@@ -576,7 +576,7 @@ function syncBuildFiles() {
 
         // 使用ssh-agent方案，不需要指定密钥文件
         const sshOptions = generateSSHOptions();
-        const rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
+        const rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}`;
 
         console.log('🚀 执行rsync同步...');
         console.log(`🔍 rsync命令: ${rsyncCommand}`);
