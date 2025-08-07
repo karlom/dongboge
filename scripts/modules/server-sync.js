@@ -280,6 +280,138 @@ function ensureServerDirectories() {
     }
 }
 
+// 测试SSH_ASKPASS是否能被rsync正确调用
+function testSSHAskpassWithRsync() {
+    try {
+        console.log('🧪 测试rsync的SSH_ASKPASS调用...');
+
+        // 创建一个测试用的SSH_ASKPASS脚本，记录调用日志
+        const testAskpassPath = `/tmp/test_ssh_askpass_${Date.now()}.sh`;
+        const testAskpassScript = `#!/bin/bash
+echo "SSH_ASKPASS被调用: $(date)" >> /tmp/ssh_askpass_debug.log
+echo "${config.server.passphrase}"`;
+
+        fs.writeFileSync(testAskpassPath, testAskpassScript, {
+            mode: 0o755
+        });
+
+        // 创建测试环境变量
+        const testEnv = {
+            ...config.server.sshEnv,
+            SSH_ASKPASS: testAskpassPath
+        };
+
+        console.log(`🔍 测试SSH_ASKPASS脚本: ${testAskpassPath}`);
+        console.log(`🔍 测试环境变量:`);
+        console.log(`  - SSH_ASKPASS: ${testEnv.SSH_ASKPASS}`);
+        console.log(`  - DISPLAY: ${testEnv.DISPLAY}`);
+        console.log(`  - SSH_AUTH_SOCK: ${testEnv.SSH_AUTH_SOCK}`);
+
+        // 使用简单的rsync测试命令
+        const sshOptions = generateSSHOptions();
+        const testRsyncCommand = `rsync --dry-run -v -e "ssh ${sshOptions}" /tmp/ ${config.server.username}@${config.server.host}:/tmp/rsync_test/`;
+
+        console.log(`🔍 测试rsync命令: ${testRsyncCommand}`);
+
+        const result = execSync(testRsyncCommand, {
+            stdio: 'pipe',
+            timeout: 10000,
+            env: testEnv
+        });
+
+        console.log('✅ rsync SSH_ASKPASS测试成功');
+        console.log(`📤 rsync输出: ${result.toString().trim()}`);
+
+        // 检查SSH_ASKPASS是否被调用
+        if (fs.existsSync('/tmp/ssh_askpass_debug.log')) {
+            const debugLog = fs.readFileSync('/tmp/ssh_askpass_debug.log', 'utf8');
+            console.log('📋 SSH_ASKPASS调用日志:');
+            console.log(debugLog);
+        } else {
+            console.warn('⚠️ SSH_ASKPASS调用日志不存在，可能未被调用');
+        }
+
+        // 清理测试文件
+        try {
+            fs.unlinkSync(testAskpassPath);
+            if (fs.existsSync('/tmp/ssh_askpass_debug.log')) {
+                fs.unlinkSync('/tmp/ssh_askpass_debug.log');
+            }
+        } catch (e) {
+            console.warn('⚠️ 清理测试文件失败');
+        }
+
+        return true;
+    } catch (error) {
+        console.error('❌ rsync SSH_ASKPASS测试失败:', error.message);
+        if (error.stderr) {
+            console.error('🔍 测试错误详情:', error.stderr.toString());
+        }
+        return false;
+    }
+}
+
+// 验证环境变量传递
+function debugEnvironmentVariables() {
+    console.log('🔍 调试环境变量传递...');
+
+    // 1. 检查当前进程环境变量
+    console.log('📋 当前进程关键环境变量:');
+    console.log(`  - HOME: ${process.env.HOME}`);
+    console.log(`  - USER: ${process.env.USER}`);
+    console.log(`  - SHELL: ${process.env.SHELL}`);
+    console.log(`  - TERM: ${process.env.TERM}`);
+
+    // 2. 检查SSH相关环境变量
+    console.log('📋 SSH相关环境变量:');
+    console.log(`  - SSH_ASKPASS: ${config.server.sshEnv.SSH_ASKPASS}`);
+    console.log(`  - DISPLAY: ${config.server.sshEnv.DISPLAY}`);
+    console.log(`  - SSH_AUTH_SOCK: ${config.server.sshEnv.SSH_AUTH_SOCK}`);
+
+    // 3. 验证SSH_ASKPASS脚本
+    if (config.server.sshEnv.SSH_ASKPASS && fs.existsSync(config.server.sshEnv.SSH_ASKPASS)) {
+        console.log('✅ SSH_ASKPASS脚本存在');
+        const askpassContent = fs.readFileSync(config.server.sshEnv.SSH_ASKPASS, 'utf8');
+        console.log('📋 SSH_ASKPASS脚本内容:');
+        console.log(askpassContent);
+
+        // 检查脚本权限
+        const stats = fs.statSync(config.server.sshEnv.SSH_ASKPASS);
+        const mode = (stats.mode & parseInt('777', 8)).toString(8);
+        console.log(`🔍 SSH_ASKPASS脚本权限: ${mode}`);
+
+        if (mode !== '755') {
+            console.warn('⚠️ SSH_ASKPASS脚本权限不正确，应该是755');
+        }
+    } else {
+        console.error('❌ SSH_ASKPASS脚本不存在或路径错误');
+    }
+
+    // 4. 测试密码是否正确
+    console.log('🔍 检查密钥密码设置:');
+    console.log(`  - 密码长度: ${config.server.passphrase ? config.server.passphrase.length : 0}`);
+    console.log(`  - 密码是否为空: ${config.server.passphrase ? '否' : '是'}`);
+
+    // 5. 验证密钥文件
+    if (fs.existsSync(config.server.keyPath)) {
+        console.log('✅ SSH密钥文件存在');
+        const keyStats = fs.statSync(config.server.keyPath);
+        const keyMode = (keyStats.mode & parseInt('777', 8)).toString(8);
+        console.log(`🔍 SSH密钥文件权限: ${keyMode}`);
+        console.log(`🔍 SSH密钥文件大小: ${keyStats.size} 字节`);
+
+        // 读取密钥文件前几行检查格式
+        const keyContent = fs.readFileSync(config.server.keyPath, 'utf8');
+        const keyLines = keyContent.split('\n');
+        console.log(`🔍 SSH密钥文件格式检查:`);
+        console.log(`  - 第一行: ${keyLines[0]}`);
+        console.log(`  - 最后一行: ${keyLines[keyLines.length - 2] || keyLines[keyLines.length - 1]}`);
+        console.log(`  - 总行数: ${keyLines.length}`);
+    } else {
+        console.error('❌ SSH密钥文件不存在');
+    }
+}
+
 // 同步构建文件到服务器
 function syncBuildFiles() {
     try {
@@ -293,6 +425,30 @@ function syncBuildFiles() {
             throw new Error('构建目录不存在，请先运行构建');
         }
 
+        // === 调试信息 1: 验证rsync执行时的环境变量 ===
+        console.log('🔍 === 调试信息 1: 验证环境变量 ===');
+        debugEnvironmentVariables();
+
+        // === 调试信息 2: 测试rsync是否能正确调用SSH_ASKPASS ===
+        console.log('🔍 === 调试信息 2: 测试rsync SSH_ASKPASS调用 ===');
+        if (!testSSHAskpassWithRsync()) {
+            console.warn('⚠️ rsync SSH_ASKPASS测试失败，但继续尝试正式同步');
+        }
+
+        // === 调试信息 3: 检查密钥密码是否正确传递 ===
+        console.log('🔍 === 调试信息 3: 验证密钥密码传递 ===');
+        console.log('🧪 手动测试SSH_ASKPASS脚本执行...');
+        try {
+            const manualTestResult = execSync(`bash ${config.server.sshEnv.SSH_ASKPASS}`, {
+                stdio: 'pipe',
+                timeout: 5000
+            });
+            console.log(`✅ SSH_ASKPASS脚本手动执行成功: "${manualTestResult.toString().trim()}"`);
+            console.log(`🔍 返回的密码长度: ${manualTestResult.toString().trim().length}`);
+        } catch (error) {
+            console.error('❌ SSH_ASKPASS脚本手动执行失败:', error.message);
+        }
+
         // 统一使用SSH_ASKPASS方式，与SSH连接测试保持一致
         const sshOptions = generateSSHOptions();
         const rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
@@ -300,6 +456,14 @@ function syncBuildFiles() {
         console.log('🚀 执行rsync同步...');
         console.log(`🔍 rsync命令: ${rsyncCommand}`);
         console.log('🔍 使用SSH_ASKPASS环境变量进行认证');
+
+        // 添加更详细的环境变量调试
+        console.log('🔍 rsync执行环境变量:');
+        Object.keys(config.server.sshEnv).forEach(key => {
+            if (key.includes('SSH') || key === 'DISPLAY') {
+                console.log(`  - ${key}: ${config.server.sshEnv[key]}`);
+            }
+        });
 
         execSync(rsyncCommand, {
             stdio: 'inherit',
@@ -310,6 +474,25 @@ function syncBuildFiles() {
         return true;
     } catch (error) {
         console.error('❌ 同步构建文件失败:', error.message);
+
+        // 增强错误分析
+        if (error.stderr) {
+            console.error('🔍 rsync错误详情:', error.stderr.toString());
+        }
+        if (error.stdout) {
+            console.error('🔍 rsync输出:', error.stdout.toString());
+        }
+
+        // 分析具体错误原因
+        const errorMsg = error.message.toLowerCase();
+        if (errorMsg.includes('permission denied')) {
+            console.error('💡 Permission denied 错误分析:');
+            console.error('  1. SSH_ASKPASS可能未被rsync正确调用');
+            console.error('  2. 密钥密码可能不正确');
+            console.error('  3. rsync的SSH子进程可能无法访问环境变量');
+            console.error('  4. 服务器端公钥配置可能有问题');
+        }
+
         return false;
     }
 }
