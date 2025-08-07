@@ -9,6 +9,7 @@ on:
       - "src/assets/**"
       - "scripts/simple-deploy.js"
       - "scripts/modules/**"
+      - "public/sitemap.xml"
   workflow_dispatch:
     inputs:
       force_deploy:

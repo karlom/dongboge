@@ -15,9 +15,17 @@
     "seo:online": "node scripts/check-online-status.js",
     "seo:all": "npm run seo:sitemap && npm run seo:online && npm run seo:submit",
     "deploy:simple": "node scripts/simple-deploy.js",
+    "deploy:test": "node scripts/test-simple-deploy.js",
     "deploy:test-server": "node -e \"import('./scripts/modules/server-sync.js').then(m => m.testServerConnection())\"",
     "deploy:test-cdn": "node -e \"import('./scripts/modules/cdn-sync.js').then(m => m.testCDNConnection())\"",
-    "deploy:sitemap": "node -e \"import('./scripts/modules/sitemap-generator.js').then(m => m.generateSitemap())\""
+    "deploy:sitemap": "node -e \"import('./scripts/modules/sitemap-generator.js').then(m => m.generateSitemap())\"",
+    "deploy:setup": "node scripts/setup-ssh-auth.js",
+    "deploy:debug": "node scripts/debug-ssh-connection.js",
+    "deploy:ssh-test": "node scripts/simple-ssh-test.js",
+    "deploy:check": "node scripts/pre-deploy-check.js",
+    "deploy:test-existing": "node scripts/test-existing-method.js",
+    "deploy:test-fixed": "node -e \"import('./scripts/modules/server-sync.js').then(m => m.testServerConnection())\"",
+    "deploy:help": "echo '简化部署脚本使用说明：' && echo '  deploy:setup - SSH认证设置助手' && echo '  deploy:debug - SSH连接调试工具' && echo '  deploy:test - 测试部署流程（不实际部署）' && echo '  deploy:test-server - 测试SSH服务器连接' && echo '  deploy:test-cdn - 测试CDN连接' && echo '  deploy:simple - 运行完整的简化部署' && echo '  deploy:sitemap - 只生成sitemap' && echo '' && echo '配置说明请查看: scripts/SSH密钥+密码认证配置.md'"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

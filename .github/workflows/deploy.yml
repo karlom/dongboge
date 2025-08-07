@@ -1,8 +1,8 @@
-name: 日常更新博客
+name: 日常更新博客（已禁用，使用simple-deploy）
 
 on:
-  push:
-    branches: [main, master]
+  # push:
+  #   branches: [main, master]
   workflow_dispatch:
     inputs:
       deploy_type:

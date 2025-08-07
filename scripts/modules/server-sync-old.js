@@ -1,5 +1,5 @@
 /**
- * 服务器同步模块（使用成功的SSH连接方法）
+ * 服务器同步模块
  * 将构建后的文件同步到服务器
  */
 
@@ -9,28 +9,6 @@ import {
     execSync
 } from 'child_process';
 
-// 手动加载.env文件
-function loadEnvFile() {
-    const envPath = '.env';
-    if (fs.existsSync(envPath)) {
-        const envContent = fs.readFileSync(envPath, 'utf8');
-        const lines = envContent.split('\n');
-
-        lines.forEach(line => {
-            line = line.trim();
-            if (line && !line.startsWith('#')) {
-                const [key, ...valueParts] = line.split('=');
-                if (key && valueParts.length > 0) {
-                    const value = valueParts.join('=').trim();
-                    process.env[key.trim()] = value;
-                }
-            }
-        });
-    }
-}
-
-loadEnvFile();
-
 // 配置
 const config = {
     server: {
@@ -39,7 +17,7 @@ const config = {
         port: process.env.PORT || '22',
         deployPath: '/var/www/dongboge/client',
         // SSH认证配置
-        keyPath: process.env.SSH_KEY_PATH,
+        keyPath: process.env.SSH_KEY_PATH || '~/.ssh/id_rsa',
         passphrase: process.env.SSH_PASSPHRASE || '',
         // 支持密钥内容直接传入（用于CI/CD）
         keyContent: process.env.SSH_PRIVATE_KEY || ''
@@ -60,7 +38,7 @@ function generateExcludeParams() {
     return config.rsync.excludes.map(exclude => `--exclude='${exclude}'`).join(' ');
 }
 
-// 设置SSH环境（使用成功的方法）
+// 设置SSH环境
 function setupSSHEnvironment() {
     try {
         console.log('🔐 设置SSH环境...');
@@ -98,12 +76,22 @@ function setupSSHEnvironment() {
 
             // 检查密钥文件是否存在
             if (!fs.existsSync(expandedKeyPath)) {
+                // 列出目录内容帮助调试
+                const dir = path.dirname(expandedKeyPath);
+                if (fs.existsSync(dir)) {
+                    console.log(`📁 目录 ${dir} 的内容:`);
+                    const files = fs.readdirSync(dir);
+                    files.forEach(file => console.log(`  - ${file}`));
+                }
                 throw new Error(`SSH密钥文件不存在: ${expandedKeyPath}`);
             }
 
-            // 设置正确的权限
+            // 检查文件权限
             const stats = fs.statSync(expandedKeyPath);
             const mode = (stats.mode & parseInt('777', 8)).toString(8);
+            console.log(`📋 密钥文件权限: ${mode}`);
+
+            // 设置正确的权限
             if (mode !== '600') {
                 console.log('🔧 修正密钥文件权限为600...');
                 fs.chmodSync(expandedKeyPath, 0o600);
@@ -112,38 +100,10 @@ function setupSSHEnvironment() {
             config.server.keyPath = expandedKeyPath;
         }
 
-        // 创建SSH_ASKPASS脚本（使用成功的方法）
-        const askpassPath = `/tmp/ssh_askpass_${Date.now()}.sh`;
-        const askpassScript = `#!/bin/bash\necho "${config.server.passphrase}"`;
-        fs.writeFileSync(askpassPath, askpassScript, {
-            mode: 0o755
-        });
-
-        // 设置SSH环境变量
-        config.server.sshEnv = {
-            ...process.env,
-            SSH_ASKPASS: askpassPath,
-            DISPLAY: ':0',
-            SSH_AUTH_SOCK: '' // 禁用SSH agent
-        };
-
-        config.server.askpassPath = askpassPath;
-
         return true;
     } catch (error) {
         console.error('❌ SSH环境设置失败:', error.message);
         return false;
-    }
-}
-
-// 清理SSH环境
-function cleanupSSHEnvironment() {
-    if (config.server.askpassPath && fs.existsSync(config.server.askpassPath)) {
-        try {
-            fs.unlinkSync(config.server.askpassPath);
-        } catch (error) {
-            console.warn('⚠️ 清理SSH临时文件失败');
-        }
     }
 }
 
@@ -159,7 +119,7 @@ function generateSSHOptions() {
     return options.join(' ');
 }
 
-// 检查SSH连接（使用成功的方法）
+// 检查SSH连接
 function checkSSHConnection() {
     try {
         console.log('🔐 检查SSH连接...');
@@ -175,35 +135,127 @@ function checkSSHConnection() {
         console.log(`🔍 测试SSH连接: ${config.server.username}@${config.server.host}:${config.server.port}`);
         console.log(`🔑 使用密钥: ${config.server.keyPath}`);
 
-        // 使用SSH_ASKPASS方式（与appleboy/ssh-action相同）
-        const result = execSync(sshCommand, {
-            stdio: 'pipe',
-            timeout: 15000,
-            env: config.server.sshEnv
-        });
+        // 如果有密码，需要使用sshpass或expect
+        let result;
+        if (config.server.passphrase) {
+            console.log('🔑 使用密钥+密码认证');
+
+            // 检查是否安装了expect
+            try {
+                execSync('which expect', {
+                    stdio: 'pipe'
+                });
+            } catch (error) {
+                console.warn('⚠️ 未安装expect，尝试使用SSH_ASKPASS');
+
+                // 使用SSH_ASKPASS环境变量
+                const askpassScript = `#!/bin/bash\necho "${config.server.passphrase}"`;
+                const askpassPath = '/tmp/ssh_askpass.sh';
+                fs.writeFileSync(askpassPath, askpassScript, {
+                    mode: 0o755
+                });
+
+                result = execSync(sshCommand, {
+                    stdio: 'pipe',
+                    timeout: 15000,
+                    env: {
+                        ...process.env,
+                        SSH_ASKPASS: askpassPath,
+                        DISPLAY: ':0'
+                    }
+                });
+
+                // 清理临时文件
+                fs.unlinkSync(askpassPath);
+            }
+
+            if (!result) {
+                // 使用expect来处理密码输入
+                const expectScript = `expect -c "
+set timeout 15
+spawn ${sshCommand}
+expect {
+    \\"Enter passphrase for key\\" {
+        send \\"${config.server.passphrase}\\r\\"
+        expect \\"SSH连接成功\\"
+    }
+    \\"SSH连接成功\\" {
+        # 直接成功
+    }
+    timeout {
+        exit 1
+    }
+    eof {
+        exit 1
+    }
+}
+"`;
+
+                result = execSync(expectScript, {
+                    stdio: 'pipe',
+                    timeout: 20000,
+                    shell: '/bin/bash'
+                });
+            }
+        } else {
+            console.log('🔑 使用密钥认证（无密码）');
+            result = execSync(sshCommand, {
+                stdio: 'pipe',
+                timeout: 15000
+            });
+        }
 
         console.log('✅ SSH连接正常');
         return true;
     } catch (error) {
         console.error('❌ SSH连接失败:', error.message);
-        cleanupSSHEnvironment();
+        console.log('💡 请检查:');
+        console.log('  - SSH密钥路径是否正确');
+        console.log('  - SSH密钥密码是否正确');
+        console.log('  - 服务器地址和端口是否正确');
+        console.log('  - 网络连接是否正常');
         return false;
     }
 }
 
-// 执行SSH命令（使用成功的方法）
+// 确保服务器目录存在
+// 执行SSH命令（支持密钥+密码认证）
 function executeSSHCommand(command, options = {}) {
     const sshOptions = generateSSHOptions();
     const sshCommand = `ssh ${sshOptions} ${config.server.username}@${config.server.host} "${command}"`;
 
-    return execSync(sshCommand, {
-        stdio: options.stdio || 'inherit',
-        timeout: options.timeout || 30000,
-        env: config.server.sshEnv
-    });
+    if (config.server.passphrase) {
+        // 使用expect处理密码
+        const expectScript = `expect -c "
+set timeout 30
+spawn ${sshCommand}
+expect {
+    \\"Enter passphrase for key\\" {
+        send \\"${config.server.passphrase}\\r\\"
+        expect eof
+    }
+    eof {
+        # 命令执行完成
+    }
+    timeout {
+        exit 1
+    }
+}
+"`;
+
+        return execSync(expectScript, {
+            stdio: options.stdio || 'inherit',
+            timeout: options.timeout || 30000,
+            shell: '/bin/bash'
+        });
+    } else {
+        return execSync(sshCommand, {
+            stdio: options.stdio || 'inherit',
+            timeout: options.timeout || 30000
+        });
+    }
 }
 
-// 确保服务器目录存在
 function ensureServerDirectories() {
     try {
         console.log('📁 确保服务器目录存在...');
@@ -236,12 +288,33 @@ function syncBuildFiles() {
         const sshOptions = generateSSHOptions();
 
         // 使用rsync同步文件
-        const rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
+        let rsyncCommand;
+        if (config.server.passphrase) {
+            // 对于有密码的密钥，使用expect包装rsync
+            rsyncCommand = `expect -c "
+set timeout 60
+spawn rsync ${config.rsync.options} ${excludeParams} -e \\"ssh ${sshOptions}\\" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/
+expect {
+    \\"Enter passphrase for key\\" {
+        send \\"${config.server.passphrase}\\r\\"
+        expect eof
+    }
+    eof {
+        # rsync完成
+    }
+    timeout {
+        exit 1
+    }
+}
+"`;
+        } else {
+            rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
+        }
 
         console.log('🚀 执行rsync同步...');
         execSync(rsyncCommand, {
             stdio: 'inherit',
-            env: config.server.sshEnv
+            shell: '/bin/bash'
         });
 
         console.log('✅ 构建文件同步完成');
@@ -262,15 +335,36 @@ function syncSitemapFiles() {
             'public/sitemap-index.xml'
         ];
 
-        const sshOptions = generateSSHOptions();
-
         sitemapFiles.forEach(file => {
             if (fs.existsSync(file)) {
-                const scpCommand = `scp ${sshOptions.replace('-o ConnectTimeout=10', '')} ${file} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
+                const sshOptions = generateSSHOptions();
+                let scpCommand;
+
+                if (config.server.passphrase) {
+                    // 使用expect处理密码
+                    scpCommand = `expect -c "
+set timeout 30
+spawn scp ${sshOptions.replace('-o ConnectTimeout=10', '')} ${file} ${config.server.username}@${config.server.host}:${config.server.deployPath}/
+expect {
+    \\"Enter passphrase for key\\" {
+        send \\"${config.server.passphrase}\\r\\"
+        expect eof
+    }
+    eof {
+        # scp完成
+    }
+    timeout {
+        exit 1
+    }
+}
+"`;
+                } else {
+                    scpCommand = `scp ${sshOptions.replace('-o ConnectTimeout=10', '')} ${file} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
+                }
 
                 execSync(scpCommand, {
                     stdio: 'pipe',
-                    env: config.server.sshEnv
+                    shell: '/bin/bash'
                 });
                 console.log(`  ✅ ${file} 已同步`);
             } else {
@@ -350,9 +444,6 @@ export async function syncToServer(changes) {
         // 5. 验证部署结果
         validateDeployment();
 
-        // 6. 清理SSH环境
-        cleanupSSHEnvironment();
-
         console.log('✅ 服务器同步完成');
 
         return {
@@ -363,7 +454,6 @@ export async function syncToServer(changes) {
 
     } catch (error) {
         console.error('❌ 服务器同步失败:', error.message);
-        cleanupSSHEnvironment();
         throw error;
     }
 }
@@ -391,14 +481,12 @@ export async function testServerConnection() {
                 console.warn('⚠️ 无法访问部署目录，可能需要先创建');
             }
 
-            cleanupSSHEnvironment();
             return true;
         } else {
             return false;
         }
     } catch (error) {
         console.error('❌ 服务器连接测试失败:', error.message);
-        cleanupSSHEnvironment();
         return false;
     }
 }

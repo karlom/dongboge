@@ -29,6 +29,29 @@ import {
     syncToCDN
 } from './modules/cdn-sync.js';
 
+// 手动加载.env文件
+function loadEnvFile() {
+    const envPath = '.env';
+    if (fs.existsSync(envPath)) {
+        const envContent = fs.readFileSync(envPath, 'utf8');
+        const lines = envContent.split('\n');
+
+        lines.forEach(line => {
+            line = line.trim();
+            if (line && !line.startsWith('#')) {
+                const [key, ...valueParts] = line.split('=');
+                if (key && valueParts.length > 0) {
+                    const value = valueParts.join('=').trim();
+                    process.env[key.trim()] = value;
+                }
+            }
+        });
+    }
+}
+
+// 加载环境变量
+loadEnvFile();
+
 // 配置
 const config = {
     server: {

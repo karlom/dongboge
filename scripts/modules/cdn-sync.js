@@ -10,6 +10,28 @@ import {
     execSync
 } from 'child_process';
 
+// 手动加载.env文件
+function loadEnvFile() {
+    const envPath = '.env';
+    if (fs.existsSync(envPath)) {
+        const envContent = fs.readFileSync(envPath, 'utf8');
+        const lines = envContent.split('\n');
+
+        lines.forEach(line => {
+            line = line.trim();
+            if (line && !line.startsWith('#')) {
+                const [key, ...valueParts] = line.split('=');
+                if (key && valueParts.length > 0) {
+                    const value = valueParts.join('=').trim();
+                    process.env[key.trim()] = value;
+                }
+            }
+        });
+    }
+}
+
+loadEnvFile();
+
 // 检查COS SDK是否可用
 function checkCOSSDK() {
     try {
