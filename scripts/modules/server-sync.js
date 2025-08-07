@@ -143,23 +143,8 @@ function setupSSHEnvironment() {
             mode: 0o755
         });
 
-        // 创建SSH配置文件（用于rsync）
-        const sshConfigPath = path.join(path.dirname(config.server.keyPath), 'ssh_config');
-        const sshConfig = `Host deploy-server
-    HostName ${config.server.host}
-    User ${config.server.username}
-    Port ${config.server.port}
-    IdentityFile ${config.server.keyPath}
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
-    PasswordAuthentication no
-    PubkeyAuthentication yes
-`;
-
-        fs.writeFileSync(sshConfigPath, sshConfig, {
-            mode: 0o600
-        });
-        console.log(`📝 SSH配置文件已创建: ${sshConfigPath}`);
+        // 不再创建SSH配置文件，统一使用SSH_ASKPASS方式
+        console.log('📝 统一使用SSH_ASKPASS环境变量进行认证');
 
         // 设置SSH环境变量
         config.server.sshEnv = {
@@ -170,7 +155,6 @@ function setupSSHEnvironment() {
         };
 
         config.server.askpassPath = askpassPath;
-        config.server.sshConfigPath = sshConfigPath;
 
         return true;
     } catch (error) {
@@ -189,13 +173,7 @@ function cleanupSSHEnvironment() {
         }
     }
 
-    if (config.server.sshConfigPath && fs.existsSync(config.server.sshConfigPath)) {
-        try {
-            fs.unlinkSync(config.server.sshConfigPath);
-        } catch (error) {
-            console.warn('⚠️ 清理SSH配置文件失败');
-        }
-    }
+    // SSH配置文件已不再使用，无需清理
 }
 
 // 生成SSH命令选项
@@ -315,18 +293,14 @@ function syncBuildFiles() {
             throw new Error('构建目录不存在，请先运行构建');
         }
 
-        // 使用SSH配置文件进行rsync（更可靠）
-        let rsyncCommand;
-        if (config.server.sshConfigPath) {
-            // 使用SSH配置文件
-            rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh -F ${config.server.sshConfigPath}" ${distPath} deploy-server:${config.server.deployPath}/`;
-        } else {
-            // 备用方案：直接使用SSH选项
-            const sshOptions = generateSSHOptions();
-            rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
-        }
+        // 统一使用SSH_ASKPASS方式，与SSH连接测试保持一致
+        const sshOptions = generateSSHOptions();
+        const rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
 
         console.log('🚀 执行rsync同步...');
+        console.log(`🔍 rsync命令: ${rsyncCommand}`);
+        console.log('🔍 使用SSH_ASKPASS环境变量进行认证');
+
         execSync(rsyncCommand, {
             stdio: 'inherit',
             env: config.server.sshEnv
@@ -352,16 +326,11 @@ function syncSitemapFiles() {
 
         sitemapFiles.forEach(file => {
             if (fs.existsSync(file)) {
-                let scpCommand;
-                if (config.server.sshConfigPath) {
-                    // 使用SSH配置文件
-                    scpCommand = `scp -F ${config.server.sshConfigPath} ${file} deploy-server:${config.server.deployPath}/`;
-                } else {
-                    // 备用方案
-                    const sshOptions = generateSSHOptions();
-                    scpCommand = `scp ${sshOptions.replace('-o ConnectTimeout=10', '')} ${file} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
-                }
+                // 统一使用SSH_ASKPASS方式
+                const sshOptions = generateSSHOptions();
+                const scpCommand = `scp ${sshOptions.replace('-o ConnectTimeout=10', '')} ${file} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
 
+                console.log(`🔍 同步 ${file} 使用SSH_ASKPASS认证`);
                 execSync(scpCommand, {
                     stdio: 'pipe',
                     env: config.server.sshEnv
