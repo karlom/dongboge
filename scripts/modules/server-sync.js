@@ -44,7 +44,7 @@ const config = {
         host: process.env.HOST,
         username: process.env.USERNAME,
         port: process.env.PORT || '22',
-        deployPath: '/var/www/dongboge',
+        deployPath: '/var/www/dongboge/client',
         // SSH认证配置 - 优先使用GitHub Secrets
         keyPath: process.env.SSH_KEY_PATH || '~/.ssh/id_rsa', // 本地环境fallback
         passphrase: process.env.SSH_PASSPHRASE || '',
@@ -52,7 +52,7 @@ const config = {
         keyContent: process.env.SSH_PRIVATE_KEY || ''
     },
     rsync: {
-        options: '-rltzv --delete',
+        options: '-rltzv',
         excludes: [
             'node_modules/',
             '.git/',
@@ -560,13 +560,22 @@ function syncBuildFiles() {
     try {
         console.log('📤 同步构建文件到服务器（ssh-agent方案）...');
 
-        const distPath = 'dist/';
+        const distClientPath = 'dist/client/'; // 只同步client目录的内容
         const excludeParams = generateExcludeParams();
 
-        // 检查dist目录是否存在
-        if (!fs.existsSync(distPath)) {
-            throw new Error('构建目录不存在，请先运行构建');
+        // 检查dist/client目录是否存在
+        if (!fs.existsSync(distClientPath)) {
+            throw new Error('构建的client目录不存在，请先运行构建');
         }
+
+        console.log(`📁 同步源目录: ${distClientPath}`);
+
+        // 安全检查：确保部署路径是client目录
+        if (!config.server.deployPath.endsWith('/client')) {
+            throw new Error(`部署路径不安全: ${config.server.deployPath}，必须以/client结尾`);
+        }
+
+        console.log(`🔒 安全检查通过，部署到: ${config.server.deployPath}`);
 
         // === 调试信息: 测试ssh-agent连接 ===
         console.log('🔍 === 测试ssh-agent连接 ===');
@@ -576,7 +585,7 @@ function syncBuildFiles() {
 
         // 使用ssh-agent方案，不需要指定密钥文件
         const sshOptions = generateSSHOptions();
-        const rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}`;
+        const rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distClientPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
 
         console.log('🚀 执行rsync同步...');
         console.log(`🔍 rsync命令: ${rsyncCommand}`);
