@@ -44,7 +44,7 @@ const config = {
         host: process.env.HOST,
         username: process.env.USERNAME,
         port: process.env.PORT || '22',
-        deployPath: '/var/www/dongboge/client',
+        deployPath: '/var/www/dongboge',
         // SSH认证配置 - 优先使用GitHub Secrets
         keyPath: process.env.SSH_KEY_PATH || '~/.ssh/id_rsa', // 本地环境fallback
         passphrase: process.env.SSH_PASSPHRASE || '',
