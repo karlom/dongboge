@@ -1,167 +1,125 @@
-name: 简化部署（备用方案）
+name: 简化博客部署
 
 on:
-  workflow_dispatch: # 手动触发
+  push:
+    branches: [main, master]
+    paths:
+      - "src/content/blog/**"
+      - "public/images/**"
+      - "src/assets/**"
+      - "scripts/simple-deploy.js"
+      - "scripts/modules/**"
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: "强制部署所有内容"
+        required: false
+        default: false
+        type: boolean
 
 jobs:
-  deploy:
+  simple-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # 获取最近两次提交，用于比较变更
 
       - name: 设置Node.js环境
         uses: actions/setup-node@v4
         with:
           node-version: "18"
+          cache: "npm"
 
-      - name: 安装依赖并构建
+      - name: 安装依赖
+        run: |
+          echo "📦 安装项目依赖..."
+          npm ci --prefer-offline --no-audit --silent --no-fund
+          echo "✅ 依赖安装完成"
+
+      - name: 运行简化部署
         env:
+          # 服务器配置
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
+          PORT: ${{ secrets.PORT || '22' }}
+
+          # CDN配置
+          TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+          TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+          TENCENT_COS_BUCKET: ${{ secrets.TENCENT_COS_BUCKET }}
+          TENCENT_COS_REGION: ap-guangzhou
+          CDN_DOMAIN: ${{ secrets.CDN_DOMAIN }}
+
+          # 构建配置
           PUBLIC_CDN_URL: https://cdn.dongboge.cn
           SITE_URL: https://dongboge.cn
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
           NODE_ENV: production
+
+          # 强制部署标志
+          FORCE_DEPLOY: ${{ github.event.inputs.force_deploy }}
         run: |
-          npm install --silent
-          npm run build
+          echo "🚀 开始简化部署流程..."
 
-      - name: 创建部署包
+          # 设置SSH密钥
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # 添加服务器到known_hosts
+          ssh-keyscan -H -p $PORT $HOST >> ~/.ssh/known_hosts
+
+          # 运行简化部署脚本
+          node scripts/simple-deploy.js
+
+      - name: 部署后验证
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT || '22' }}
         run: |
-          mkdir -p deploy-ready
-          cp -r dist/* deploy-ready/
-          cp package.json deploy-ready/
-          cp -r deploy deploy-ready/
-          echo "部署包创建完成"
-          ls -la deploy-ready/
+          echo "🧪 验证部署结果..."
 
-      - name: 部署到服务器
-        uses: burnett01/rsync-deployments@6.0.0
-        with:
-          switches: -avzr --delete
-          path: deploy-ready/
-          remote_path: /var/www/dongboge
-          remote_host: ${{ secrets.HOST }}
-          remote_user: ${{ secrets.USERNAME }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          remote_key_pass: ${{ secrets.SSH_PASSPHRASE }}
+          # 检查网站响应
+          sleep 5
 
-      - name: 启动服务
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          port: ${{ secrets.PORT || '22' }}
-          script: |
-            cd /var/www/dongboge
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/ || echo "ERROR")
+          echo "🌐 网站响应: $RESPONSE"
 
-            # 安装依赖
-            npm install --production
+          if [ "$RESPONSE" = "200" ]; then
+            echo "✅ 网站访问正常"
+          else
+            echo "⚠️ 网站响应异常: $RESPONSE"
+          fi
 
-            # 更新Nginx配置
-            sudo tee /etc/nginx/sites-available/dongboge.conf > /dev/null << 'EOF'
-            server {
-                listen 80;
-                server_name dongboge.cn www.dongboge.cn;
-                return 301 https://$server_name$request_uri;
-            }
+          # 检查sitemap
+          SITEMAP_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/sitemap.xml || echo "ERROR")
+          echo "🗺️ Sitemap响应: $SITEMAP_RESPONSE"
 
-            server {
-                listen 443 ssl http2;
-                server_name dongboge.cn www.dongboge.cn;
+          if [ "$SITEMAP_RESPONSE" = "200" ]; then
+            echo "✅ Sitemap访问正常"
+          else
+            echo "⚠️ Sitemap响应异常: $SITEMAP_RESPONSE"
+          fi
 
-                ssl_certificate /etc/letsencrypt/live/dongboge.cn/fullchain.pem;
-                ssl_certificate_key /etc/letsencrypt/live/dongboge.cn/privkey.pem;
-                ssl_protocols TLSv1.2 TLSv1.3;
-                ssl_prefer_server_ciphers off;
-
-                root /var/www/dongboge/client;
-                index index.html;
-
-                add_header X-Frame-Options "SAMEORIGIN";
-                add_header X-Content-Type-Options "nosniff";
-
-                gzip on;
-                gzip_vary on;
-                gzip_min_length 1024;
-                gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-
-                # 联系表单页面
-                location = /contact {
-                    proxy_pass http://127.0.0.1:3000;
-                    proxy_http_version 1.1;
-                    proxy_set_header Host $host;
-                    proxy_set_header X-Real-IP $remote_addr;
-                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto $scheme;
-                }
-
-                # API端点
-                location ^~ /api/ {
-                    proxy_pass http://127.0.0.1:3000;
-                    proxy_http_version 1.1;
-                    proxy_set_header Host $host;
-                    proxy_set_header X-Real-IP $remote_addr;
-                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto $scheme;
-                }
-
-                # 管理后台
-                location ^~ /admin/ {
-                    proxy_pass http://127.0.0.1:3000;
-                    proxy_http_version 1.1;
-                    proxy_set_header Host $host;
-                    proxy_set_header X-Real-IP $remote_addr;
-                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto $scheme;
-                }
-
-                # 静态文件
-                location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp|avif)$ {
-                    expires 1y;
-                    add_header Cache-Control "public, immutable";
-                    try_files $uri =404;
-                }
-
-                # 其他页面
-                location / {
-                    try_files $uri $uri/ $uri.html =404;
-                }
-
-                error_page 404 /404.html;
-                error_page 500 502 503 504 /50x.html;
-            }
-            EOF
-
-            # 测试并重载Nginx
-            sudo nginx -t && sudo systemctl reload nginx
-
-            # 设置环境变量
-            cat > .env << EOF
-            PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
-            PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
-            PUBLIC_CDN_URL=https://cdn.dongboge.cn
-            SITE_URL=https://dongboge.cn
-            NODE_ENV=production
-            HOST=127.0.0.1
-            PORT=3000
-            EOF
-
-            # 启动Node.js服务器
-            pkill -f "node.*server/entry.mjs" || echo "没有旧进程"
-            nohup node server/entry.mjs > server.log 2>&1 &
-
-            sleep 5
-
-            # 检查状态
-            if ps aux | grep "node.*server/entry.mjs" | grep -v grep > /dev/null; then
-              echo "✅ 部署成功！"
-              echo "Contact页面测试: $(curl -s -o /dev/null -w "%{http_code}" https://dongboge.cn/contact)"
-            else
-              echo "❌ Node.js启动失败"
-              tail -10 server.log
-            fi
+      - name: 通知部署结果
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "🎉 简化部署成功完成！"
+            echo "📊 部署统计："
+            echo "  - 触发方式: ${{ github.event_name }}"
+            echo "  - 分支: ${{ github.ref_name }}"
+            echo "  - 提交: ${{ github.sha }}"
+            echo "  - 网站: https://dongboge.cn"
+          else
+            echo "❌ 简化部署失败"
+            echo "请检查日志并考虑使用完整部署流程"
+          fi

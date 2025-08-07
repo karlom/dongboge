@@ -13,7 +13,11 @@
     "seo:submit": "node scripts/submit-to-search-engines.js",
     "seo:check": "node scripts/seo-health-check.js",
     "seo:online": "node scripts/check-online-status.js",
-    "seo:all": "npm run seo:sitemap && npm run seo:online && npm run seo:submit"
+    "seo:all": "npm run seo:sitemap && npm run seo:online && npm run seo:submit",
+    "deploy:simple": "node scripts/simple-deploy.js",
+    "deploy:test-server": "node -e \"import('./scripts/modules/server-sync.js').then(m => m.testServerConnection())\"",
+    "deploy:test-cdn": "node -e \"import('./scripts/modules/cdn-sync.js').then(m => m.testCDNConnection())\"",
+    "deploy:sitemap": "node -e \"import('./scripts/modules/sitemap-generator.js').then(m => m.generateSitemap())\""
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
