@@ -67,10 +67,10 @@ function generateExcludeParams() {
     return config.rsync.excludes.map(exclude => `--exclude='${exclude}'`).join(' ');
 }
 
-// 设置SSH环境（使用成功的方法）
+// 设置SSH环境（使用ssh-agent方案）
 function setupSSHEnvironment() {
     try {
-        console.log('🔐 设置SSH环境...');
+        console.log('🔐 设置SSH环境（ssh-agent方案）...');
         console.log(`🔍 环境检查: GITHUB_ACTIONS=${process.env.GITHUB_ACTIONS}`);
         console.log(`🔍 密钥内容长度: ${config.server.keyContent ? config.server.keyContent.length : 0}`);
         console.log(`🔍 密钥密码: ${config.server.passphrase ? '已设置' : '未设置'}`);
@@ -136,27 +136,126 @@ function setupSSHEnvironment() {
             config.server.keyPath = expandedKeyPath;
         }
 
-        // 创建SSH_ASKPASS脚本（使用成功的方法）
-        const askpassPath = `/tmp/ssh_askpass_${Date.now()}.sh`;
-        const askpassScript = `#!/bin/bash\necho "${config.server.passphrase}"`;
-        fs.writeFileSync(askpassPath, askpassScript, {
-            mode: 0o755
+        // === SSH-Agent方案实现 ===
+        console.log('🔧 启动ssh-agent并加载密钥...');
+
+        // 1. 启动ssh-agent
+        console.log('🚀 启动ssh-agent...');
+        const sshAgentOutput = execSync('ssh-agent -s', {
+            stdio: 'pipe',
+            encoding: 'utf8'
         });
 
-        // 不再创建SSH配置文件，统一使用SSH_ASKPASS方式
-        console.log('📝 统一使用SSH_ASKPASS环境变量进行认证');
+        console.log('📋 ssh-agent输出:', sshAgentOutput.trim());
 
-        // 设置SSH环境变量
-        config.server.sshEnv = {
+        // 2. 解析ssh-agent输出，获取环境变量
+        const sshAuthSockMatch = sshAgentOutput.match(/SSH_AUTH_SOCK=([^;]+)/);
+        const sshAgentPidMatch = sshAgentOutput.match(/SSH_AGENT_PID=([^;]+)/);
+
+        if (!sshAuthSockMatch || !sshAgentPidMatch) {
+            throw new Error('无法解析ssh-agent输出');
+        }
+
+        const sshAuthSock = sshAuthSockMatch[1];
+        const sshAgentPid = sshAgentPidMatch[1];
+
+        console.log(`✅ ssh-agent已启动:`);
+        console.log(`  - SSH_AUTH_SOCK: ${sshAuthSock}`);
+        console.log(`  - SSH_AGENT_PID: ${sshAgentPid}`);
+
+        // 3. 创建expect脚本来自动输入密码
+        const expectScriptPath = `/tmp/ssh_add_expect_${Date.now()}.exp`;
+        const expectScript = `#!/usr/bin/expect -f
+set timeout 10
+spawn ssh-add ${config.server.keyPath}
+expect {
+    "Enter passphrase for*" {
+        send "${config.server.passphrase}\\r"
+        exp_continue
+    }
+    "Identity added*" {
+        exit 0
+    }
+    "Bad passphrase*" {
+        exit 1
+    }
+    timeout {
+        exit 2
+    }
+    eof {
+        exit 0
+    }
+}`;
+
+        fs.writeFileSync(expectScriptPath, expectScript, {
+            mode: 0o755
+        });
+        console.log(`📝 expect脚本已创建: ${expectScriptPath}`);
+
+        // 4. 设置ssh-agent环境变量
+        const sshAgentEnv = {
             ...process.env,
-            SSH_ASKPASS: askpassPath,
-            DISPLAY: ':0',
-            SSH_AUTH_SOCK: '' // 禁用SSH agent
+            SSH_AUTH_SOCK: sshAuthSock,
+            SSH_AGENT_PID: sshAgentPid
         };
 
-        config.server.askpassPath = askpassPath;
+        // 4. 检查expect工具是否可用
+        try {
+            execSync('which expect', {
+                stdio: 'pipe'
+            });
+            console.log('✅ expect工具可用');
+        } catch (error) {
+            console.log('⚠️ expect工具不可用，尝试安装...');
+            try {
+                execSync('sudo apt-get update && sudo apt-get install -y expect', {
+                    stdio: 'pipe'
+                });
+                console.log('✅ expect工具安装成功');
+            } catch (installError) {
+                throw new Error('无法安装expect工具，ssh-agent方案需要expect');
+            }
+        }
 
+        // 5. 使用expect脚本添加密钥到ssh-agent
+        console.log('🔑 添加SSH密钥到ssh-agent...');
+        try {
+            const addKeyResult = execSync(`expect ${expectScriptPath}`, {
+                stdio: 'pipe',
+                env: sshAgentEnv,
+                timeout: 15000
+            });
+            console.log('✅ SSH密钥已成功添加到ssh-agent');
+            console.log('📤 ssh-add输出:', addKeyResult.toString().trim());
+        } catch (error) {
+            console.error('❌ 添加SSH密钥到ssh-agent失败:', error.message);
+            if (error.stderr) {
+                console.error('🔍 错误详情:', error.stderr.toString());
+            }
+            throw new Error('SSH密钥添加失败，可能是密码错误');
+        }
+
+        // 6. 验证密钥是否成功加载
+        console.log('🧪 验证ssh-agent中的密钥...');
+        try {
+            const listKeysResult = execSync('ssh-add -l', {
+                stdio: 'pipe',
+                env: sshAgentEnv
+            });
+            console.log('✅ ssh-agent中的密钥列表:');
+            console.log(listKeysResult.toString().trim());
+        } catch (error) {
+            console.warn('⚠️ 无法列出ssh-agent中的密钥，但继续尝试');
+        }
+
+        // 7. 设置环境变量（不再需要SSH_ASKPASS）
+        config.server.sshEnv = sshAgentEnv;
+        config.server.expectScriptPath = expectScriptPath;
+        config.server.sshAgentPid = sshAgentPid;
+
+        console.log('✅ ssh-agent环境设置完成');
         return true;
+
     } catch (error) {
         console.error('❌ SSH环境设置失败:', error.message);
         return false;
@@ -165,24 +264,37 @@ function setupSSHEnvironment() {
 
 // 清理SSH环境
 function cleanupSSHEnvironment() {
-    if (config.server.askpassPath && fs.existsSync(config.server.askpassPath)) {
+    // 清理expect脚本
+    if (config.server.expectScriptPath && fs.existsSync(config.server.expectScriptPath)) {
         try {
-            fs.unlinkSync(config.server.askpassPath);
+            fs.unlinkSync(config.server.expectScriptPath);
+            console.log('🧹 expect脚本已清理');
         } catch (error) {
-            console.warn('⚠️ 清理SSH askpass文件失败');
+            console.warn('⚠️ 清理expect脚本失败');
         }
     }
 
-    // SSH配置文件已不再使用，无需清理
+    // 停止ssh-agent
+    if (config.server.sshAgentPid) {
+        try {
+            execSync(`kill ${config.server.sshAgentPid}`, {
+                stdio: 'pipe'
+            });
+            console.log('🧹 ssh-agent已停止');
+        } catch (error) {
+            console.warn('⚠️ 停止ssh-agent失败');
+        }
+    }
 }
 
-// 生成SSH命令选项
+// 生成SSH命令选项（ssh-agent方案）
 function generateSSHOptions() {
+    // 使用ssh-agent时，不需要指定密钥文件，ssh-agent会自动处理
     const options = [
         '-o ConnectTimeout=10',
         '-o StrictHostKeyChecking=no',
-        `-p ${config.server.port}`,
-        `-i ${config.server.keyPath}`
+        `-p ${config.server.port}`
+        // 不再需要 -i 参数，ssh-agent会自动提供密钥
     ];
 
     return options.join(' ');
@@ -205,14 +317,13 @@ function checkSSHConnection() {
         console.log(`🔑 使用密钥: ${config.server.keyPath}`);
 
         // 打印关键参数用于调试
-        console.log('🔍 SSH连接测试参数:');
+        console.log('🔍 SSH连接测试参数（ssh-agent方案）:');
         console.log(`  - SSH命令: ${sshCommand}`);
-        console.log(`  - SSH_ASKPASS: ${config.server.sshEnv.SSH_ASKPASS}`);
-        console.log(`  - DISPLAY: ${config.server.sshEnv.DISPLAY}`);
         console.log(`  - SSH_AUTH_SOCK: ${config.server.sshEnv.SSH_AUTH_SOCK}`);
+        console.log(`  - SSH_AGENT_PID: ${config.server.sshEnv.SSH_AGENT_PID}`);
         console.log(`  - 密钥文件权限: ${fs.statSync(config.server.keyPath).mode.toString(8)}`);
 
-        // 使用SSH_ASKPASS方式（与appleboy/ssh-action相同）
+        // 使用ssh-agent方式
         const result = execSync(sshCommand, {
             stdio: 'pipe',
             timeout: 15000,
@@ -276,6 +387,38 @@ function ensureServerDirectories() {
         return true;
     } catch (error) {
         console.error('❌ 创建服务器目录失败:', error.message);
+        return false;
+    }
+}
+
+// 测试ssh-agent连接
+function testSSHAgentConnection() {
+    try {
+        console.log('🧪 测试ssh-agent连接...');
+
+        // 使用简单的rsync测试命令
+        const sshOptions = generateSSHOptions();
+        const testRsyncCommand = `rsync --dry-run -v -e "ssh ${sshOptions}" /tmp/ ${config.server.username}@${config.server.host}:/tmp/rsync_test/`;
+
+        console.log(`🔍 测试rsync命令: ${testRsyncCommand}`);
+        console.log(`🔍 使用ssh-agent环境变量:`);
+        console.log(`  - SSH_AUTH_SOCK: ${config.server.sshEnv.SSH_AUTH_SOCK}`);
+        console.log(`  - SSH_AGENT_PID: ${config.server.sshEnv.SSH_AGENT_PID}`);
+
+        const result = execSync(testRsyncCommand, {
+            stdio: 'pipe',
+            timeout: 10000,
+            env: config.server.sshEnv
+        });
+
+        console.log('✅ rsync ssh-agent测试成功');
+        console.log(`📤 rsync输出: ${result.toString().trim()}`);
+        return true;
+    } catch (error) {
+        console.error('❌ rsync ssh-agent测试失败:', error.message);
+        if (error.stderr) {
+            console.error('🔍 测试错误详情:', error.stderr.toString());
+        }
         return false;
     }
 }
@@ -412,10 +555,10 @@ function debugEnvironmentVariables() {
     }
 }
 
-// 同步构建文件到服务器
+// 同步构建文件到服务器（ssh-agent方案）
 function syncBuildFiles() {
     try {
-        console.log('📤 同步构建文件到服务器...');
+        console.log('📤 同步构建文件到服务器（ssh-agent方案）...');
 
         const distPath = 'dist/';
         const excludeParams = generateExcludeParams();
@@ -425,45 +568,24 @@ function syncBuildFiles() {
             throw new Error('构建目录不存在，请先运行构建');
         }
 
-        // === 调试信息 1: 验证rsync执行时的环境变量 ===
-        console.log('🔍 === 调试信息 1: 验证环境变量 ===');
-        debugEnvironmentVariables();
-
-        // === 调试信息 2: 测试rsync是否能正确调用SSH_ASKPASS ===
-        console.log('🔍 === 调试信息 2: 测试rsync SSH_ASKPASS调用 ===');
-        if (!testSSHAskpassWithRsync()) {
-            console.warn('⚠️ rsync SSH_ASKPASS测试失败，但继续尝试正式同步');
+        // === 调试信息: 测试ssh-agent连接 ===
+        console.log('🔍 === 测试ssh-agent连接 ===');
+        if (!testSSHAgentConnection()) {
+            console.warn('⚠️ ssh-agent连接测试失败，但继续尝试正式同步');
         }
 
-        // === 调试信息 3: 检查密钥密码是否正确传递 ===
-        console.log('🔍 === 调试信息 3: 验证密钥密码传递 ===');
-        console.log('🧪 手动测试SSH_ASKPASS脚本执行...');
-        try {
-            const manualTestResult = execSync(`bash ${config.server.sshEnv.SSH_ASKPASS}`, {
-                stdio: 'pipe',
-                timeout: 5000
-            });
-            console.log(`✅ SSH_ASKPASS脚本手动执行成功: "${manualTestResult.toString().trim()}"`);
-            console.log(`🔍 返回的密码长度: ${manualTestResult.toString().trim().length}`);
-        } catch (error) {
-            console.error('❌ SSH_ASKPASS脚本手动执行失败:', error.message);
-        }
-
-        // 统一使用SSH_ASKPASS方式，与SSH连接测试保持一致
+        // 使用ssh-agent方案，不需要指定密钥文件
         const sshOptions = generateSSHOptions();
         const rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
 
         console.log('🚀 执行rsync同步...');
         console.log(`🔍 rsync命令: ${rsyncCommand}`);
-        console.log('🔍 使用SSH_ASKPASS环境变量进行认证');
+        console.log('🔍 使用ssh-agent进行认证');
 
-        // 添加更详细的环境变量调试
-        console.log('🔍 rsync执行环境变量:');
-        Object.keys(config.server.sshEnv).forEach(key => {
-            if (key.includes('SSH') || key === 'DISPLAY') {
-                console.log(`  - ${key}: ${config.server.sshEnv[key]}`);
-            }
-        });
+        // 显示ssh-agent环境变量
+        console.log('🔍 ssh-agent环境变量:');
+        console.log(`  - SSH_AUTH_SOCK: ${config.server.sshEnv.SSH_AUTH_SOCK}`);
+        console.log(`  - SSH_AGENT_PID: ${config.server.sshEnv.SSH_AGENT_PID}`);
 
         execSync(rsyncCommand, {
             stdio: 'inherit',
@@ -487,9 +609,9 @@ function syncBuildFiles() {
         const errorMsg = error.message.toLowerCase();
         if (errorMsg.includes('permission denied')) {
             console.error('💡 Permission denied 错误分析:');
-            console.error('  1. SSH_ASKPASS可能未被rsync正确调用');
-            console.error('  2. 密钥密码可能不正确');
-            console.error('  3. rsync的SSH子进程可能无法访问环境变量');
+            console.error('  1. ssh-agent可能未正确启动');
+            console.error('  2. SSH密钥可能未正确添加到ssh-agent');
+            console.error('  3. 密钥密码可能不正确');
             console.error('  4. 服务器端公钥配置可能有问题');
         }
 
@@ -509,11 +631,11 @@ function syncSitemapFiles() {
 
         sitemapFiles.forEach(file => {
             if (fs.existsSync(file)) {
-                // 统一使用SSH_ASKPASS方式
+                // 使用ssh-agent方式
                 const sshOptions = generateSSHOptions();
                 const scpCommand = `scp ${sshOptions.replace('-o ConnectTimeout=10', '')} ${file} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
 
-                console.log(`🔍 同步 ${file} 使用SSH_ASKPASS认证`);
+                console.log(`🔍 同步 ${file} 使用ssh-agent认证`);
                 execSync(scpCommand, {
                     stdio: 'pipe',
                     env: config.server.sshEnv
