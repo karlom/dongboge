@@ -226,6 +226,14 @@ function checkSSHConnection() {
         console.log(`🔍 测试SSH连接: ${config.server.username}@${config.server.host}:${config.server.port}`);
         console.log(`🔑 使用密钥: ${config.server.keyPath}`);
 
+        // 打印关键参数用于调试
+        console.log('🔍 SSH连接测试参数:');
+        console.log(`  - SSH命令: ${sshCommand}`);
+        console.log(`  - SSH_ASKPASS: ${config.server.sshEnv.SSH_ASKPASS}`);
+        console.log(`  - DISPLAY: ${config.server.sshEnv.DISPLAY}`);
+        console.log(`  - SSH_AUTH_SOCK: ${config.server.sshEnv.SSH_AUTH_SOCK}`);
+        console.log(`  - 密钥文件权限: ${fs.statSync(config.server.keyPath).mode.toString(8)}`);
+
         // 使用SSH_ASKPASS方式（与appleboy/ssh-action相同）
         const result = execSync(sshCommand, {
             stdio: 'pipe',
