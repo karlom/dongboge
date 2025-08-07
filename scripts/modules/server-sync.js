@@ -143,6 +143,24 @@ function setupSSHEnvironment() {
             mode: 0o755
         });
 
+        // 创建SSH配置文件（用于rsync）
+        const sshConfigPath = path.join(path.dirname(config.server.keyPath), 'ssh_config');
+        const sshConfig = `Host deploy-server
+    HostName ${config.server.host}
+    User ${config.server.username}
+    Port ${config.server.port}
+    IdentityFile ${config.server.keyPath}
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    PasswordAuthentication no
+    PubkeyAuthentication yes
+`;
+
+        fs.writeFileSync(sshConfigPath, sshConfig, {
+            mode: 0o600
+        });
+        console.log(`📝 SSH配置文件已创建: ${sshConfigPath}`);
+
         // 设置SSH环境变量
         config.server.sshEnv = {
             ...process.env,
@@ -152,6 +170,7 @@ function setupSSHEnvironment() {
         };
 
         config.server.askpassPath = askpassPath;
+        config.server.sshConfigPath = sshConfigPath;
 
         return true;
     } catch (error) {
@@ -166,7 +185,15 @@ function cleanupSSHEnvironment() {
         try {
             fs.unlinkSync(config.server.askpassPath);
         } catch (error) {
-            console.warn('⚠️ 清理SSH临时文件失败');
+            console.warn('⚠️ 清理SSH askpass文件失败');
+        }
+    }
+
+    if (config.server.sshConfigPath && fs.existsSync(config.server.sshConfigPath)) {
+        try {
+            fs.unlinkSync(config.server.sshConfigPath);
+        } catch (error) {
+            console.warn('⚠️ 清理SSH配置文件失败');
         }
     }
 }
@@ -280,11 +307,16 @@ function syncBuildFiles() {
             throw new Error('构建目录不存在，请先运行构建');
         }
 
-        // 生成SSH选项用于rsync
-        const sshOptions = generateSSHOptions();
-
-        // 使用rsync同步文件
-        const rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
+        // 使用SSH配置文件进行rsync（更可靠）
+        let rsyncCommand;
+        if (config.server.sshConfigPath) {
+            // 使用SSH配置文件
+            rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh -F ${config.server.sshConfigPath}" ${distPath} deploy-server:${config.server.deployPath}/`;
+        } else {
+            // 备用方案：直接使用SSH选项
+            const sshOptions = generateSSHOptions();
+            rsyncCommand = `rsync ${config.rsync.options} ${excludeParams} -e "ssh ${sshOptions}" ${distPath} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
+        }
 
         console.log('🚀 执行rsync同步...');
         execSync(rsyncCommand, {
@@ -310,11 +342,17 @@ function syncSitemapFiles() {
             'public/sitemap-index.xml'
         ];
 
-        const sshOptions = generateSSHOptions();
-
         sitemapFiles.forEach(file => {
             if (fs.existsSync(file)) {
-                const scpCommand = `scp ${sshOptions.replace('-o ConnectTimeout=10', '')} ${file} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
+                let scpCommand;
+                if (config.server.sshConfigPath) {
+                    // 使用SSH配置文件
+                    scpCommand = `scp -F ${config.server.sshConfigPath} ${file} deploy-server:${config.server.deployPath}/`;
+                } else {
+                    // 备用方案
+                    const sshOptions = generateSSHOptions();
+                    scpCommand = `scp ${sshOptions.replace('-o ConnectTimeout=10', '')} ${file} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
+                }
 
                 execSync(scpCommand, {
                     stdio: 'pipe',
