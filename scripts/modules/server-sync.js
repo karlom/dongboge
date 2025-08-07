@@ -628,53 +628,36 @@ function syncBuildFiles() {
     }
 }
 
-// 同步sitemap文件
-function syncSitemapFiles() {
-    try {
-        console.log('🗺️ 同步sitemap文件...');
-
-        const sitemapFiles = [
-            'public/sitemap.xml',
-            'public/sitemap-index.xml'
-        ];
-
-        sitemapFiles.forEach(file => {
-            if (fs.existsSync(file)) {
-                // 使用ssh-agent方式
-                const sshOptions = generateSSHOptions();
-                const scpCommand = `scp ${sshOptions.replace('-o ConnectTimeout=10', '')} ${file} ${config.server.username}@${config.server.host}:${config.server.deployPath}/`;
-
-                console.log(`🔍 同步 ${file} 使用ssh-agent认证`);
-                execSync(scpCommand, {
-                    stdio: 'pipe',
-                    env: config.server.sshEnv
-                });
-                console.log(`  ✅ ${file} 已同步`);
-            } else {
-                console.warn(`  ⚠️ ${file} 不存在，跳过`);
-            }
-        });
-
-        console.log('✅ Sitemap文件同步完成');
-        return true;
-    } catch (error) {
-        console.error('❌ 同步sitemap文件失败:', error.message);
-        return false;
-    }
-}
+// 注意：sitemap文件已经通过主rsync命令一起同步，无需单独处理
 
 // 验证部署结果
 function validateDeployment() {
     try {
         console.log('🧪 验证部署结果...');
 
-        const checkCommands = [
-            'ls -la',
-            'find . -name "*.html" | wc -l',
-            'ls -la sitemap.xml'
+        // 简化验证：只检查关键文件和目录
+        const checkCommands = [{
+                cmd: 'ls -la index.html',
+                desc: '主页文件'
+            },
+            {
+                cmd: 'find . -name "*.html" | wc -l',
+                desc: 'HTML文件数量'
+            },
+            {
+                cmd: 'ls -la sitemap*.xml',
+                desc: 'Sitemap文件'
+            },
+            {
+                cmd: 'ls -la _astro/',
+                desc: 'Astro资源目录'
+            }
         ];
 
-        checkCommands.forEach(cmd => {
+        checkCommands.forEach(({
+            cmd,
+            desc
+        }) => {
             try {
                 const command = `cd ${config.server.deployPath} && ${cmd}`;
                 const result = executeSSHCommand(command, {
@@ -682,12 +665,14 @@ function validateDeployment() {
                 });
 
                 if (cmd.includes('wc -l')) {
-                    console.log(`  📄 HTML文件数量: ${result.toString().trim()}`);
-                } else if (cmd.includes('sitemap.xml')) {
-                    console.log(`  🗺️ Sitemap文件: ${result.toString().includes('sitemap.xml') ? '存在' : '不存在'}`);
+                    console.log(`  � ${deesc}: ${result.toString().trim()}`);
+                } else if (result.toString().trim()) {
+                    console.log(`  ✅ ${desc}: 存在`);
+                } else {
+                    console.log(`  ⚠️ ${desc}: 不存在`);
                 }
             } catch (error) {
-                console.warn(`  ⚠️ 验证命令失败: ${cmd}`);
+                console.log(`  ⚠️ ${desc}: 检查失败`);
             }
         });
 
@@ -719,10 +704,8 @@ export async function syncToServer(changes) {
             throw new Error('同步构建文件失败');
         }
 
-        // 4. 同步sitemap文件
-        if (!syncSitemapFiles()) {
-            console.warn('⚠️ Sitemap同步失败，但继续部署');
-        }
+        // 4. sitemap文件已通过主rsync一起同步，无需单独处理
+        console.log('✅ Sitemap文件已通过主rsync同步');
 
         // 5. 验证部署结果
         validateDeployment();
