@@ -9,10 +9,17 @@ import {
     execSync
 } from 'child_process';
 
-// 手动加载.env文件
+// 手动加载.env文件（仅在本地环境）
 function loadEnvFile() {
+    // 在CI/CD环境中不加载.env文件，使用GitHub Secrets
+    if (process.env.GITHUB_ACTIONS) {
+        console.log('🔧 CI/CD环境，使用GitHub Secrets');
+        return;
+    }
+
     const envPath = '.env';
     if (fs.existsSync(envPath)) {
+        console.log('🔧 本地环境，加载.env文件');
         const envContent = fs.readFileSync(envPath, 'utf8');
         const lines = envContent.split('\n');
 
@@ -38,10 +45,10 @@ const config = {
         username: process.env.USERNAME,
         port: process.env.PORT || '22',
         deployPath: '/var/www/dongboge/client',
-        // SSH认证配置
-        keyPath: process.env.SSH_KEY_PATH,
+        // SSH认证配置 - 优先使用GitHub Secrets
+        keyPath: process.env.SSH_KEY_PATH || '~/.ssh/id_rsa', // 本地环境fallback
         passphrase: process.env.SSH_PASSPHRASE || '',
-        // 支持密钥内容直接传入（用于CI/CD）
+        // CI/CD环境使用SSH_PRIVATE_KEY（GitHub Secrets）
         keyContent: process.env.SSH_PRIVATE_KEY || ''
     },
     rsync: {
@@ -64,10 +71,18 @@ function generateExcludeParams() {
 function setupSSHEnvironment() {
     try {
         console.log('🔐 设置SSH环境...');
+        console.log(`🔍 环境检查: GITHUB_ACTIONS=${process.env.GITHUB_ACTIONS}`);
+        console.log(`🔍 密钥内容长度: ${config.server.keyContent ? config.server.keyContent.length : 0}`);
+        console.log(`🔍 密钥密码: ${config.server.passphrase ? '已设置' : '未设置'}`);
 
         // 如果提供了密钥内容（CI/CD环境）
         if (config.server.keyContent) {
-            console.log('📝 使用提供的SSH密钥内容');
+            console.log('📝 使用GitHub Secrets中的SSH密钥内容');
+
+            // 验证密钥格式
+            if (!config.server.keyContent.includes('BEGIN') || !config.server.keyContent.includes('END')) {
+                throw new Error('SSH密钥格式不正确，缺少BEGIN/END标记');
+            }
 
             // 确保.ssh目录存在
             const sshDir = path.join(process.env.HOME || '~', '.ssh');
@@ -75,16 +90,25 @@ function setupSSHEnvironment() {
                 fs.mkdirSync(sshDir, {
                     mode: 0o700
                 });
+                console.log(`📁 创建SSH目录: ${sshDir}`);
             }
 
             // 写入密钥文件
             const keyPath = path.join(sshDir, 'deploy_key');
-            fs.writeFileSync(keyPath, config.server.keyContent, {
+
+            // 确保密钥内容格式正确（添加换行符）
+            let keyContent = config.server.keyContent.trim();
+            if (!keyContent.endsWith('\n')) {
+                keyContent += '\n';
+            }
+
+            fs.writeFileSync(keyPath, keyContent, {
                 mode: 0o600
             });
             config.server.keyPath = keyPath;
 
             console.log(`✅ SSH密钥已写入: ${keyPath}`);
+            console.log(`🔍 密钥文件大小: ${fs.statSync(keyPath).size} 字节`);
         } else {
             console.log(`📁 使用SSH密钥文件: ${config.server.keyPath}`);
 
@@ -183,9 +207,33 @@ function checkSSHConnection() {
         });
 
         console.log('✅ SSH连接正常');
+        console.log('📤 连接输出:', result.toString().trim());
         return true;
     } catch (error) {
         console.error('❌ SSH连接失败:', error.message);
+
+        // 显示详细的错误信息
+        if (error.stderr) {
+            console.error('🔍 SSH错误详情:', error.stderr.toString());
+        }
+        if (error.stdout) {
+            console.error('🔍 SSH输出:', error.stdout.toString());
+        }
+
+        // 检查常见问题
+        const errorMsg = error.message.toLowerCase();
+        if (errorMsg.includes('permission denied')) {
+            console.error('💡 可能的原因:');
+            console.error('  1. 服务器上没有对应的公钥');
+            console.error('  2. SSH密钥格式不正确');
+            console.error('  3. SSH密钥密码错误');
+        } else if (errorMsg.includes('libcrypto')) {
+            console.error('💡 可能的原因:');
+            console.error('  1. SSH密钥格式损坏');
+            console.error('  2. 密钥文件权限问题');
+            console.error('  3. 密钥内容复制时出现问题');
+        }
+
         cleanupSSHEnvironment();
         return false;
     }

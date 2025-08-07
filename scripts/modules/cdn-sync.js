@@ -10,8 +10,13 @@ import {
     execSync
 } from 'child_process';
 
-// 手动加载.env文件
+// 手动加载.env文件（仅在本地环境）
 function loadEnvFile() {
+    // 在CI/CD环境中不加载.env文件，使用GitHub Secrets
+    if (process.env.GITHUB_ACTIONS) {
+        return;
+    }
+
     const envPath = '.env';
     if (fs.existsSync(envPath)) {
         const envContent = fs.readFileSync(envPath, 'utf8');
