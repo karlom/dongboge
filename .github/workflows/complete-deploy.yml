@@ -1,9 +1,9 @@
-name: 完整部署到服务器
+name: 完整部署到服务器（已禁用自动触发）
 
 on:
-  workflow_dispatch: # 手动触发
-  push:
-    branches: [main]
+  workflow_dispatch: # 只允许手动触发
+  # push:
+  #   branches: [main]  # 已禁用自动触发，避免与simple-deploy冲突
 
 jobs:
   deploy:
