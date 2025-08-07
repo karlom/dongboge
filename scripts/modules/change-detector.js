@@ -63,11 +63,26 @@ function parseFrontmatter(content) {
 // 从博客文件提取信息
 function extractBlogInfo(filePath) {
     try {
-        const content = fs.readFileSync(filePath, 'utf8');
-        const frontmatter = parseFrontmatter(content);
-        const fileName = path.basename(filePath, '.md');
+        console.log(`    🔍 读取博客文件: ${filePath}`);
 
-        return {
+        if (!fs.existsSync(filePath)) {
+            console.log(`    ❌ 文件不存在: ${filePath}`);
+            return null;
+        }
+
+        const content = fs.readFileSync(filePath, 'utf8');
+        console.log(`    📖 文件内容长度: ${content.length} 字符`);
+
+        const frontmatter = parseFrontmatter(content);
+        console.log(`    📋 Frontmatter解析结果:`, {
+            title: frontmatter.title,
+            slug: frontmatter.slug,
+            pubDate: frontmatter.pubDate
+        });
+
+        const fileName = path.basename(filePath, path.extname(filePath));
+
+        const blogInfo = {
             filePath,
             fileName,
             title: frontmatter.title || fileName,
@@ -78,8 +93,12 @@ function extractBlogInfo(filePath) {
             tags: frontmatter.tags || [],
             url: `/blog/${frontmatter.slug || fileName}/`
         };
+
+        console.log(`    ✅ 博客信息提取成功: ${blogInfo.title} (${blogInfo.slug})`);
+        return blogInfo;
     } catch (error) {
-        console.warn(`⚠️ 无法解析博客文件: ${filePath}`, error.message);
+        console.error(`❌ 解析博客文件失败: ${filePath}`, error.message);
+        console.error(`错误堆栈:`, error.stack);
         return null;
     }
 }
@@ -87,13 +106,18 @@ function extractBlogInfo(filePath) {
 // 获取Git变更的文件
 function getGitChangedFiles() {
     try {
-        // 尝试获取最近一次提交的变更
-        const output = execSync('git diff --name-only HEAD~1 HEAD', {
+        // 使用 -z 选项避免路径编码问题，并使用 --no-renames 避免重命名检测
+        const output = execSync('git diff --name-only -z --no-renames HEAD~1 HEAD', {
             encoding: 'utf8',
             stdio: ['pipe', 'pipe', 'ignore'] // 忽略stderr
         });
 
-        return output.trim().split('\n').filter(file => file.length > 0);
+        // 使用 \0 分割文件名，避免特殊字符问题
+        const files = output.split('\0').filter(file => file.length > 0);
+
+        console.log(`📝 Git检测到的原始文件:`, files);
+
+        return files;
     } catch (error) {
         // 如果Git命令失败，返回空数组（比如在CI环境中可能会有问题）
         console.warn('⚠️ 无法获取Git变更，将检查所有文件');
@@ -174,20 +198,46 @@ export async function detectChanges() {
 
             // 分析变更的文件
             gitChangedFiles.forEach(file => {
-                if (file.startsWith('src/content/blog/') && (file.endsWith('.md') || file.endsWith('.mdx'))) {
+                console.log(`🔍 检查文件: "${file}"`);
+                console.log(`  文件长度: ${file.length}`);
+
+                // 更宽松的博客文件匹配 - 使用includes而不是startsWith/endsWith
+                const isBlogFile = file.includes('src/content/blog/') && (file.includes('.md') || file.includes('.mdx'));
+
+                if (isBlogFile) {
+                    console.log(`  📝 识别为博客文件: ${file}`);
+
+                    // 检查文件是否存在
+                    if (!fs.existsSync(file)) {
+                        console.log(`  ⚠️ 文件不存在，可能已被删除: ${file}`);
+                        return;
+                    }
+
                     // 博客文章变更
                     const blogInfo = extractBlogInfo(file);
                     if (blogInfo) {
                         changes.blog.push(blogInfo);
-                        console.log(`  📄 博客变更: ${blogInfo.title} (${blogInfo.slug})`);
+                        console.log(`  ✅ 博客变更: ${blogInfo.title} (${blogInfo.slug})`);
+                    } else {
+                        console.log(`  ❌ 无法提取博客信息: ${file}`);
                     }
                 } else if (file.includes('images/') || file.includes('assets/') ||
-                    file.startsWith('public/') && !file.endsWith('.html')) {
+                    (file.includes('public/') && !file.includes('.html'))) {
+                    console.log(`  🖼️ 识别为静态资源: ${file}`);
+
                     // 静态资源变更
                     if (fs.existsSync(file)) {
                         changes.assets.push(file);
-                        console.log(`  🖼️ 资源变更: ${file}`);
+                        console.log(`  ✅ 资源变更: ${file}`);
+                    } else {
+                        console.log(`  ⚠️ 资源文件不存在: ${file}`);
                     }
+                } else {
+                    console.log(`  ⏭️ 跳过文件（不匹配规则）: ${file}`);
+                    console.log(`    - 包含src/content/blog/: ${file.includes('src/content/blog/')}`);
+                    console.log(`    - 包含.md: ${file.includes('.md')}`);
+                    console.log(`    - 以src/content/blog/开头: ${file.startsWith('src/content/blog/')}`);
+                    console.log(`    - 以.md结尾: ${file.endsWith('.md')}`);
                 }
             });
         } else {
