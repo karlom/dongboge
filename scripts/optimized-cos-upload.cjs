@@ -225,9 +225,15 @@ async function getAllFiles(dir, baseDir = dir) {
             }
 
             const stats = await stat(fullPath);
+            // 处理路径映射：移除client/前缀
+            let relativePath = path.relative(baseDir, fullPath);
+            if (relativePath.startsWith('client/')) {
+                relativePath = relativePath.substring('client/'.length);
+            }
+
             files.push({
                 path: fullPath,
-                relativePath: path.relative(baseDir, fullPath),
+                relativePath: relativePath,
                 size: stats.size,
                 mtime: stats.mtime
             });
@@ -374,7 +380,26 @@ async function main() {
         console.log('📁 扫描文件...');
         let allFiles = [];
 
-        const scanPaths = [{
+        const scanPaths = [
+            // 优先扫描client目录（server模式构建输出）
+            {
+                path: path.join(distPath, 'client', 'assets'),
+                name: 'assets' // 上传到CDN的assets目录
+            },
+            {
+                path: path.join(distPath, 'client', 'fonts'),
+                name: 'fonts'
+            },
+            {
+                path: path.join(distPath, 'client', 'images'),
+                name: 'images'
+            },
+            {
+                path: path.join(distPath, 'client', '_astro'),
+                name: '_astro' // 重要：带hash的资源文件
+            },
+            // 兼容static模式构建输出
+            {
                 path: path.join(distPath, 'assets'),
                 name: 'assets'
             },
@@ -389,23 +414,6 @@ async function main() {
             {
                 path: path.join(distPath, '_astro'),
                 name: '_astro'
-            },
-            // 如果有client目录，也扫描它
-            {
-                path: path.join(distPath, 'client', 'assets'),
-                name: 'client/assets'
-            },
-            {
-                path: path.join(distPath, 'client', 'fonts'),
-                name: 'client/fonts'
-            },
-            {
-                path: path.join(distPath, 'client', 'images'),
-                name: 'client/images'
-            },
-            {
-                path: path.join(distPath, 'client', '_astro'),
-                name: 'client/_astro'
             }
         ];
 
