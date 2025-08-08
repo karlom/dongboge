@@ -39,9 +39,9 @@ jobs:
           path: |
             **/node_modules
             ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-npm-v2-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-
+            ${{ runner.os }}-npm-v2-
 
       - name: 安装依赖
         run: |
@@ -136,6 +136,14 @@ jobs:
           script: |
             set -e
             echo "🚀 开始服务器准备..."
+
+            # 清理服务器缓存
+            echo "🧹 清理服务器缓存..."
+            cd /var/www/dongboge 2>/dev/null || true
+            rm -rf node_modules/.cache 2>/dev/null || true
+            rm -rf dist 2>/dev/null || true
+            npm cache clean --force 2>/dev/null || true
+            echo "✅ 服务器缓存已清理"
 
             # 创建目录结构
             mkdir -p /var/www/dongboge/{server,client,logs,backup,node_modules} >/dev/null 2>&1
