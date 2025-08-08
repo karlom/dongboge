@@ -405,7 +405,7 @@ async function createAssetsCompatibilityMapping(allFiles, manifest) {
 
                     // 更新清单
                     manifest[assetsPath] = {
-                        hash: manifest[cosPath]?.hash || 'copied',
+                        hash: manifest[cosPath] && manifest[cosPath].hash || 'copied',
                         size: file.size,
                         mtime: file.mtime,
                         uploadTime: new Date().toISOString(),
