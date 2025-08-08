@@ -87,7 +87,7 @@ jobs:
           export TENCENT_COS_REGION=ap-guangzhou
           export CDN_DOMAIN=$(echo ${{ secrets.CDN_DOMAIN }} | sed 's|^https://||' | sed 's|^http://||')
 
-          # 使用优化上传策略（包含兼容性映射）
+          # 使用优化上传策略（包含兼容性映射-›）
           chmod +x scripts/optimized-cos-upload.cjs
           echo "🚀 使用优化上传策略..."
           node scripts/optimized-cos-upload.cjs
