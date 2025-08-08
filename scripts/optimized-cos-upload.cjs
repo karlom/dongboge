@@ -291,7 +291,7 @@ async function uploadBatch(files, manifest) {
                                 skipped: true
                             };
                         } else {
-                            console.log(`🔄 文件内容变化: ${cosPath} (大小: ${file.size} 未变, 哈希: ${existingHash?.substring(0, 8)}... -> ${fileHash.substring(0, 8)}...)`);
+                            console.log(`🔄 文件内容变化: ${cosPath} (大小: ${file.size} 未变, 哈希: ${existingHash && existingHash.substring(0, 8)}... -> ${fileHash.substring(0, 8)}...)`);
                             shouldUpload = true;
                         }
                     }
