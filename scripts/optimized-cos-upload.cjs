@@ -376,49 +376,44 @@ async function createAssetsCompatibilityMapping(allFiles, manifest) {
 
         // 只处理_astro目录中的图片文件
         if (cosPath.startsWith('_astro/') && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(cosPath)) {
-            // 提取原始文件名
-            // 例如：_astro/success2.DnpSl9pE.jpg -> success2.jpg
+            // 保持完整的带hash文件名
+            // 例如：_astro/success2.DnpSl9pE.jpg -> assets/success2.DnpSl9pE.jpg
             const fileName = path.basename(cosPath);
-            const match = fileName.match(/^(.+?)\.([a-zA-Z0-9_-]+)\.(jpg|jpeg|png|gif|webp|svg)$/i);
+            const assetsPath = `assets/${fileName}`;
 
-            if (match) {
-                const originalName = `${match[1]}.${match[3]}`;
-                const assetsPath = `assets/${originalName}`;
-
-                // 检查assets路径是否已经存在
-                if (!manifest[assetsPath]) {
-                    try {
-                        // 创建兼容性映射：将_astro中的文件复制到assets路径
-                        await new Promise((resolve, reject) => {
-                            cos.putObjectCopy({
-                                Bucket: process.env.TENCENT_COS_BUCKET,
-                                Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
-                                Key: assetsPath,
-                                CopySource: `${process.env.TENCENT_COS_BUCKET}.cos.${process.env.TENCENT_COS_REGION || 'ap-guangzhou'}.myqcloud.com/${cosPath}`,
-                                Headers: {
-                                    'Cache-Control': 'max-age=31536000',
-                                }
-                            }, (err, data) => {
-                                if (err) reject(err);
-                                else resolve(data);
-                            });
+            // 检查assets路径是否已经存在
+            if (!manifest[assetsPath]) {
+                try {
+                    // 创建兼容性映射：将_astro中的文件复制到assets路径
+                    await new Promise((resolve, reject) => {
+                        cos.putObjectCopy({
+                            Bucket: process.env.TENCENT_COS_BUCKET,
+                            Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
+                            Key: assetsPath,
+                            CopySource: `${process.env.TENCENT_COS_BUCKET}.cos.${process.env.TENCENT_COS_REGION || 'ap-guangzhou'}.myqcloud.com/${cosPath}`,
+                            Headers: {
+                                'Cache-Control': 'max-age=31536000',
+                            }
+                        }, (err, data) => {
+                            if (err) reject(err);
+                            else resolve(data);
                         });
+                    });
 
-                        console.log(`✅ 兼容性映射: ${cosPath} -> ${assetsPath}`);
-                        mappingCount++;
+                    console.log(`✅ 兼容性映射: ${cosPath} -> ${assetsPath}`);
+                    mappingCount++;
 
-                        // 更新清单
-                        manifest[assetsPath] = {
-                            hash: manifest[cosPath] ? .hash || 'copied',
-                            size: file.size,
-                            mtime: file.mtime,
-                            uploadTime: new Date().toISOString(),
-                            mappedFrom: cosPath
-                        };
+                    // 更新清单
+                    manifest[assetsPath] = {
+                        hash: manifest[cosPath] ? .hash || 'copied',
+                        size: file.size,
+                        mtime: file.mtime,
+                        uploadTime: new Date().toISOString(),
+                        mappedFrom: cosPath
+                    };
 
-                    } catch (error) {
-                        console.warn(`⚠️ 创建兼容性映射失败: ${cosPath} -> ${assetsPath}`, error.message);
-                    }
+                } catch (error) {
+                    console.warn(`⚠️ 创建兼容性映射失败: ${cosPath} -> ${assetsPath}`, error.message);
                 }
             }
         }

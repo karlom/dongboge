@@ -40,25 +40,24 @@ if (typeof src === "string") {
     finalSrc = processImagePath(src);
   }
 } else if (src && typeof src === "object" && "src" in src) {
-  // 如果是Astro图像对象，直接使用Astro处理后的路径
-  // 在生产环境中，Astro会将图片处理并生成带hash的路径
-  const isDev = import.meta.env.DEV || process.env.NODE_ENV === "development";
+  // 如果是Astro图像对象，需要特殊处理
+  // Astro图像对象的src可能包含@fs等内部路径，我们需要提取实际的文件名
+  let astroSrc = src.src;
 
-  if (isDev) {
-    // 开发环境：使用原始路径
-    finalSrc = src.src;
-  } else {
-    // 生产环境：Astro图像对象的src属性包含了构建后的真实路径
-    // 我们需要将路径前缀从默认的 /assets/ 改为 /_astro/，并添加CDN前缀
-    let astroPath = src.src;
-
-    // 如果路径以 /assets/ 开头，替换为 /_astro/
-    if (astroPath.startsWith("/assets/")) {
-      astroPath = astroPath.replace("/assets/", "/_astro/");
+  // 如果包含@fs路径，提取文件名
+  if (astroSrc.includes("@fs")) {
+    // 从路径中提取文件名
+    const matches = astroSrc.match(
+      /([^\/]+\.(jpg|jpeg|png|gif|webp|svg))(\?|$)/i
+    );
+    if (matches) {
+      finalSrc = processImagePath(matches[1]);
+    } else {
+      // 如果无法提取文件名，使用默认图片
+      finalSrc = processImagePath("default.png");
     }
-
-    // 使用cdnUrl函数添加CDN前缀
-    finalSrc = cdnUrl(astroPath);
+  } else {
+    finalSrc = processImagePath(astroSrc);
   }
 } else {
   // 其他情况，转换为字符串后处理
