@@ -141,9 +141,23 @@ async function main() {
         log('blue', '🔍 检测文件变更...');
         const changes = await detectChanges();
 
-        if (changes.total === 0) {
+        // 检查是否强制部署
+        const forceDeployFlag = process.env.FORCE_DEPLOY === 'true';
+
+        if (changes.total === 0 && !forceDeployFlag) {
             log('green', '✅ 没有检测到变更，部署完成');
             return;
+        }
+
+        if (forceDeployFlag) {
+            log('yellow', '🔄 强制部署模式：将重新构建和上传所有内容');
+            // 强制标记所有内容为变更
+            changes.blog = changes.blog.length > 0 ? changes.blog : [{
+                title: '强制重新构建',
+                slug: 'force-rebuild'
+            }];
+            changes.assets = changes.assets.length > 0 ? changes.assets : ['force-rebuild'];
+            changes.total = changes.blog.length + changes.assets.length;
         }
 
         log('yellow', `📊 变更统计:`);

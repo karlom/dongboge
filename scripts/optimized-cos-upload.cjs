@@ -367,6 +367,92 @@ async function uploadBatch(files, manifest) {
     };
 }
 
+// 创建assets兼容性映射
+async function createAssetsCompatibilityMapping(allFiles, manifest) {
+    let mappingCount = 0;
+
+    for (const file of allFiles) {
+        const cosPath = file.relativePath.replace(/\\/g, '/');
+
+        // 只处理_astro目录中的图片文件
+        if (cosPath.startsWith('_astro/') && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(cosPath)) {
+            // 提取原始文件名
+            // 例如：_astro/success2.DnpSl9pE.jpg -> success2.jpg
+            const fileName = path.basename(cosPath);
+            const match = fileName.match(/^(.+?)\.([a-zA-Z0-9_-]+)\.(jpg|jpeg|png|gif|webp|svg)$/i);
+
+            if (match) {
+                const originalName = `${match[1]}.${match[3]}`;
+                const assetsPath = `assets/${originalName}`;
+
+                // 检查assets路径是否已经存在
+                if (!manifest[assetsPath]) {
+                    try {
+                        // 创建兼容性映射：将_astro中的文件复制到assets路径
+                        await new Promise((resolve, reject) => {
+                            cos.putObjectCopy({
+                                Bucket: process.env.TENCENT_COS_BUCKET,
+                                Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
+                                Key: assetsPath,
+                                CopySource: `${process.env.TENCENT_COS_BUCKET}.cos.${process.env.TENCENT_COS_REGION || 'ap-guangzhou'}.myqcloud.com/${cosPath}`,
+                                Headers: {
+                                    'Cache-Control': 'max-age=31536000',
+                                }
+                            }, (err, data) => {
+                                if (err) reject(err);
+                                else resolve(data);
+                            });
+                        });
+
+                        console.log(`✅ 兼容性映射: ${cosPath} -> ${assetsPath}`);
+                        mappingCount++;
+
+                        // 更新清单
+                        manifest[assetsPath] = {
+                            hash: manifest[cosPath] ? .hash || 'copied',
+                            size: file.size,
+                            mtime: file.mtime,
+                            uploadTime: new Date().toISOString(),
+                            mappedFrom: cosPath
+                        };
+
+                    } catch (error) {
+                        console.warn(`⚠️ 创建兼容性映射失败: ${cosPath} -> ${assetsPath}`, error.message);
+                    }
+                }
+            }
+        }
+    }
+
+    if (mappingCount > 0) {
+        console.log(`✅ 创建了 ${mappingCount} 个兼容性映射`);
+
+        // 保存更新后的清单
+        try {
+            await new Promise((resolve, reject) => {
+                cos.putObject({
+                    Bucket: process.env.TENCENT_COS_BUCKET,
+                    Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
+                    Key: manifestKey,
+                    Body: JSON.stringify(manifest, null, 2),
+                    Headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                }, (err, data) => {
+                    if (err) reject(err);
+                    else resolve(data);
+                });
+            });
+            console.log('💾 兼容性映射已保存到清单');
+        } catch (error) {
+            console.warn('⚠️ 保存兼容性映射清单失败:', error.message);
+        }
+    } else {
+        console.log('⏭️ 没有需要创建的兼容性映射');
+    }
+}
+
 // 主函数
 async function main() {
     const startTime = Date.now();
@@ -439,6 +525,10 @@ async function main() {
             uploadedCount,
             skippedCount
         } = await uploadBatch(allFiles, manifest);
+
+        // 为_astro目录中的图片创建assets兼容性映射
+        console.log('\n🔗 创建assets兼容性映射...');
+        await createAssetsCompatibilityMapping(allFiles, newManifest);
 
         const endTime = Date.now();
         const duration = ((endTime - startTime) / 1000).toFixed(1);

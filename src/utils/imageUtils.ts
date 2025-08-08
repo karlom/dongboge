@@ -11,7 +11,7 @@ export function processImagePath(imagePath: string): string {
         return imagePath;
     }
 
-    // 处理各种相对路径格式
+    // 处理各种相对路径格式，提取原始文件名
     let assetPath = '';
 
     if (imagePath.startsWith('assets-')) {
@@ -37,10 +37,22 @@ export function processImagePath(imagePath: string): string {
         assetPath = imagePath.split('/').pop() || imagePath;
     }
 
-    // 根据环境返回正确的路径
-    // 在本地开发时，cdnUrl 会返回本地路径
-    // 在远程部署时，cdnUrl 会返回CDN路径
-    return cdnUrl(`/assets/${assetPath}`);
+    // 检查是否为开发环境
+    const isDev = import.meta.env.DEV || process.env.NODE_ENV === 'development';
+
+    if (isDev) {
+        // 本地开发环境：返回本地路径
+        if (assetPath) {
+            return `/src/assets/${assetPath}`;
+        }
+        return imagePath;
+    } else {
+        // 生产环境：在CDN上传时，我们会将文件同时上传到两个位置
+        // 1. /_astro/filename.hash.jpg (Astro构建后的实际位置)
+        // 2. /assets/filename.jpg (兼容性位置)
+        // 这里我们使用兼容性位置，确保图片能正常显示
+        return cdnUrl(`/assets/${assetPath}`);
+    }
 }
 
 /**
