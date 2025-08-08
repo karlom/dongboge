@@ -3,7 +3,7 @@ title: "brew updte出错解决方法记录"
 description: "# brew updte出错解决方法记录 今天上午看到一个推说要brew更新，于是我也终于想起来要为安装的应用 [&hellip;]"
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
-heroImage: '../../assets/tech1.png'
+heroImage: "../../assets/tech1.jpg"
 slug: "fixing-brew-update-errors"
 ---
 

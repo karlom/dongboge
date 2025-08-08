@@ -3,7 +3,7 @@ title: "AI时代的企业数字化转型实践指南"
 description: "探讨人工智能如何重塑现代企业的运营模式，分享数字化转型的实践经验和成功案例。"
 pubDate: "Dec 15 2024"
 tags: ["人工智能", "数字化转型", "企业管理", "AI应用"]
-heroImage: '../../assets/default1.png'
+heroImage: "../../assets/default1.jpg"
 slug: "ai-era-digital-transformation-guide"
 ---
 
@@ -14,16 +14,19 @@ slug: "ai-era-digital-transformation-guide"
 ## 数字化转型的核心要素
 
 ### 1. 技术基础设施
+
 - 云计算平台的选择与部署
 - 数据管理体系的建立
 - AI模型的集成与优化
 
 ### 2. 组织变革
+
 - 团队结构的调整
 - 工作流程的重新设计
 - 人才培养与技能提升
 
 ### 3. 业务创新
+
 - 新商业模式的探索
 - 客户体验的优化
 - 产品服务的智能化

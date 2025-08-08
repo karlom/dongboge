@@ -2,7 +2,7 @@
 title: "Dify平台实战：从零开始构建企业级智能体"
 description: "深入解析Dify平台的核心功能，分享如何利用Dify快速构建和部署企业级AI智能体的实践经验。"
 pubDate: "Jul 15 2022"
-heroImage: "../../assets/success2.png"
+heroImage: "../../assets/success2.jpg"
 tags: ["Dify", "智能体", "AI应用", "企业级部署"]
 slug: "dify-platform-enterprise-ai-agent-guide"
 ---

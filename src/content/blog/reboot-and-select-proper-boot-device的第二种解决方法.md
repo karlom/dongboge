@@ -3,7 +3,7 @@ title: "reboot and select proper boot device的第二种解决方法"
 description: "# reboot and select proper boot device的第二种解决方法 今天下午，我看w [&hellip;]"
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
-heroImage: '../../assets/tech.png'
+heroImage: "../../assets/tech.jpg"
 slug: "second-solution-boot-device-error"
 ---
 
