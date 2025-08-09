@@ -74,8 +74,14 @@ jobs:
           # 复制部署脚本
           cp -r deploy deploy-package/
 
+          # 复制scripts目录（包含依赖检查和其他工具脚本）
+          cp -r scripts deploy-package/
+
           echo "=== 部署包内容 ==="
           ls -la deploy-package/
+          echo ""
+          echo "=== scripts目录内容 ==="
+          ls -la deploy-package/scripts/ | head -10
 
       - name: 上传静态资源到CDN
         timeout-minutes: 8
