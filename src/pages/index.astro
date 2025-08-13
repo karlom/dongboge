@@ -197,9 +197,9 @@ const hasPosts = recentPosts.length > 0;
 									)}
 
 									<!-- 文章标题 -->
-									<a class="text-2xl lg:text-3xl font-bold mb-4 transition-colors duration-200" style="color: var(--text-on-light);">
-										<a href={`/blog/${blogPost.id}/`}><h3>{blogPost.data.title}</h3></a>
-									
+									<a href={`/blog/${blogPost.id}/`} class="text-2xl lg:text-3xl font-bold mb-4 transition-colors duration-200 block" style="color: var(--text-on-light);">
+										<h3>{blogPost.data.title}</h3>
+									</a>
 
 									<!-- 文章描述 -->
 									<p class="text-lg mb-4 leading-relaxed" style="color: var(--text-secondary);">
