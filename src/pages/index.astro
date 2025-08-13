@@ -197,9 +197,9 @@ const hasPosts = recentPosts.length > 0;
 									)}
 
 									<!-- 文章标题 -->
-									<h3 class="text-2xl lg:text-3xl font-bold mb-4 transition-colors duration-200" style="color: var(--text-on-light);">
-										{blogPost.data.title}
-									</h3>
+									<a class="text-2xl lg:text-3xl font-bold mb-4 transition-colors duration-200" style="color: var(--text-on-light);">
+										<a href={`/blog/${blogPost.id}/`}><h3>{blogPost.data.title}</h3></a>
+									
 
 									<!-- 文章描述 -->
 									<p class="text-lg mb-4 leading-relaxed" style="color: var(--text-secondary);">
@@ -208,7 +208,26 @@ const hasPosts = recentPosts.length > 0;
 
 									<!-- 文章预览内容 -->
 									<div class="mb-6 leading-relaxed line-clamp-4" style="color: var(--text-on-light);">
-										{blogPost.data.description.length > 300 ? blogPost.data.description.slice(0, 300) + '...' : blogPost.data.description}
+										{(() => {
+											// 从文章正文中提取纯文本作为预览
+											const content = blogPost.body || '';
+											// 移除 Markdown 语法，获取纯文本
+											const plainText = content
+												.replace(/^---[\s\S]*?---/, '') // 移除 frontmatter
+												.replace(/#{1,6}\s+/g, '') // 移除标题标记
+												.replace(/\*\*(.*?)\*\*/g, '$1') // 移除粗体标记
+												.replace(/\*(.*?)\*/g, '$1') // 移除斜体标记
+												.replace(/\[(.*?)\]\(.*?\)/g, '$1') // 移除链接，保留文本
+												.replace(/`(.*?)`/g, '$1') // 移除行内代码标记
+												.replace(/```[\s\S]*?```/g, '') // 移除代码块
+												.replace(/^\s*[-*+]\s+/gm, '') // 移除列表标记
+												.replace(/^\s*\d+\.\s+/gm, '') // 移除有序列表标记
+												.replace(/\n\s*\n/g, '\n') // 合并多个换行
+												.trim();
+											
+											// 截取前300个字符作为预览
+											return plainText.length > 300 ? plainText.slice(0, 300) + '...' : plainText;
+										})()}
 									</div>
 
 									<!-- 底部信息 -->
@@ -221,13 +240,7 @@ const hasPosts = recentPosts.length > 0;
 												</svg>
 												{blogPost.data.pubDate.toLocaleDateString('zh-CN')}
 											</span>
-											<span class="flex items-center">
-												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-												</svg>
-												阅读全文
-											</span>
+						
 										</div>
 										
 										<!-- 阅读更多按钮 -->
@@ -303,9 +316,7 @@ const hasPosts = recentPosts.length > 0;
 			</div>
 			<div class="pt-4" style="border-top: 1px solid var(--border-color-dark);">
 				<p class="text-sm" style="color: var(--text-secondary);">
-					<span itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
-						<span itemProp="addressLocality">广州</span><span itemProp="addressRegion">广东省</span>
-					</span>
+					
 					<a href="https://beian.miit.gov.cn/" target="_blank" class="footer-link transition-colors duration-200 ml-4">
 						粤ICP备2021046742号-1
 					</a>
