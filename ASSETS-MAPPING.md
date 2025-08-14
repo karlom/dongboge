@@ -71,10 +71,47 @@
 2. **重复创建映射**：检查 `.assets-mapping-manifest.json` 文件是否正常
 3. **图片仍然无法访问**：检查CDN缓存，可能需要等待缓存刷新
 
-## 测试
+## 检查和维护
 
-可以使用测试脚本验证功能：
+### 检查映射状态
 
 ```bash
+npm run assets:check
+# 或者
+node scripts/check-cdn-assets-mapping.js
+```
+
+这个命令会：
+
+- 列出CDN上 `_astro/` 目录下的所有图片文件
+- 检查对应的 `assets/` 映射是否存在
+- 显示详细的映射状态报告
+- 识别缺失的映射
+
+### 修复缺失的映射
+
+```bash
+npm run assets:fix
+# 或者
+node scripts/fix-missing-assets-mapping.js
+```
+
+这个命令会：
+
+- 自动为缺失的映射创建COS复制
+- 更新本地映射清单
+- 显示修复结果统计
+
+### 测试功能
+
+```bash
+npm run assets:test
+# 或者
 node scripts/test-assets-mapping.js
 ```
+
+## 维护建议
+
+1. **定期检查**：建议定期运行 `npm run assets:check` 检查映射状态
+2. **部署后验证**：每次部署后可以运行检查命令确认新图片已正确映射
+3. **清单备份**：`.assets-mapping-manifest.json` 文件包含重要的映射记录，建议定期备份

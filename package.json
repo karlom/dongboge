@@ -26,7 +26,10 @@
     "deploy:test-existing": "node scripts/test-existing-method.js",
     "deploy:test-fixed": "node -e \"import('./scripts/modules/server-sync.js').then(m => m.testServerConnection())\"",
     "deploy:test-changes": "node scripts/test-change-detection.js",
-    "deploy:help": "echo '简化部署脚本使用说明：' && echo '  deploy:setup - SSH认证设置助手' && echo '  deploy:debug - SSH连接调试工具' && echo '  deploy:test - 测试部署流程（不实际部署）' && echo '  deploy:test-server - 测试SSH服务器连接' && echo '  deploy:test-cdn - 测试CDN连接' && echo '  deploy:simple - 运行完整的简化部署' && echo '  deploy:sitemap - 只生成sitemap' && echo '' && echo '配置说明请查看: scripts/SSH密钥+密码认证配置.md'"
+    "assets:check": "node scripts/check-cdn-assets-mapping.js",
+    "assets:fix": "node scripts/fix-missing-assets-mapping.js",
+    "assets:test": "node scripts/test-assets-mapping.js",
+    "deploy:help": "echo '简化部署脚本使用说明：' && echo '  deploy:setup - SSH认证设置助手' && echo '  deploy:debug - SSH连接调试工具' && echo '  deploy:test - 测试部署流程（不实际部署）' && echo '  deploy:test-server - 测试SSH服务器连接' && echo '  deploy:test-cdn - 测试CDN连接' && echo '  deploy:simple - 运行完整的简化部署' && echo '  deploy:sitemap - 只生成sitemap' && echo '  assets:check - 检查CDN上的assets映射状态' && echo '  assets:fix - 修复缺失的assets映射' && echo '  assets:test - 测试assets映射功能' && echo '' && echo '配置说明请查看: scripts/SSH密钥+密码认证配置.md'"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
