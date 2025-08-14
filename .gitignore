@@ -131,6 +131,10 @@ dist/**/*.tiff
 .stylelintcache
 .prettiercache
 
+# CDN同步相关的本地清单文件
+.upload-manifest-local.json
+.assets-mapping-manifest.json
+
 # 其他
 *.tgz
 *.tsbuildinfo

@@ -95,6 +95,34 @@ async function loadUploadManifest() {
     return {};
 }
 
+// 加载assets映射清单
+async function loadAssetsMappingManifest() {
+    const manifestPath = '.assets-mapping-manifest.json';
+
+    try {
+        if (fs.existsSync(manifestPath)) {
+            const content = fs.readFileSync(manifestPath, 'utf8');
+            return JSON.parse(content);
+        }
+    } catch (error) {
+        console.warn('⚠️ 无法加载assets映射清单，将创建新的清单');
+    }
+
+    return {};
+}
+
+// 保存assets映射清单
+async function saveAssetsMappingManifest(manifest) {
+    const manifestPath = '.assets-mapping-manifest.json';
+
+    try {
+        fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
+        console.log('💾 assets映射清单已保存');
+    } catch (error) {
+        console.warn('⚠️ 无法保存assets映射清单:', error.message);
+    }
+}
+
 // 保存上传清单
 async function saveUploadManifest(manifest) {
     const manifestPath = '.upload-manifest-local.json';
@@ -188,6 +216,117 @@ async function runCOSUpload(filesToUpload) {
     } catch (error) {
         console.error('❌ COS上传失败:', error.message);
         return false;
+    }
+}
+
+// 创建assets映射（将_astro目录下的图片复制到assets目录）
+async function createAssetsMapping(uploadedFiles) {
+    try {
+        console.log('🔗 开始创建assets映射...');
+
+        // 检查COS SDK
+        if (!checkCOSSDK()) {
+            console.log('⏭️ 跳过assets映射（COS SDK不可用）');
+            return {
+                success: true,
+                skipped: true
+            };
+        }
+
+        // 动态导入COS SDK
+        const COS = (await import('cos-nodejs-sdk-v5')).default;
+        const cos = new COS({
+            SecretId: process.env.TENCENT_SECRET_ID,
+            SecretKey: process.env.TENCENT_SECRET_KEY,
+        });
+
+        // 1. 筛选 _astro 目录下的图片文件
+        const astroImages = uploadedFiles.filter(file =>
+            file.includes('_astro/') &&
+            /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file)
+        );
+
+        if (astroImages.length === 0) {
+            console.log('⏭️ 没有需要创建映射的_astro图片文件');
+            return {
+                success: true,
+                mapped: 0
+            };
+        }
+
+        console.log(`📋 发现 ${astroImages.length} 个_astro图片文件需要检查映射`);
+
+        // 2. 加载映射记录
+        const mappingManifest = await loadAssetsMappingManifest();
+        let mappingCount = 0;
+
+        // 3. 为每个图片创建 assets 映射
+        for (const astroFile of astroImages) {
+            try {
+                // 提取文件名（保持带hash的完整文件名）
+                const fileName = path.basename(astroFile); // success.DnpSl9pE.jpg
+                const assetsPath = `assets/${fileName}`; // assets/success.DnpSl9pE.jpg
+
+                // 检查是否已经创建过映射
+                if (mappingManifest[assetsPath]) {
+                    console.log(`  ⏭️ ${assetsPath} - 映射已存在`);
+                    continue;
+                }
+
+                console.log(`  📤 创建映射: ${astroFile} -> ${assetsPath}`);
+
+                // 使用 COS putObjectCopy 创建映射
+                await new Promise((resolve, reject) => {
+                    cos.putObjectCopy({
+                        Bucket: process.env.TENCENT_COS_BUCKET,
+                        Region: process.env.TENCENT_COS_REGION || 'ap-guangzhou',
+                        Key: assetsPath,
+                        CopySource: `${process.env.TENCENT_COS_BUCKET}.cos.${process.env.TENCENT_COS_REGION || 'ap-guangzhou'}.myqcloud.com/${astroFile}`,
+                        Headers: {
+                            'Cache-Control': 'max-age=31536000',
+                        }
+                    }, (err, data) => {
+                        if (err) reject(err);
+                        else resolve(data);
+                    });
+                });
+
+                // 更新映射记录
+                mappingManifest[assetsPath] = {
+                    sourceFile: astroFile,
+                    createdAt: new Date().toISOString(),
+                    fileName: fileName
+                };
+
+                mappingCount++;
+                console.log(`  ✅ 映射创建成功: ${assetsPath}`);
+
+            } catch (error) {
+                console.warn(`  ⚠️ 创建映射失败: ${astroFile} -> assets/${path.basename(astroFile)}`, error.message);
+            }
+        }
+
+        // 4. 保存映射记录
+        if (mappingCount > 0) {
+            await saveAssetsMappingManifest(mappingManifest);
+            console.log(`✅ 创建了 ${mappingCount} 个assets映射`);
+        } else {
+            console.log('⏭️ 没有创建新的assets映射');
+        }
+
+        return {
+            success: true,
+            mapped: mappingCount,
+            total: astroImages.length,
+            files: astroImages
+        };
+
+    } catch (error) {
+        console.error('❌ 创建assets映射失败:', error.message);
+        return {
+            success: false,
+            error: error.message
+        };
     }
 }
 
@@ -301,12 +440,25 @@ export async function syncToCDN(changedAssets) {
 
             await saveUploadManifest(newManifest);
 
+            // 创建assets映射（将_astro目录下的图片复制到assets目录）
+            console.log('\n🔗 检查是否需要创建assets映射...');
+            const mappingResult = await createAssetsMapping(filesToUpload);
+
+            if (mappingResult.success && mappingResult.mapped > 0) {
+                console.log(`✅ assets映射完成: ${mappingResult.mapped}/${mappingResult.total} 个文件`);
+            } else if (mappingResult.skipped) {
+                console.log('⏭️ assets映射已跳过');
+            } else if (!mappingResult.success) {
+                console.warn('⚠️ assets映射失败，但CDN同步将继续');
+            }
+
             console.log('✅ CDN同步完成');
             return {
                 success: true,
                 uploaded: filesToUpload.length,
                 skipped: cdnFiles.length - filesToUpload.length,
-                files: filesToUpload
+                files: filesToUpload,
+                assetsMapping: mappingResult
             };
         } else {
             throw new Error('COS上传失败');
