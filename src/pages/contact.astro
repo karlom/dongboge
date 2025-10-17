@@ -158,6 +158,13 @@ const budgetOptions = [
             填写咨询需求
           </h2>
 
+          <div
+            id="formStatus"
+            class="hidden rounded-lg border px-4 py-3 text-sm"
+            role="status"
+            aria-live="polite"
+          ></div>
+
           <form id="contactForm" class="space-y-4 sm:space-y-6">
             <!-- 企业信息 -->
             <div class="space-y-4 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0">
@@ -176,6 +183,12 @@ const budgetOptions = [
                   class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   placeholder="请输入企业名称"
                 />
+                <p
+                  class="form-field-error hidden mt-2 text-xs text-red-600"
+                  data-error-for="companyName"
+                >
+                  企业名称为必填项
+                </p>
               </div>
               <div>
                 <CustomDropdown
@@ -186,6 +199,9 @@ const budgetOptions = [
                   placeholder="请选择行业"
                 />
               </div>
+              <p class="form-field-error hidden mt-2 text-xs text-red-600" data-error-for="consultationTypes">
+                请至少选择一种咨询类型
+              </p>
             </div>
 
             <!-- 联系人信息 -->
@@ -205,6 +221,9 @@ const budgetOptions = [
                   class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   placeholder="请输入您的姓名"
                 />
+                <p class="form-field-error hidden mt-2 text-xs text-red-600" data-error-for="contactName">
+                  请填写联系人姓名
+                </p>
               </div>
               <div>
                 <label
@@ -240,6 +259,9 @@ const budgetOptions = [
                   class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   placeholder="请输入联系电话"
                 />
+                <p class="form-field-error hidden mt-2 text-xs text-red-600" data-error-for="phone">
+                  请填写联系电话
+                </p>
               </div>
               <div>
                 <label
@@ -270,7 +292,7 @@ const budgetOptions = [
                 id="consultationTypesHidden"
                 value=""
               />
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-field-group="consultationTypes">
                 <label
                   class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors duration-200"
                 >
@@ -334,6 +356,9 @@ const budgetOptions = [
                 class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                 placeholder="请详细描述您的AI咨询需求，包括期望解决的问题、预期目标等..."
               ></textarea>
+              <p class="form-field-error hidden mt-2 text-xs text-red-600" data-error-for="requirements">
+                请详细描述您的需求，帮助我们快速给出方案
+              </p>
             </div>
 
             <!-- 预算范围 -->
@@ -348,24 +373,47 @@ const budgetOptions = [
             </div>
 
             <!-- 提交按钮 -->
-            <button
-              type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm sm:text-base"
-            >
-              <svg
-                class="w-4 h-4 sm:w-5 sm:h-5 mr-2 inline"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div class="space-y-3">
+              <button
+                type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm sm:text-base"
+                data-submit-btn
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-              </svg>
-              提交咨询申请
-            </button>
+                <span class="submit-btn-content flex items-center justify-center gap-2">
+                  <svg
+                    class="w-4 h-4 sm:w-5 sm:h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                  </svg>
+                  提交咨询申请
+                </span>
+                <span class="submit-btn-loading hidden items-center justify-center gap-2">
+                  <svg
+                    class="w-4 h-4 sm:w-5 sm:h-5 animate-spin"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  正在提交...
+                </span>
+              </button>
+              <p class="text-xs text-gray-500 text-center">
+                我们尊重并保护您的隐私，信息仅用于建立联系及提供咨询建议。
+              </p>
+            </div>
           </form>
         </div>
 
@@ -652,86 +700,168 @@ const budgetOptions = [
 </Layout>
 
 <script>
-  // 表单提交处理
-  document
-    .getElementById("contactForm")
-    ?.addEventListener("submit", async function (e) {
-      e.preventDefault(); // 阻止默认提交
+  const contactForm = document.getElementById("contactForm");
+  const statusBox = document.getElementById("formStatus");
 
-      const form = e.target as HTMLFormElement;
-      const formData = new FormData(form);
+  const statusClassMap = {
+    success: ["border-green-200", "bg-green-50", "text-green-700"],
+    error: ["border-red-200", "bg-red-50", "text-red-700"],
+    info: ["border-blue-200", "bg-blue-50", "text-blue-700"],
+  };
 
-      // 获取多选框数据
-      const consultationTypes = Array.from(
-        document.querySelectorAll('input[name="consultationType"]:checked')
-      ).map((cb: HTMLInputElement) => cb.value);
+  function setStatus(type, message) {
+    if (!statusBox) return;
+    statusBox.classList.remove(
+      "hidden",
+      "border-green-200",
+      "border-red-200",
+      "bg-green-50",
+      "bg-red-50",
+      "text-green-700",
+      "text-red-700",
+      "bg-blue-50",
+      "border-blue-200",
+      "text-blue-700"
+    );
 
-      // 表单验证
-      const companyName = formData.get("companyName") as string;
-      const contactName = formData.get("contactName") as string;
-      const phone = formData.get("phone") as string;
-      const requirements = formData.get("requirements") as string;
+    const classes = statusClassMap[type] || statusClassMap.info;
+    statusBox.classList.add(...classes);
+    statusBox.textContent = message;
+  }
 
-      if (!companyName || !contactName || !phone || !requirements) {
-        alert("请填写必填项目");
-        return;
+  function clearStatus() {
+    if (!statusBox) return;
+    statusBox.classList.add("hidden");
+    statusBox.textContent = "";
+  }
+
+  function toggleFieldError(fieldName, hasError) {
+    const errorEl = document.querySelector(`[data-error-for="${fieldName}"]`);
+    const fieldEl = contactForm ? contactForm.querySelector(`[name="${fieldName}"]`) : null;
+
+    if (hasError) {
+      if (errorEl) errorEl.classList.remove("hidden");
+      if (fieldEl instanceof HTMLElement) {
+        fieldEl.classList.add("border-red-500", "focus:ring-red-400");
       }
-
-      if (consultationTypes.length === 0) {
-        alert("请至少选择一种咨询类型");
-        return;
+    } else {
+      if (errorEl) errorEl.classList.add("hidden");
+      if (fieldEl instanceof HTMLElement) {
+        fieldEl.classList.remove("border-red-500", "focus:ring-red-400");
       }
+    }
+  }
 
-      // 显示提交中状态
-      const submitBtn = form.querySelector(
-        'button[type="submit"]'
-      ) as HTMLButtonElement;
-      const originalText = submitBtn.innerHTML;
+  function toggleGroupError(groupName, hasError) {
+    const errorEl = document.querySelector(`[data-error-for="${groupName}"]`);
+    const groupEl = document.querySelector(`[data-field-group="${groupName}"]`);
 
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML =
-          '<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 inline animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>提交中...';
+    if (hasError) {
+      if (errorEl) errorEl.classList.remove("hidden");
+      if (groupEl instanceof HTMLElement) {
+        groupEl.classList.add("ring-2", "ring-red-300", "rounded-lg", "ring-offset-2", "ring-offset-white");
       }
+    } else {
+      if (errorEl) errorEl.classList.add("hidden");
+      if (groupEl instanceof HTMLElement) {
+        groupEl.classList.remove("ring-2", "ring-red-300", "rounded-lg", "ring-offset-2", "ring-offset-white");
+      }
+    }
+  }
 
-      try {
-        // 将多选框数据添加到FormData
-        formData.set("consultationTypes", JSON.stringify(consultationTypes));
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (!(contactForm instanceof HTMLFormElement)) return;
 
-        // 提交到API端点
-        const response = await fetch("/api/contact", {
-          method: "POST",
-          body: formData,
-        });
+    clearStatus();
 
-        const result = await response.json();
+    const formData = new FormData(contactForm);
+    const selectedTypes = Array.from(
+      document.querySelectorAll('input[name="consultationType"]:checked')
+    ).map((cb) => cb.value);
 
-        if (result.success) {
-          // 成功处理
-          alert(
-            result.message || "感谢您的咨询申请！我们将在24小时内与您联系。"
-          );
-          form.reset(); // 重置表单
+    const requiredFields = [
+      { name: "companyName", value: (formData.get("companyName") || "").toString().trim() },
+      { name: "contactName", value: (formData.get("contactName") || "").toString().trim() },
+      { name: "phone", value: (formData.get("phone") || "").toString().trim() },
+      { name: "requirements", value: (formData.get("requirements") || "").toString().trim() },
+    ];
 
-          // 清除多选框选中状态
-          document
-            .querySelectorAll('input[name="consultationType"]')
-            .forEach((cb: HTMLInputElement) => {
-              cb.checked = false;
-            });
-        } else {
-          // 错误处理
-          alert("提交失败：" + result.error);
-        }
-      } catch (error) {
-        console.error("提交错误:", error);
-        alert("网络错误，请检查网络连接后重试");
-      } finally {
-        // 恢复按钮状态
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalText;
-        }
+    let hasError = false;
+
+    requiredFields.forEach(({ name, value }) => {
+      const invalid = value.length === 0;
+      toggleFieldError(name, invalid);
+      if (invalid) {
+        hasError = true;
       }
     });
+
+    const checkboxError = selectedTypes.length === 0;
+    toggleGroupError("consultationTypes", checkboxError);
+    if (checkboxError) {
+      hasError = true;
+    }
+
+    if (hasError) {
+      setStatus("error", "请完善必填项后再提交，我们才能第一时间与您对接。");
+      return;
+    }
+
+    const submitBtn = contactForm.querySelector('[data-submit-btn]');
+    const btnContent = submitBtn ? submitBtn.querySelector(".submit-btn-content") : null;
+    const btnLoading = submitBtn ? submitBtn.querySelector(".submit-btn-loading") : null;
+
+    if (submitBtn instanceof HTMLButtonElement) {
+      submitBtn.disabled = true;
+    }
+    if (btnContent instanceof HTMLElement) {
+      btnContent.classList.add("hidden");
+    }
+    if (btnLoading instanceof HTMLElement) {
+      btnLoading.classList.remove("hidden");
+    }
+
+    try {
+      formData.set("consultationTypes", JSON.stringify(selectedTypes));
+
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStatus("success", result.message || "感谢申请！我们将在 24 小时内与您联系，确认需求细节。");
+        contactForm.reset();
+        document.querySelectorAll('input[name="consultationType"]').forEach((cb) => {
+          if (cb instanceof HTMLInputElement) {
+            cb.checked = false;
+          }
+        });
+        requiredFields.forEach(({ name }) => toggleFieldError(name, false));
+        toggleGroupError("consultationTypes", false);
+      } else {
+        setStatus("error", result.error || "提交失败，请稍后重试或通过微信联系我。");
+      }
+    } catch (error) {
+      console.error("提交错误:", error);
+      setStatus("error", "网络异常，请稍后再试，或直接通过页面右侧联系方式与我联系。");
+    } finally {
+      if (submitBtn instanceof HTMLButtonElement) {
+        submitBtn.disabled = false;
+      }
+      if (btnContent instanceof HTMLElement) {
+        btnContent.classList.remove("hidden");
+      }
+      if (btnLoading instanceof HTMLElement) {
+        btnLoading.classList.add("hidden");
+      }
+    }
+  }
+
+  if (contactForm) {
+    contactForm.addEventListener("submit", handleSubmit);
+  }
 </script>

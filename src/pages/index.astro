@@ -7,6 +7,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import OptimizedImage from '../components/OptimizedImage.astro';
+import SideNavigation from '../components/SideNavigation.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { cdnUrl } from '../cdnConfig';
 
@@ -20,14 +21,26 @@ const recentPosts = posts.slice(0, 6);
 
 // 如果没有文章，显示默认内容
 const hasPosts = recentPosts.length > 0;
+
+// 导航sections配置
+const navigationSections = [
+  { id: 'intro', name: '概览' },
+  { id: 'value-promise', name: '价值' },
+  { id: 'case-highlights', name: '案例' },
+  { id: 'blog-section', name: '文章' },
+  { id: 'stay-connected', name: '联系' }
+];
 ---
 
 <Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+	<!-- 右侧导航 -->
+	<SideNavigation sections={navigationSections} />
 	<!-- Header - 亮区背景 -->
 	<div class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
 		<Header />
 	</div>
-	
+
+		
 	<!-- SEO优化隐藏内容 -->
 	<div class="sr-only" itemScope itemType="https://schema.org/Person">
 		<h1 itemProp="name">东波哥（杨东波）- 广州企业AI培训专家</h1>
@@ -49,7 +62,7 @@ const hasPosts = recentPosts.length > 0;
 	</div>
 
 	<!-- Hero Section - 暗区背景 -->
-	<section class="hero-section min-h-screen flex items-center relative overflow-hidden" style="background-color: var(--bg-dark)" itemScope itemType="https://schema.org/Person">
+	<section id="intro" class="hero-section min-h-screen flex items-center relative overflow-hidden" style="background-color: var(--bg-dark)" itemScope itemType="https://schema.org/Person">
 
 
 		<div class="relative z-30 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-4 lg:pt-8 lg:pb-16">
@@ -148,6 +161,100 @@ const hasPosts = recentPosts.length > 0;
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
 				</svg>
 			</button>
+		</div>
+	</section>
+
+	<section id="value-promise" class="bg-white py-14 sm:py-16">
+		<div class="max-w-7xl mx-auto px-6">
+			<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-8 mb-8">
+				<div class="max-w-2xl">
+					<h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">我如何为你的团队创造价值</h2>
+					<p class="text-sm sm:text-base text-gray-600 leading-relaxed">
+						三大场景总结了绝大多数客户的痛点——我们围绕效率提升、技术落地与团队赋能设计陪跑方案，让 AI 真正服务业务目标。
+					</p>
+				</div>
+				<a href="/contact" class="btn-primary-blue inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold whitespace-nowrap">
+					预约免费咨询
+				</a>
+			</div>
+			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<div class="rounded-2xl border border-slate-200 p-6 bg-slate-50/60">
+					<h3 class="text-lg font-semibold text-slate-900 mb-2">AI 业务赋能</h3>
+					<ul class="space-y-2 text-sm text-slate-600 leading-relaxed">
+						<li>梳理企业最具 ROI 的 AI 场景与流程</li>
+						<li>提供 MVP 试点路线与落地时间表</li>
+						<li>设计评估指标，确保成效可追踪</li>
+					</ul>
+				</div>
+				<div class="rounded-2xl border border-slate-200 p-6 bg-slate-50/60">
+					<h3 class="text-lg font-semibold text-slate-900 mb-2">团队实战培训</h3>
+					<ul class="space-y-2 text-sm text-slate-600 leading-relaxed">
+						<li>按岗位定制课程大纲与案例库</li>
+						<li>现场演练 + 复盘报告，确保吸收</li>
+						<li>培训后提供 30 天远程技术顾问支持</li>
+					</ul>
+				</div>
+				<div class="rounded-2xl border border-slate-200 p-6 bg-slate-50/60">
+					<h3 class="text-lg font-semibold text-slate-900 mb-2">智能体与 Dify 陪跑</h3>
+					<ul class="space-y-2 text-sm text-slate-600 leading-relaxed">
+						<li>自建知识库 + 多渠道接入的智能体规划</li>
+						<li>从私有化部署到运营体系一次交付</li>
+						<li>提供风险预案与安全合规建议</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="case-highlights" class="bg-slate-900 text-white py-16">
+		<div class="max-w-7xl mx-auto px-6">
+			<div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8 mb-10">
+				<div class="max-w-3xl">
+					<h2 class="text-3xl sm:text-4xl font-bold mb-3 text-white">得到这些团队的共同认可</h2>
+					<p class="text-base sm:text-lg text-slate-200 leading-relaxed">
+						我与高校、国企、上市公司以及高速成长的创业团队长期合作。以下只是部分合作伙伴，他们在培训或项目落地后都实现了效率提升与团队能力升级。
+					</p>
+				</div>
+				<a href="/training-cases" class="inline-flex items-center px-5 py-3 rounded-xl font-semibold bg-white text-slate-900 shadow-lg hover:shadow-xl transition">查看全部案例</a>
+			</div>
+			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+				<div class="case-card rounded-2xl p-6 border transition-all duration-300" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.85)); border-color: rgba(148, 163, 184, 0.3);">
+					<div class="case-card-icon mb-3">
+						<svg class="w-5 h-5" style="color: var(--action-gold);" fill="currentColor" viewBox="0 0 20 20">
+							<path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+						</svg>
+					</div>
+					<h3 class="text-lg font-semibold mb-2 text-white">太平洋电脑网</h3>
+					<p class="text-sm text-slate-200 leading-relaxed">为编辑团队提供 AI 内容生成培训，实现科技新闻初稿写作效率提升 60%，记者平均每天多发布 2 篇深度报道，内容质量评分提高 25%。</p>
+				</div>
+				<div class="case-card rounded-2xl p-6 border transition-all duration-300" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.85)); border-color: rgba(148, 163, 184, 0.3);">
+					<div class="case-card-icon mb-3">
+						<svg class="w-5 h-5" style="color: var(--action-blue);" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+						</svg>
+					</div>
+					<h3 class="text-lg font-semibold mb-2 text-white">广州交通集团</h3>
+					<p class="text-sm text-slate-200 leading-relaxed">部署智能交通管理系统，实现路况数据分析速度提升 300%，客服响应时间从 15 分钟缩短至 2 分钟，市民满意度提升 42%。</p>
+				</div>
+				<div class="case-card rounded-2xl p-6 border transition-all duration-300" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.85)); border-color: rgba(148, 163, 184, 0.3);">
+					<div class="case-card-icon mb-3">
+						<svg class="w-5 h-5" style="color: var(--action-gold);" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+						</svg>
+					</div>
+					<h3 class="text-lg font-semibold mb-2 text-white">广药集团旗下多家子公司</h3>
+					<p class="text-sm text-slate-200 leading-relaxed">广药集团下面的采芝林、潘高寿、敬修堂、天心药业等多家子公司举办 AI 办公提效训练营，三周内帮助 60+ 门店掌握 AI 文案与直播脚本自动生成，营销成本降低 35%，线上销售额增长 48%。</p>
+				</div>
+				<div class="case-card rounded-2xl p-6 border transition-all duration-300" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.85)); border-color: rgba(148, 163, 184, 0.3);">
+					<div class="case-card-icon mb-3">
+						<svg class="w-5 h-5" style="color: var(--action-blue);" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+						</svg>
+					</div>
+					<h3 class="text-lg font-semibold mb-2 text-white">爱齐福珠宝设计公司</h3>
+					<p class="text-sm text-slate-200 leading-relaxed">定制珠宝设计 AI 助手，实现设计稿自动生成效率提升 5 倍，客户沟通周期缩短 60%，新品上市时间加快 30%，并建立智能库存预警系统。</p>
+				</div>
+			</div>
 		</div>
 	</section>
 
@@ -302,6 +409,32 @@ const hasPosts = recentPosts.length > 0;
 		</div>
 	</section>
 
+	<section id="stay-connected" class="py-16 bg-blue-50">
+		<div class="max-w-4xl mx-auto px-6 text-center">
+			<h2 class="text-3xl font-bold text-blue-900 mb-4">持续获取 AI 实战策略</h2>
+			<p class="text-base text-blue-800 leading-relaxed mb-8">
+				订阅最新文章、案例拆解与公开课通知。也可以直接添加下方微信二维码，加我为好友即可获取《企业 AI 落地 30 个高频问答》资料包。
+			</p>
+			<form id="subscribeForm" class="flex flex-col sm:flex-row gap-3 justify-center">
+				<input
+					type="email"
+					name="subscriberEmail"
+					class="w-full sm:w-80 px-4 py-3 rounded-lg border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+					placeholder="输入邮箱地址"
+					required
+					aria-label="邮箱地址"
+				/>
+				<button
+					type="submit"
+					class="px-6 py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
+				>
+					获取资料与更新
+				</button>
+			</form>
+			<p id="subscribeStatus" class="mt-4 text-sm text-blue-700" role="status" aria-live="polite"></p>
+		</div>
+	</section>
+
 	<!-- Footer - 暗区背景 -->
 	<footer class="py-12" style="background-color: var(--bg-dark); color: var(--text-on-dark)" itemScope itemType="https://schema.org/Organization">
 		<div class="max-w-7xl mx-auto px-6 text-center">
@@ -412,6 +545,7 @@ const hasPosts = recentPosts.length > 0;
 		color: var(--action-gold) !important;
 	}
 
+	
 	.hero-section {
 		min-height: 100vh;
 		min-height: 100dvh; /* 动态视口高度，更适合移动端 */
@@ -512,6 +646,43 @@ const hasPosts = recentPosts.length > 0;
 		}
 	}
 
+	/* 案例卡片样式 */
+	.case-card {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.case-card::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 2px;
+		background: linear-gradient(90deg, var(--action-gold), var(--action-blue));
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
+
+	.case-card:hover::before {
+		opacity: 1;
+	}
+
+	.case-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.4);
+		background: linear-gradient(135deg, rgba(30, 41, 59, 1), rgba(51, 65, 85, 0.95));
+	}
+
+	.case-card:hover .case-card-icon svg {
+		transform: scale(1.1);
+	}
+
+	.case-card-icon svg {
+		transition: transform 0.3s ease;
+	}
+
 	/* SEO优化 - 屏幕阅读器可见但视觉隐藏 */
 	.sr-only {
 		position: absolute;
@@ -538,11 +709,49 @@ const hasPosts = recentPosts.length > 0;
 		}
 	}
 
-	// 页面加载完成后绑定事件
-	document.addEventListener('DOMContentLoaded', function() {
-		const scrollBtn = document.getElementById('scrollDownBtn');
-		if (scrollBtn) {
-			scrollBtn.addEventListener('click', scrollToSection);
-		}
-	});
+// 页面加载完成后绑定事件
+document.addEventListener('DOMContentLoaded', function() {
+    const scrollBtn = document.getElementById('scrollDownBtn');
+    if (scrollBtn) {
+        scrollBtn.addEventListener('click', scrollToSection);
+    }
+
+    const subscribeForm = document.getElementById('subscribeForm');
+    const subscribeStatus = document.getElementById('subscribeStatus');
+
+    if (subscribeForm) {
+        subscribeForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formElement = event.target;
+            if (!(formElement instanceof HTMLFormElement)) {
+                return;
+            }
+
+            const emailInput = formElement.querySelector('[name="subscriberEmail"]');
+            if (!(emailInput instanceof HTMLInputElement)) {
+                return;
+            }
+
+            const emailValue = emailInput.value.trim();
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+                if (subscribeStatus) {
+                    subscribeStatus.classList.add('text-red-600');
+                    subscribeStatus.classList.remove('text-blue-700');
+                    subscribeStatus.textContent = '请输入有效的邮箱地址。';
+                }
+                return;
+            }
+
+            if (subscribeStatus) {
+                subscribeStatus.classList.remove('text-red-600');
+                subscribeStatus.classList.add('text-blue-700');
+                subscribeStatus.textContent = '感谢关注！我们会在 24 小时内发送资料，请留意邮箱或微信消息。';
+            }
+
+            window.open(`mailto:yangdongbo@tacod.com?subject=订阅AI动态&body=我想订阅东波哥的AI实战资讯，邮箱：${encodeURIComponent(emailValue)}`);
+            formElement.reset();
+        });
+    }
+});
 </script>

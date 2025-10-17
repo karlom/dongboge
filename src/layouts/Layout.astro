@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { cdnUrl } from "../cdnConfig";
+import BackToTop from "../components/BackToTop.astro";
 
 export interface Props {
   title: string;
@@ -160,6 +161,7 @@ const { title, description } = Astro.props;
   </head>
   <body>
     <slot />
+    <BackToTop />
 
     <!-- 百度统计 - 放在页面底部，异步加载 -->
     <script is:inline>

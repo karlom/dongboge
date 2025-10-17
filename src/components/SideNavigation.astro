@@ -1,0 +1,218 @@
+---
+export interface Props {
+  sections: Array<{
+    id: string;
+    name: string;
+  }>;
+}
+
+const { sections } = Astro.props;
+---
+
+<nav id="sideNav" class="side-nav" aria-label="页面导航">
+  <div class="side-nav__container">
+    <ul class="side-nav__list">
+      {sections.map((section) => (
+        <li class="side-nav__item">
+          <a
+            href={`#${section.id}`}
+            class="side-nav__link"
+            data-section={section.id}
+          >
+            {section.name}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<style>
+  .side-nav {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 35;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .side-nav.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .side-nav__container {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px) saturate(180%);
+    border-radius: 12px 0 0 12px;
+    padding: 1rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-right: none;
+    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .side-nav__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .side-nav__item {
+    position: relative;
+  }
+
+  .side-nav__link {
+    display: block;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(51, 65, 85, 0.9);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .side-nav__link:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: rgba(30, 64, 175, 0.95);
+    transform: translateX(-3px);
+  }
+
+  .side-nav__link.active {
+    background: rgba(255, 255, 255, 0.35);
+    color: rgba(30, 64, 175, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+  }
+
+  .side-nav__link.active::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 16px;
+    background: rgba(37, 99, 235, 0.8);
+    border-radius: 2px;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 1024px) {
+    .side-nav__container {
+      padding: 0.875rem 0.625rem;
+    }
+
+    .side-nav__link {
+      font-size: 0.8rem;
+      padding: 0.45rem 0.875rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .side-nav {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // 页面导航功能
+  document.addEventListener('DOMContentLoaded', function() {
+    const sideNav = document.getElementById('sideNav');
+    const navLinks = document.querySelectorAll('.side-nav__link');
+
+    if (!sideNav) return;
+
+    // 滚动显示/隐藏导航
+    let lastScrollY = window.scrollY;
+    let showNav = false;
+
+    function toggleNavVisibility() {
+      const currentScrollY = window.scrollY;
+
+      // 滚动过第一个section后显示
+      if (currentScrollY > window.innerHeight * 0.5) {
+        if (!showNav) {
+          showNav = true;
+          sideNav.classList.add('visible');
+        }
+      } else {
+        if (showNav) {
+          showNav = false;
+          sideNav.classList.remove('visible');
+        }
+      }
+
+      lastScrollY = currentScrollY;
+    }
+
+    // Intersection Observer 监测当前section
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -70% 0px', // 当section进入中心区域时触发
+      threshold: 0
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.id;
+
+          // 移除所有激活状态
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+          });
+
+          // 添加当前section的激活状态
+          const activeLink = document.querySelector(`.side-nav__link[data-section="${sectionId}"]`);
+          if (activeLink) {
+            activeLink.classList.add('active');
+          }
+        }
+      });
+    }, observerOptions);
+
+    // 观察所有section
+    navLinks.forEach(link => {
+      const sectionId = link.getAttribute('data-section');
+      const section = document.getElementById(sectionId);
+      if (section) {
+        sectionObserver.observe(section);
+      }
+    });
+
+    // 点击导航链接平滑滚动
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const sectionId = link.getAttribute('data-section');
+        const section = document.getElementById(sectionId);
+
+        if (section) {
+          const headerHeight = document.querySelector('.fixed.top-0')?.offsetHeight || 0;
+          const sectionTop = section.offsetTop - headerHeight - 20;
+
+          window.scrollTo({
+            top: sectionTop,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // 监听滚动事件
+    window.addEventListener('scroll', toggleNavVisibility, { passive: true });
+
+    // 初始检查
+    toggleNavVisibility();
+  });
+</script>

@@ -17,6 +17,32 @@ import Footer from "../components/Footer.astro";
     <Header />
   </div>
 
+  <nav class="section-nav" aria-label="服务导航">
+    <div class="section-nav__inner">
+      <span class="section-nav__title">服务导航</span>
+      <div class="section-nav__links" role="list">
+        <a class="section-nav__link" href="#services-hero" role="listitem">
+          服务概览
+        </a>
+        <a class="section-nav__link" href="#services-benefits" role="listitem">
+          我的优势
+        </a>
+        <a class="section-nav__link" href="#enterprise-solutions" role="listitem">
+          企业方案
+        </a>
+        <a class="section-nav__link" href="#training-products" role="listitem">
+          培训产品
+        </a>
+        <a class="section-nav__link" href="#service-process" role="listitem">
+          合作流程
+        </a>
+        <a class="section-nav__link" href="#service-faq" role="listitem">
+          常见问答
+        </a>
+      </div>
+    </div>
+  </nav>
+
   <!-- Breadcrumb Navigation -->
   <nav
     class="bg-white border-b border-gray-200 pt-20 pb-4"
@@ -32,7 +58,7 @@ import Footer from "../components/Footer.astro";
   </nav>
 
   <!-- Hero Section -->
-  <section class="bg-gradient-to-br from-blue-50 to-indigo-100 pt-12 pb-16">
+  <section id="services-hero" class="bg-gradient-to-br from-blue-50 to-indigo-100 pt-12 pb-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h1
@@ -74,7 +100,7 @@ import Footer from "../components/Footer.astro";
   </section>
 
   <!-- 服务优势 -->
-  <section class="py-16 bg-white">
+  <section id="services-benefits" class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
@@ -172,7 +198,7 @@ import Footer from "../components/Footer.astro";
   </section>
   <!--
  企业级解决方案 -->
-  <section class="py-16 bg-gray-50">
+  <section id="enterprise-solutions" class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
@@ -449,7 +475,7 @@ import Footer from "../components/Footer.astro";
   </section>
 
   <!-- 个人成长与创业加速 -->
-  <section class="py-16 bg-white">
+  <section id="training-products" class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
@@ -718,6 +744,85 @@ import Footer from "../components/Footer.astro";
     </div>
   </section>
 
+  <!-- 合作流程 -->
+  <section id="service-process" class="py-16 bg-gray-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">合作流程一览</h2>
+        <p class="text-base sm:text-lg text-gray-600">
+          四步走流程，确保从需求沟通到落地复盘都有明确的产出和责任人。
+        </p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-4">
+        {[
+          {
+            title: "1. 需求诊断",
+            detail: "30 分钟线上沟通，快速明确业务目标、痛点与可行的 AI 场景。",
+          },
+          {
+            title: "2. 方案共创",
+            detail: "3-5 个工作日输出方案草稿，涵盖实施路径、预算估算与风险提示。",
+          },
+          {
+            title: "3. 并行交付",
+            detail: "落地阶段按周复盘：培训、开发或部署同步推进，所有交付放入共享空间。",
+          },
+          {
+            title: "4. 复盘优化",
+            detail: "项目收尾后 30 天跟踪指标，提供复盘报告与下一阶段增长建议。",
+          },
+        ].map((step) => (
+          <div class="rounded-2xl bg-white shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">{step.title}</h3>
+            <p class="text-sm text-gray-600 leading-relaxed">{step.detail}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 常见问题 -->
+  <section id="service-faq" class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">常见问题</h2>
+        <p class="text-base sm:text-lg text-gray-600">
+          如果你有更多疑问，欢迎随时微信联系我获取详细说明。
+        </p>
+      </div>
+      <div class="space-y-4">
+        {[
+          {
+            q: "培训或项目支持可以线上完成吗？",
+            a: "大部分培训与咨询可以线上完成，涉及现场演练或深度访谈时会提前安排到场时间，外地客户可安排连线形式。",
+          },
+          {
+            q: "企业机密或数据会如何处理？",
+            a: "签署双向保密协议，敏感数据在本地或客户私有云内处理，所有材料项目交付后统一销毁或归档到客户指定仓库。",
+          },
+          {
+            q: "没有技术团队也能推进吗？",
+            a: "可以。我会根据现有人力配置出实施方案，必要时协助引入第三方伙伴或临时团队共同完成。",
+          },
+          {
+            q: "合作周期一般多久？",
+            a: "短则 2~3 周（方案/培训），涉及系统部署或智能体运营的项目通常为 4~8 周，具体以需求复杂度为准。",
+          },
+        ].map((item) => (
+          <details class="group rounded-2xl border border-gray-200 bg-gray-50/60 px-6 py-4 transition">
+            <summary class="flex items-center justify-between cursor-pointer text-left text-gray-900 font-semibold text-base sm:text-lg">
+              {item.q}
+              <span class="ml-4 text-gray-500 group-open:rotate-180 transition-transform">⌄</span>
+            </summary>
+            <p class="mt-3 text-sm sm:text-base leading-relaxed text-gray-600">
+              {item.a}
+            </p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <!-- 行动号召 -->
   <section class="py-16 bg-gradient-to-r from-blue-600 to-indigo-600">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -779,3 +884,94 @@ import Footer from "../components/Footer.astro";
   <!-- Footer -->
   <Footer />
 </Layout>
+
+<style>
+	.section-nav {
+		position: sticky;
+		top: 84px;
+		z-index: 40;
+		backdrop-filter: blur(8px);
+		background: rgba(255, 255, 255, 0.92);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+	}
+
+	.section-nav__inner {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		max-width: 80rem;
+		margin: 0 auto;
+		padding: 0.75rem 1.5rem;
+	}
+
+	.section-nav__title {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: #0f172a;
+		white-space: nowrap;
+	}
+
+	.section-nav__links {
+		display: flex;
+		gap: 0.75rem;
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
+
+	.section-nav__links::-webkit-scrollbar {
+		height: 4px;
+	}
+
+	.section-nav__links::-webkit-scrollbar-thumb {
+		background: rgba(148, 163, 184, 0.6);
+		border-radius: 9999px;
+	}
+
+	.section-nav__link {
+		padding: 0.5rem 0.85rem;
+		border-radius: 9999px;
+		background: rgba(15, 23, 42, 0.05);
+		color: #0f172a;
+		font-size: 0.85rem;
+		font-weight: 500;
+		text-decoration: none;
+		transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+	}
+
+	.section-nav__link:hover,
+	.section-nav__link:focus-visible {
+		background: rgba(59, 130, 246, 0.15);
+		color: #1d4ed8;
+		transform: translateY(-1px);
+		outline: none;
+	}
+
+	@media (max-width: 1024px) {
+		.section-nav {
+			top: 72px;
+		}
+
+		.section-nav__inner {
+			padding-inline: 1rem;
+		}
+
+		.section-nav__title {
+			display: none;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.section-nav {
+			top: 64px;
+		}
+
+		.section-nav__inner {
+			gap: 0.5rem;
+		}
+
+		.section-nav__link {
+			font-size: 0.8rem;
+			padding: 0.45rem 0.75rem;
+		}
+	}
+</style>

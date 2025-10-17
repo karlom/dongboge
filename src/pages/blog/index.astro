@@ -158,6 +158,57 @@ const posts = (await getProcessedBlogCollection()).sort(
         gap: 0.5rem;
       }
 
+      .blog-search {
+        max-width: 520px;
+        margin: 0 auto 2.5rem;
+        text-align: left;
+      }
+
+      .blog-search label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-on-light);
+        margin-bottom: 0.75rem;
+      }
+
+      .blog-search-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: #f9fafb;
+        border: 1px solid var(--border-color-light);
+        border-radius: 9999px;
+        padding-inline: 1.25rem;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .blog-search-group:focus-within {
+        border-color: var(--action-blue);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+      }
+
+      .blog-search-group input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 0.85rem 0;
+        font-size: 1rem;
+        outline: none;
+        color: var(--text-on-light);
+      }
+
+      .blog-search-group svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--text-secondary);
+      }
+
+      .blog-search-empty {
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+      }
+
       .blog-card-date svg {
         width: 1rem;
         height: 1rem;
@@ -211,10 +262,37 @@ const posts = (await getProcessedBlogCollection()).sort(
 
     <!-- 主内容区域 - 亮区背景 -->
     <main>
+      <div class="blog-search">
+        <label for="blogSearch">快速搜索文章</label>
+        <div class="blog-search-group">
+          <input
+            id="blogSearch"
+            type="search"
+            placeholder="输入关键词、标签或文章标题"
+            aria-label="搜索文章"
+          />
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-4.35-4.35m1.35-4.15a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+              fill="none"
+            />
+          </svg>
+        </div>
+        <p id="blogSearchEmpty" class="blog-search-empty" hidden>
+          暂无符合条件的文章，尝试换个关键词。
+        </p>
+      </div>
       <ul class="blog-grid">
         {
           posts.map((post) => (
-            <li class="blog-card">
+            <li
+              class="blog-card"
+              data-search-content={`${post.data.title} ${post.data.description} ${post.data.tags?.join(" ") ?? ""}`}
+            >
               <a href={`/blog/${post.id}/`}>
                 {post.data.heroImage && (
                   <div class="blog-card-image">
@@ -249,5 +327,46 @@ const posts = (await getProcessedBlogCollection()).sort(
 
     <!-- Footer - 暗区背景 -->
     <Footer />
+    <script>
+      const searchInput = document.getElementById('blogSearch');
+      const emptyTip = document.getElementById('blogSearchEmpty');
+      const cards = Array.from(
+        document.querySelectorAll('[data-search-content]'),
+      );
+
+      function filterPosts() {
+        if (!cards.length) {
+          return;
+        }
+
+        const keyword = (searchInput?.value || '').trim().toLowerCase();
+
+        if (!keyword) {
+          cards.forEach((card) => {
+            card.hidden = false;
+          });
+          if (emptyTip) {
+            emptyTip.hidden = true;
+          }
+          return;
+        }
+
+        let visibleCount = 0;
+        cards.forEach((card) => {
+          const haystack = card.dataset.searchContent?.toLowerCase() || '';
+          const matched = haystack.includes(keyword);
+          card.hidden = !matched;
+          if (matched) {
+            visibleCount += 1;
+          }
+        });
+
+        if (emptyTip) {
+          emptyTip.hidden = visibleCount > 0;
+        }
+      }
+
+      searchInput?.addEventListener('input', filterPosts);
+    </script>
   </body>
 </html>
