@@ -4,44 +4,32 @@ export const prerender = true;
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import SideNavigation from "../components/SideNavigation.astro";
+
+// 导航sections配置
+const navigationSections = [
+  { id: 'services-hero', name: '服务概览' },
+  { id: 'services-benefits', name: '我的优势' },
+  { id: 'enterprise-solutions', name: '企业方案' },
+  { id: 'training-products', name: '培训产品' },
+  { id: 'service-process', name: '合作流程' },
+  { id: 'service-faq', name: '常见问答' }
+];
 ---
 
 <Layout
   title="我的服务_专业AI咨询与IT技术服务 - 东波哥"
   description="提供企业AI咨询、智能体开发、Dify私有化部署、个人技能提升等专业服务。助力企业数字化转型和个人职业发展。"
 >
+  <!-- 右侧导航 -->
+  <SideNavigation sections={navigationSections} />
+
   <!-- Header -->
   <div
     class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm"
   >
     <Header />
   </div>
-
-  <nav class="section-nav" aria-label="服务导航">
-    <div class="section-nav__inner">
-      <span class="section-nav__title">服务导航</span>
-      <div class="section-nav__links" role="list">
-        <a class="section-nav__link" href="#services-hero" role="listitem">
-          服务概览
-        </a>
-        <a class="section-nav__link" href="#services-benefits" role="listitem">
-          我的优势
-        </a>
-        <a class="section-nav__link" href="#enterprise-solutions" role="listitem">
-          企业方案
-        </a>
-        <a class="section-nav__link" href="#training-products" role="listitem">
-          培训产品
-        </a>
-        <a class="section-nav__link" href="#service-process" role="listitem">
-          合作流程
-        </a>
-        <a class="section-nav__link" href="#service-faq" role="listitem">
-          常见问答
-        </a>
-      </div>
-    </div>
-  </nav>
 
   <!-- Breadcrumb Navigation -->
   <nav
@@ -884,94 +872,3 @@ import Footer from "../components/Footer.astro";
   <!-- Footer -->
   <Footer />
 </Layout>
-
-<style>
-	.section-nav {
-		position: sticky;
-		top: 84px;
-		z-index: 40;
-		backdrop-filter: blur(8px);
-		background: rgba(255, 255, 255, 0.92);
-		border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-	}
-
-	.section-nav__inner {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		max-width: 80rem;
-		margin: 0 auto;
-		padding: 0.75rem 1.5rem;
-	}
-
-	.section-nav__title {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #0f172a;
-		white-space: nowrap;
-	}
-
-	.section-nav__links {
-		display: flex;
-		gap: 0.75rem;
-		overflow-x: auto;
-		scrollbar-width: thin;
-	}
-
-	.section-nav__links::-webkit-scrollbar {
-		height: 4px;
-	}
-
-	.section-nav__links::-webkit-scrollbar-thumb {
-		background: rgba(148, 163, 184, 0.6);
-		border-radius: 9999px;
-	}
-
-	.section-nav__link {
-		padding: 0.5rem 0.85rem;
-		border-radius: 9999px;
-		background: rgba(15, 23, 42, 0.05);
-		color: #0f172a;
-		font-size: 0.85rem;
-		font-weight: 500;
-		text-decoration: none;
-		transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-	}
-
-	.section-nav__link:hover,
-	.section-nav__link:focus-visible {
-		background: rgba(59, 130, 246, 0.15);
-		color: #1d4ed8;
-		transform: translateY(-1px);
-		outline: none;
-	}
-
-	@media (max-width: 1024px) {
-		.section-nav {
-			top: 72px;
-		}
-
-		.section-nav__inner {
-			padding-inline: 1rem;
-		}
-
-		.section-nav__title {
-			display: none;
-		}
-	}
-
-	@media (max-width: 640px) {
-		.section-nav {
-			top: 64px;
-		}
-
-		.section-nav__inner {
-			gap: 0.5rem;
-		}
-
-		.section-nav__link {
-			font-size: 0.8rem;
-			padding: 0.45rem 0.75rem;
-		}
-	}
-</style>
