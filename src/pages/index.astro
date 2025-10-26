@@ -6,6 +6,7 @@ import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import OptimizedImage from '../components/OptimizedImage.astro';
 import SideNavigation from '../components/SideNavigation.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
@@ -436,27 +437,7 @@ const navigationSections = [
 	</section>
 
 	<!-- Footer - 暗区背景 -->
-	<footer class="py-12" style="background-color: var(--bg-dark); color: var(--text-on-dark)" itemScope itemType="https://schema.org/Organization">
-		<div class="max-w-7xl mx-auto px-6 text-center">
-			<p class="mb-4" style="color: var(--text-secondary);">
-				© 2025 <span itemProp="name">东波哥</span>. 用心记录，用技术创造价值. 
-				<span class="sr-only">广州企业AI培训专家，专注企业培训、AI培训、企业AI培训、广州AI培训、AI创业指导服务。</span>
-			</p>
-			<div class="flex justify-center space-x-6 mb-4">
-				<a href="/about" class="footer-link transition-colors duration-200" style="color: var(--text-secondary);">关于东波哥</a>
-				<a href="/contact" class="footer-link transition-colors duration-200" style="color: var(--text-secondary);">联系我们</a>
-				<a href="/services" class="footer-link transition-colors duration-200" style="color: var(--text-secondary);">AI培训服务</a>
-			</div>
-			<div class="pt-4" style="border-top: 1px solid var(--border-color-dark);">
-				<p class="text-sm" style="color: var(--text-secondary);">
-					
-					<a href="https://beian.miit.gov.cn/" target="_blank" class="footer-link transition-colors duration-200 ml-4">
-						粤ICP备2021046742号-1
-					</a>
-				</p>
-			</div>
-		</div>
-	</footer>
+	<Footer />
 </Layout>
 
 <style>
