@@ -27,6 +27,7 @@ SEO_FILES=(
     "public/sitemap.xml"
     "public/sitemap-index.xml"
     "public/rss.xml"
+    "public/3de7d2f0dba83cb8d31c8016626acb0f.txt"
 )
 
 for file in "${SEO_FILES[@]}"; do
@@ -58,8 +59,8 @@ echo -e "${YELLOW}🔧 设置文件权限...${NC}"
 
 ssh "$SERVER_USER@$SERVER_HOST" << 'EOF'
 cd /var/www/dongboge/client
-chmod 644 robots.txt sitemap.xml sitemap-index.xml rss.xml
-chown www-data:www-data robots.txt sitemap.xml sitemap-index.xml rss.xml
+    chmod 644 robots.txt sitemap.xml sitemap-index.xml rss.xml 3de7d2f0dba83cb8d31c8016626acb0f.txt
+    chown www-data:www-data robots.txt sitemap.xml sitemap-index.xml rss.xml 3de7d2f0dba83cb8d31c8016626acb0f.txt
 echo "文件权限设置完成"
 EOF
 
@@ -77,6 +78,7 @@ URLS=(
     "https://dongboge.cn/sitemap.xml"
     "https://dongboge.cn/sitemap-index.xml"
     "https://dongboge.cn/rss.xml"
+    "https://dongboge.cn/3de7d2f0dba83cb8d31c8016626acb0f.txt"
 )
 
 SUCCESS_COUNT=0
