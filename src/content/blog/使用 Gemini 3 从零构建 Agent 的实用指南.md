@@ -1,3 +1,10 @@
+---
+title: "使用 Gemini 3 从零构建 Agent 的实用指南"
+description: "核心思想非常简单：它是一个在循环中运行的大语言模型（LLM），并被赋予可选择使用的工具。只要你会在 Python 中写一个循环，你就能构建一个 Agent。"
+pubDate: "Nov 21, 2025"
+tags: ["技术", "摘录"]
+heroImage: "../../assets/tech.jpg"
+---
 # 使用 Gemini 3 从零构建 Agent 的实用指南
 
 > 原文标题：Practical Guide on how to build an Agent from scratch with Gemini 3
