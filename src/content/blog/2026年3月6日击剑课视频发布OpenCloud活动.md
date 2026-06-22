@@ -4,7 +4,7 @@ description: "儿子去上击剑课，我在家研究一个博主怎么一天发
 pubDate: "Mar 06, 2026"
 tags: ["生活", "工作"]
 category: "工作与商业"
-heroImage: "../../assets/life.jpg"
+heroImage: "../../assets/cat-business-work-1.jpg"
 slug: "2026-03-06-fencing-video-opencloud"
 ---
 

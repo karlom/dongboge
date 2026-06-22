@@ -8,7 +8,7 @@ slug: "enterprise-ai-training-preparation"
 author: "杨东波"
 tags: ["企业AI培训", "培训准备", "AI安全"]
 category: "企业 AI 培训"
-heroImage: "../../assets/default2.jpg"
+heroImage: "../../assets/cat-enterprise-ai-training-1.jpg"
 ---
 
 企业 AI 培训前至少要准备六项内容：明确目标、确定学员、收集任务样本、检查工具账号、划定数据安全边界、记录培训前基线。准备越具体，课程越能解决真实问题，也越容易在培训后验证效果。

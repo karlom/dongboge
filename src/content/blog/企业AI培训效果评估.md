@@ -8,7 +8,7 @@ slug: "measure-enterprise-ai-training-results"
 author: "杨东波"
 tags: ["企业AI培训", "培训评估", "AI落地"]
 category: "企业 AI 培训"
-heroImage: "../../assets/success.jpg"
+heroImage: "../../assets/cat-enterprise-ai-training-2.jpg"
 ---
 
 企业 AI 培训效果应从知识掌握、任务表现、实际采用和业务结果四层评估。满意度只能说明课堂感受，不能证明工作效率或质量提升；可靠结论需要培训前基线、培训后同类任务测试和一段时间的真实使用记录。

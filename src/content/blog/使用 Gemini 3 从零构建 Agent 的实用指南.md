@@ -5,7 +5,7 @@ pubDate: "Nov 21, 2025"
 slug: "build-agent-from-scratch-with-gemini-3"
 tags: ["技术", "摘录"]
 category: "AI 应用与智能体"
-heroImage: "../../assets/tech.jpg"
+heroImage: "../../assets/cat-ai-agent-2.jpg"
 ---
 # 使用 Gemini 3 从零构建 Agent 的实用指南
 

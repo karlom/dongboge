@@ -4,7 +4,7 @@ description: "# reboot and select proper boot device的第二种解决方法 今
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
 category: "技术实践"
-heroImage: "../../assets/tech.jpg"
+heroImage: "../../assets/cat-tech-practice-2.jpg"
 slug: "second-solution-boot-device-error"
 ---
 

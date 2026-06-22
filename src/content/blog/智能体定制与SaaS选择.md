@@ -8,7 +8,7 @@ slug: "custom-ai-agent-vs-saas"
 author: "杨东波"
 tags: ["AI智能体", "SaaS选型", "Dify"]
 category: "AI 应用与智能体"
-heroImage: "../../assets/default.jpg"
+heroImage: "../../assets/cat-ai-agent-1.jpg"
 ---
 
 需求标准、需要快速上线、内部集成少时，优先选择成熟 SaaS；流程差异明显、涉及私有数据和复杂权限、需要连接内部系统时，再评估定制开发。正确顺序是先验证业务价值，再决定技术形态，避免为尚未稳定的流程投入重开发。

@@ -4,7 +4,7 @@ description: "不知不觉这周已经过去两天了，昨天下午去见了老
 pubDate: "Jul 19, 2025"
 tags: ["工作"]
 category: "企业 AI 培训"
-heroImage: '../../assets/work2.jpg'
+heroImage: "../../assets/cat-enterprise-ai-training-2.jpg"
 slug: "ai-trainer-career-took-off-after-two-weeks"
 ---
 

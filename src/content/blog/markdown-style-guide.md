@@ -2,7 +2,7 @@
 title: "AI技术文档写作规范：Markdown最佳实践指南"
 description: "分享AI技术文档写作中的Markdown语法规范和最佳实践，帮助技术团队创建清晰、专业的技术文档。"
 pubDate: "Jun 19 2024"
-heroImage: "../../assets/daily1.jpg"
+heroImage: "../../assets/cat-tech-practice-1.jpg"
 tags: ["技术文档", "Markdown", "写作规范", "团队协作"]
 category: "技术实践"
 slug: "ai-markdown-documentation-best-practices"

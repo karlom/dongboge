@@ -4,7 +4,7 @@ description: ""
 pubDate: "2025-09-14"
 tags: ["参会记录"]
 category: "工作与商业"
-heroImage: "../../assets/success1.jpg"
+heroImage: "../../assets/cat-business-work-2.jpg"
 slug: "itechclub-beijing-2025-networking-opportunities"
 ---
 

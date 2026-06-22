@@ -8,7 +8,7 @@ slug: "guangzhou-enterprise-ai-training-selection"
 author: "杨东波"
 tags: ["广州AI培训", "企业AI培训", "培训选型"]
 category: "企业 AI 培训"
-heroImage: "../../assets/work2.jpg"
+heroImage: "../../assets/cat-enterprise-ai-training-1.jpg"
 ---
 
 选择广州企业 AI 培训机构时，应优先核查是否理解你的业务、能否按岗位定制、是否明确数据安全边界，以及课后有没有落地机制。不要只比较讲师名气、工具数量或演示效果；真正有效的课程必须让员工用自己的任务完成练习。

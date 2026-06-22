@@ -8,7 +8,7 @@ slug: "enterprise-ai-training-pricing"
 author: "杨东波"
 tags: ["企业AI培训", "培训报价", "课程采购"]
 category: "企业 AI 培训"
-heroImage: "../../assets/default1.jpg"
+heroImage: "../../assets/cat-enterprise-ai-training-1.jpg"
 ---
 
 企业 AI 内训没有可靠的统一日价。报价通常由需求调研、课程定制、参与人数、授课时长、交付物和课后服务共同决定。企业应先统一需求范围，再比较总交付和可落地程度，而不是只比较讲师一天的价格。

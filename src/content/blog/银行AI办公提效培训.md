@@ -8,7 +8,7 @@ slug: "bank-ai-productivity-training"
 author: "杨东波"
 tags: ["银行AI培训", "AI办公提效", "数据安全"]
 category: "企业 AI 培训"
-heroImage: "../../assets/work.jpg"
+heroImage: "../../assets/cat-enterprise-ai-training-2.jpg"
 ---
 
 银行员工可以先在公开资料检索、非敏感材料整理、培训内容起草和会议信息结构化等低风险场景使用 AI。客户身份、账户、交易、授信、内部经营和未公开制度等数据，不应输入未经批准的外部模型；所有对客和决策性输出必须由责任人复核。

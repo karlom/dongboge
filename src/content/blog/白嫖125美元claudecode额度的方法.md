@@ -4,7 +4,7 @@ description: "Claude Code 保姆级部署教程：Node.js 安装、全局安装 
 pubDate: "2025-10-21"
 tags: ["商业探索", "AI培训", "claude code教程"]
 category: "技术实践"
-heroImage: "../../assets/tech1.jpg"
+heroImage: "../../assets/cat-tech-practice-1.jpg"
 slug: "claude-code-150usd-free-setup"
 ---
 

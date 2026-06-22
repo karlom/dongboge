@@ -4,7 +4,7 @@ description: "修复东京节点的 OpenCloud 功能，然后做了一份 18 页
 pubDate: "Mar 18, 2026"
 tags: ["技术", "工作"]
 category: "技术实践"
-heroImage: "../../assets/work.jpg"
+heroImage: "../../assets/cat-tech-practice-1.jpg"
 slug: "2026-03-18-opencloud-fix-bay-area-meeting"
 ---
 

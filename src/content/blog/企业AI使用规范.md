@@ -9,7 +9,7 @@ author: "杨东波"
 tags: ["AI治理", "数据安全", "企业AI"]
 category: "AI 应用与智能体"
 references: ["https://www.nist.gov/itl/ai-risk-management-framework"]
-heroImage: "../../assets/tech1.jpg"
+heroImage: "../../assets/cat-ai-agent-2.jpg"
 ---
 
 企业 AI 使用规范至少要明确八件事：允许使用的工具、禁止输入的数据、账号与权限、输出复核、版权与引用、高风险场景、日志与保留、事件报告。规范必须能让员工在具体任务中做判断，而不是只写“注意安全”。

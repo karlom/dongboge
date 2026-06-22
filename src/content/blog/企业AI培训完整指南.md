@@ -8,7 +8,7 @@ slug: "enterprise-ai-training-guide"
 author: "杨东波"
 tags: ["企业AI培训", "AI办公提效", "数字化转型"]
 category: "企业 AI 培训"
-heroImage: "../../assets/tech.jpg"
+heroImage: "../../assets/cat-enterprise-ai-training-2.jpg"
 ---
 
 企业 AI 培训是围绕真实岗位任务，帮助员工理解 AI 边界、掌握工具并形成可复用工作流的组织学习项目。它适合管理、销售、运营、人力、行政、研发等部门，但课程内容必须按岗位和数据风险分层，不能只做通用工具演示。

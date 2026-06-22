@@ -8,7 +8,7 @@ slug: "enterprise-ai-productivity-guide"
 author: "杨东波"
 tags: ["AI办公提效", "企业培训", "岗位场景"]
 category: "企业 AI 培训"
-heroImage: "../../assets/work.jpg"
+heroImage: "../../assets/cat-enterprise-ai-training-2.jpg"
 ---
 
 AI 办公提效培训应覆盖信息检索、材料整理、内容起草、数据分析和流程协作，同时教会员工识别幻觉、保护敏感数据并复核结果。课程价值不在“会用多少工具”，而在把高频任务变成可重复、可检查的工作流。

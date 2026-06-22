@@ -4,7 +4,7 @@ description: "根据前些天 X 友们的讨论，总结了一下：《不会考
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
 category: "技术实践"
-heroImage: '../../assets/tech2.jpg'
+heroImage: "../../assets/cat-tech-practice-1.jpg"
 slug: "will-companies-test-ai-skills"
 ---
 

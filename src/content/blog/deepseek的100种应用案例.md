@@ -4,7 +4,7 @@ description: "# DeepSeek的100种应用场景 以下100个场景展示了DeepSee
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
 category: "AI 应用与智能体"
-heroImage: "../../assets/tech.jpg"
+heroImage: "../../assets/cat-ai-agent-1.jpg"
 slug: "deepseek-100-use-cases"
 ---
 

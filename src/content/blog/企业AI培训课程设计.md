@@ -8,7 +8,7 @@ slug: "enterprise-ai-training-course-design"
 author: "杨东波"
 tags: ["企业AI培训", "课程设计", "AI办公提效"]
 category: "企业 AI 培训"
-heroImage: "../../assets/work1.jpg"
+heroImage: "../../assets/cat-enterprise-ai-training-1.jpg"
 ---
 
 企业 AI 培训课程应从业务目标倒推，而不是从工具菜单开始。有效课程要回答五件事：谁来学、要解决什么任务、允许使用什么数据、怎样练习、培训后如何验证结果。

@@ -8,7 +8,7 @@ slug: "enterprise-ai-agent-dify-guide"
 author: "杨东波"
 tags: ["AI智能体", "Dify", "企业知识库"]
 category: "AI 应用与智能体"
-heroImage: "../../assets/tech2.jpg"
+heroImage: "../../assets/cat-ai-agent-1.jpg"
 ---
 
 企业需要 AI 智能体的前提是：任务重复、输入和输出相对明确、资料可用、结果能够复核。Dify 适合快速验证知识库问答、内容处理和流程编排，但它不能自动解决数据质量差、权限混乱或业务规则不清的问题。

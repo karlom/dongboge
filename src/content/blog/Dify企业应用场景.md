@@ -8,7 +8,7 @@ slug: "dify-enterprise-use-cases"
 author: "杨东波"
 tags: ["Dify", "企业AI", "工作流"]
 category: "AI 应用与智能体"
-heroImage: "../../assets/tech.jpg"
+heroImage: "../../assets/cat-ai-agent-2.jpg"
 ---
 
 Dify 适合快速验证知识库问答、文本处理、内容生成和多步骤 AI 工作流。它最适合任务边界清楚、输入输出可检查、需要连接模型或知识库的场景；对于规则频繁变化、权限极复杂或要求确定性执行的核心交易流程，应先做更严格的架构评估。
