@@ -103,12 +103,17 @@ async function incrementalBuild(changes) {
     log('blue', '🔨 开始增量构建...');
 
     try {
+        const assetChanges = changes.assets || [];
         const sourceChanges = changes.source || [];
 
-        // 如果有博客或构建相关变更，需要重新构建
-        if (changes.blog.length > 0 || sourceChanges.length > 0) {
+        // 如果有博客、静态资源或构建相关变更，需要重新构建
+        if (changes.blog.length > 0 || assetChanges.length > 0 || sourceChanges.length > 0) {
             if (changes.blog.length > 0) {
                 log('yellow', `📝 检测到 ${changes.blog.length} 个博客文章变更`);
+            }
+
+            if (assetChanges.length > 0) {
+                log('yellow', `🖼️ 检测到 ${assetChanges.length} 个静态资源变更`);
             }
 
             if (sourceChanges.length > 0) {
@@ -124,7 +129,7 @@ async function incrementalBuild(changes) {
             log('green', '✅ 构建完成');
             return true;
         } else {
-            log('cyan', '⏭️ 没有博客或构建相关变更，跳过构建');
+            log('cyan', '⏭️ 没有博客、静态资源或构建相关变更，跳过构建');
             return false;
         }
     } catch (error) {
