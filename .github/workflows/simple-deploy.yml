@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, master]
     paths:
-      - "src/content/blog/**"
+      - "src/**"
       - "public/images/**"
       - "src/assets/**"
       - "scripts/simple-deploy.js"

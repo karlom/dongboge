@@ -103,9 +103,17 @@ async function incrementalBuild(changes) {
     log('blue', '🔨 开始增量构建...');
 
     try {
-        // 如果有博客变更，需要重新构建
-        if (changes.blog.length > 0) {
-            log('yellow', `📝 检测到 ${changes.blog.length} 个博客文章变更`);
+        const sourceChanges = changes.source || [];
+
+        // 如果有博客或构建相关变更，需要重新构建
+        if (changes.blog.length > 0 || sourceChanges.length > 0) {
+            if (changes.blog.length > 0) {
+                log('yellow', `📝 检测到 ${changes.blog.length} 个博客文章变更`);
+            }
+
+            if (sourceChanges.length > 0) {
+                log('yellow', `🧩 检测到 ${sourceChanges.length} 个构建相关变更`);
+            }
 
             // 运行Astro构建（只构建必要的部分）
             log('blue', '⚡ 运行Astro构建...');
@@ -116,7 +124,7 @@ async function incrementalBuild(changes) {
             log('green', '✅ 构建完成');
             return true;
         } else {
-            log('cyan', '⏭️ 没有博客变更，跳过构建');
+            log('cyan', '⏭️ 没有博客或构建相关变更，跳过构建');
             return false;
         }
     } catch (error) {
@@ -157,12 +165,14 @@ async function main() {
                 slug: 'force-rebuild'
             }];
             changes.assets = changes.assets.length > 0 ? changes.assets : ['force-rebuild'];
-            changes.total = changes.blog.length + changes.assets.length;
+            changes.source = changes.source || [];
+            changes.total = changes.blog.length + changes.assets.length + changes.source.length;
         }
 
         log('yellow', `📊 变更统计:`);
         log('yellow', `  - 博客文章: ${changes.blog.length}`);
         log('yellow', `  - 静态资源: ${changes.assets.length}`);
+        log('yellow', `  - 构建相关: ${(changes.source || []).length}`);
         log('yellow', `  - 总计: ${changes.total}`);
 
         // 3. 增量构建
@@ -197,6 +207,7 @@ async function main() {
         log('cyan', `⏱️ 总耗时: ${duration}秒`);
         log('cyan', `📝 博客更新: ${changes.blog.length} 篇`);
         log('cyan', `🖼️ 资源更新: ${changes.assets.length} 个`);
+        log('cyan', `🧩 构建相关更新: ${(changes.source || []).length} 个`);
         log('cyan', `🌐 网站: https://dongboge.cn`);
 
         if (changes.blog.length > 0) {

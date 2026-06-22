@@ -184,6 +184,31 @@ function getAllAssetFiles() {
     return files;
 }
 
+// 判断是否为会影响站点输出或部署流程的源码/配置文件
+function isBuildRelevantFile(file) {
+    const sourcePrefixes = [
+        'src/components/',
+        'src/layouts/',
+        'src/pages/',
+        'src/styles/',
+        'src/utils/',
+        'scripts/modules/',
+    ];
+
+    const sourceFiles = [
+        'src/cdnConfig.ts',
+        'scripts/simple-deploy.js',
+        'astro.config.mjs',
+        'tailwind.config.mjs',
+        'tsconfig.json',
+        'package.json',
+        'package-lock.json'
+    ];
+
+    return sourcePrefixes.some(prefix => file.startsWith(prefix)) ||
+        sourceFiles.includes(file);
+}
+
 // 检测变更
 export async function detectChanges() {
     console.log('🔍 开始检测文件变更...');
@@ -191,6 +216,7 @@ export async function detectChanges() {
     const changes = {
         blog: [],
         assets: [],
+        source: [],
         total: 0
     };
 
@@ -237,6 +263,15 @@ export async function detectChanges() {
                     } else {
                         console.log(`  ⚠️ 资源文件不存在: ${file}`);
                     }
+                } else if (isBuildRelevantFile(file)) {
+                    console.log(`  🧩 识别为构建相关变更: ${file}`);
+
+                    if (fs.existsSync(file)) {
+                        changes.source.push(file);
+                        console.log(`  ✅ 构建相关变更: ${file}`);
+                    } else {
+                        console.log(`  ⚠️ 构建相关文件不存在，可能已被删除: ${file}`);
+                    }
                 } else {
                     console.log(`  ⏭️ 跳过文件（不匹配规则）: ${file}`);
                     console.log(`    - 包含src/content/blog/: ${file.includes('src/content/blog/')}`);
@@ -273,9 +308,11 @@ export async function detectChanges() {
                     console.log(`  🖼️ 最近修改: ${file}`);
                 }
             });
+
+            changes.source = [];
         }
 
-        changes.total = changes.blog.length + changes.assets.length;
+        changes.total = changes.blog.length + changes.assets.length + changes.source.length;
 
         console.log(`✅ 变更检测完成: ${changes.total} 个文件`);
 

@@ -35,6 +35,7 @@ if (typeof src === "string") {
     src.startsWith("/src/assets/")
   ) {
     // 已经是完整URL或已经处理过的路径，直接使用
+    // /_astro/ 是 Astro 构建后的实际 CDN 路径，不能再改写到旧的 /assets/ 兼容路径
     finalSrc = src.startsWith("/_astro/") ? cdnUrl(src) : src;
   } else {
     // 需要处理的相对路径
