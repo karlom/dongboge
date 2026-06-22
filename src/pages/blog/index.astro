@@ -8,12 +8,19 @@ import FormattedDate from "../../components/FormattedDate.astro";
 import Header from "../../components/Header.astro";
 import OptimizedImage from "../../components/OptimizedImage.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
+import { BLOG_CATEGORIES } from "../../data/blogCategories";
 import { getProcessedBlogCollection } from "../../utils/contentUtils";
 import { getPostUrl } from "../../utils/contentUtils";
 
 // 使用处理过的博客集合
 const posts = (await getProcessedBlogCollection()).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const categoryCounts = Object.fromEntries(
+  BLOG_CATEGORIES.map((category) => [
+    category,
+    posts.filter((post) => post.data.category === category).length,
+  ]),
 );
 ---
 
@@ -210,6 +217,57 @@ const posts = (await getProcessedBlogCollection()).sort(
         color: var(--text-secondary);
       }
 
+      .category-filter {
+        margin: 0 auto 2.5rem;
+      }
+
+      .category-filter h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.9rem;
+      }
+
+      .category-filter-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+      }
+
+      .category-filter-button {
+        border: 1px solid var(--border-color-light);
+        border-radius: 9999px;
+        background: #fff;
+        color: var(--text-on-light);
+        cursor: pointer;
+        font-size: 0.875rem;
+        line-height: 1;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+      }
+
+      .category-filter-button:hover {
+        border-color: var(--action-blue);
+        color: var(--action-blue);
+      }
+
+      .category-filter-button[aria-pressed="true"] {
+        background: var(--bg-dark);
+        border-color: var(--bg-dark);
+        color: var(--text-on-dark);
+      }
+
+      .blog-card-category {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 9999px;
+        background: rgba(11, 105, 163, 0.1);
+        color: var(--action-blue);
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        padding: 0.4rem 0.7rem;
+      }
+
       .blog-card-date svg {
         width: 1rem;
         height: 1rem;
@@ -287,12 +345,38 @@ const posts = (await getProcessedBlogCollection()).sort(
           暂无符合条件的文章，尝试换个关键词。
         </p>
       </div>
+      <section class="category-filter" aria-labelledby="categoryFilterTitle">
+        <h2 id="categoryFilterTitle">按分类浏览</h2>
+        <div class="category-filter-list" role="group" aria-label="文章分类">
+          <button
+            class="category-filter-button"
+            type="button"
+            data-category-filter="全部"
+            aria-pressed="true"
+          >
+            全部（{posts.length}）
+          </button>
+          {
+            BLOG_CATEGORIES.map((category) => (
+              <button
+                class="category-filter-button"
+                type="button"
+                data-category-filter={category}
+                aria-pressed="false"
+              >
+                {category}（{categoryCounts[category]}）
+              </button>
+            ))
+          }
+        </div>
+      </section>
       <ul class="blog-grid">
         {
           posts.map((post) => (
             <li
               class="blog-card"
-              data-search-content={`${post.data.title} ${post.data.description} ${post.data.tags?.join(" ") ?? ""}`}
+              data-category={post.data.category}
+              data-search-content={`${post.data.title} ${post.data.description} ${post.data.category} ${post.data.tags?.join(" ") ?? ""}`}
             >
               <a href={getPostUrl(post)}>
                 {post.data.heroImage && (
@@ -306,6 +390,7 @@ const posts = (await getProcessedBlogCollection()).sort(
                   </div>
                 )}
                 <div class="blog-card-content">
+                  <span class="blog-card-category">{post.data.category}</span>
                   <h2 class="blog-card-title">{post.data.title}</h2>
                   <div class="blog-card-date">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,6 +419,10 @@ const posts = (await getProcessedBlogCollection()).sort(
       const cards = Array.from(
         document.querySelectorAll<HTMLElement>('[data-search-content]'),
       );
+      const categoryButtons = Array.from(
+        document.querySelectorAll<HTMLButtonElement>('[data-category-filter]'),
+      );
+      let activeCategory = '全部';
 
       function filterPosts() {
         if (!cards.length) {
@@ -342,20 +431,13 @@ const posts = (await getProcessedBlogCollection()).sort(
 
         const keyword = (searchInput?.value || '').trim().toLowerCase();
 
-        if (!keyword) {
-          cards.forEach((card) => {
-            card.hidden = false;
-          });
-          if (emptyTip) {
-            emptyTip.hidden = true;
-          }
-          return;
-        }
-
         let visibleCount = 0;
         cards.forEach((card) => {
           const haystack = card.dataset.searchContent?.toLowerCase() || '';
-          const matched = haystack.includes(keyword);
+          const matchesKeyword = !keyword || haystack.includes(keyword);
+          const matchesCategory =
+            activeCategory === '全部' || card.dataset.category === activeCategory;
+          const matched = matchesKeyword && matchesCategory;
           card.hidden = !matched;
           if (matched) {
             visibleCount += 1;
@@ -368,6 +450,18 @@ const posts = (await getProcessedBlogCollection()).sort(
       }
 
       searchInput?.addEventListener('input', filterPosts);
+      categoryButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          activeCategory = button.dataset.categoryFilter || '全部';
+          categoryButtons.forEach((item) => {
+            item.setAttribute(
+              'aria-pressed',
+              String(item.dataset.categoryFilter === activeCategory),
+            );
+          });
+          filterPosts();
+        });
+      });
     </script>
   </body>
 </html>

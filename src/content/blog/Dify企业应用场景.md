@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "dify-enterprise-use-cases"
 author: "杨东波"
 tags: ["Dify", "企业AI", "工作流"]
+category: "AI 应用与智能体"
 heroImage: "../../assets/tech.jpg"
 ---
 

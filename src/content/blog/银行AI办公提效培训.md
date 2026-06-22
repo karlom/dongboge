@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "bank-ai-productivity-training"
 author: "杨东波"
 tags: ["银行AI培训", "AI办公提效", "数据安全"]
+category: "企业 AI 培训"
 heroImage: "../../assets/work.jpg"
 ---
 

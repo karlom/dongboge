@@ -4,6 +4,7 @@ description: "探讨人工智能如何重塑现代企业的运营模式，以及
 pubDate: "Jul 08 2022"
 heroImage: "../../assets/zhailu.jpg"
 tags: ["人工智能", "AI", "数字化转型", "企业管理"]
+category: "AI 应用与智能体"
 slug: "ai-enterprise-digital-transformation-guide"
 ---
 

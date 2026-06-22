@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "enterprise-ai-training-course-design"
 author: "杨东波"
 tags: ["企业AI培训", "课程设计", "AI办公提效"]
+category: "企业 AI 培训"
 heroImage: "../../assets/work1.jpg"
 ---
 

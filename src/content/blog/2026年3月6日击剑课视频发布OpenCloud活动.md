@@ -3,6 +3,7 @@ title: "送娃去击剑课，上午研究怎么一天发75条短视频"
 description: "儿子去上击剑课，我在家研究一个博主怎么一天发75条视频；下午去参加 OpenCloud 线下活动，带着大疆出门。"
 pubDate: "Mar 06, 2026"
 tags: ["生活", "工作"]
+category: "工作与商业"
 heroImage: "../../assets/life.jpg"
 slug: "2026-03-06-fencing-video-opencloud"
 ---

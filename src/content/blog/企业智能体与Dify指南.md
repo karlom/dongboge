@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "enterprise-ai-agent-dify-guide"
 author: "杨东波"
 tags: ["AI智能体", "Dify", "企业知识库"]
+category: "AI 应用与智能体"
 heroImage: "../../assets/tech2.jpg"
 ---
 

@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "guangzhou-enterprise-ai-training-selection"
 author: "杨东波"
 tags: ["广州AI培训", "企业AI培训", "培训选型"]
+category: "企业 AI 培训"
 heroImage: "../../assets/work2.jpg"
 ---
 

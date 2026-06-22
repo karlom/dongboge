@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "measure-enterprise-ai-training-results"
 author: "杨东波"
 tags: ["企业AI培训", "培训评估", "AI落地"]
+category: "企业 AI 培训"
 heroImage: "../../assets/success.jpg"
 ---
 

@@ -3,6 +3,7 @@ title: "决定了，我要做deepseek培训！"
 description: "# 从此以后请叫我：AI培训师东波哥😊。 上周六的早上醒来后躺在床上冥想，突然想通了一件事：**我要做ai培训 [&hellip;]"
 pubDate: "Jul 19, 2025"
 tags: ["工作"]
+category: "工作与商业"
 heroImage: "../../assets/work.jpg"
 slug: "decided-to-do-deepseek-training"
 ---

@@ -3,6 +3,7 @@ title: "AI时代的企业数字化转型实践指南"
 description: "探讨人工智能如何重塑现代企业的运营模式，分享数字化转型的实践经验和成功案例。"
 pubDate: "Dec 15 2024"
 tags: ["人工智能", "数字化转型", "企业管理", "AI应用"]
+category: "AI 应用与智能体"
 heroImage: "../../assets/default1.jpg"
 slug: "ai-era-digital-transformation-guide"
 ---

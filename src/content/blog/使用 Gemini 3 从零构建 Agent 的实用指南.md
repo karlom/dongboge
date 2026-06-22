@@ -4,6 +4,7 @@ description: "核心思想非常简单：它是一个在循环中运行的大语
 pubDate: "Nov 21, 2025"
 slug: "build-agent-from-scratch-with-gemini-3"
 tags: ["技术", "摘录"]
+category: "AI 应用与智能体"
 heroImage: "../../assets/tech.jpg"
 ---
 # 使用 Gemini 3 从零构建 Agent 的实用指南

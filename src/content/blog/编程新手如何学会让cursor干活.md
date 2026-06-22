@@ -3,6 +3,7 @@ title: "编程新手如何学会让cursor干活"
 description: "现在假设你是公司的产品经理，你要带一个会编程的新手。你打算咋办？ 是给他下个：\"自己学学，然后把淘宝做出来的命 [&hellip;]"
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
+category: "技术实践"
 heroImage: '../../assets/tech2.jpg'
 slug: "how-beginners-learn-cursor-ai-coding"
 ---

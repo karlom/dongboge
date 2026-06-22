@@ -3,6 +3,7 @@ title: "你的AI agent能卖多少钱是由什么决定的"
 description: "是什么决定了你的AI Agent能卖多少钱？ 记住这个公式： 场景价值=人数*单位时间用人成本*使用频率*单次 [&hellip;]"
 pubDate: "Jul 19, 2025"
 tags: ["摘录"]
+category: "AI 应用与智能体"
 heroImage: '../../assets/zhailu2.jpg'
 slug: "what-determines-ai-agent-pricing"
 ---

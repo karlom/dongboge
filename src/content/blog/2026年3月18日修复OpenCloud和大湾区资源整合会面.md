@@ -3,6 +3,7 @@ title: "上午修东京节点，下午拿着 PPT 去谈资源整合"
 description: "修复东京节点的 OpenCloud 功能，然后做了一份 18 页的 PPT，带着它去港澳大湾区创新中心谈资源整合的事情。"
 pubDate: "Mar 18, 2026"
 tags: ["技术", "工作"]
+category: "技术实践"
 heroImage: "../../assets/work.jpg"
 slug: "2026-03-18-opencloud-fix-bay-area-meeting"
 ---

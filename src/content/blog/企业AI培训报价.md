@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "enterprise-ai-training-pricing"
 author: "杨东波"
 tags: ["企业AI培训", "培训报价", "课程采购"]
+category: "企业 AI 培训"
 heroImage: "../../assets/default1.jpg"
 ---
 

@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "enterprise-ai-usage-policy"
 author: "杨东波"
 tags: ["AI治理", "数据安全", "企业AI"]
+category: "AI 应用与智能体"
 references: ["https://www.nist.gov/itl/ai-risk-management-framework"]
 heroImage: "../../assets/tech1.jpg"
 ---

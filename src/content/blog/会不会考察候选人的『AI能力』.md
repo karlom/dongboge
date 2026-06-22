@@ -3,6 +3,7 @@ title: "会不会考察候选人的『AI能力』"
 description: "根据前些天 X 友们的讨论，总结了一下：《不会考察候选人的「AI能力」？你可能招不到未来的人才！》 你有没有发 [&hellip;]"
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
+category: "技术实践"
 heroImage: '../../assets/tech2.jpg'
 slug: "will-companies-test-ai-skills"
 ---

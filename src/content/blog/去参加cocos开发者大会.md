@@ -3,6 +3,7 @@ title: "去参加cocos开发者大会"
 description: "# 去参加cocos开发者大会 今天下午是老蔡喵组织的cocos开发者大会的日子，我昨天晚上就跟老婆说过这个安 [&hellip;]"
 pubDate: "Jul 19, 2025"
 tags: ["工作"]
+category: "工作与商业"
 heroImage: '../../assets/work2.jpg'
 slug: "attending-cocos-developer-conference"
 ---

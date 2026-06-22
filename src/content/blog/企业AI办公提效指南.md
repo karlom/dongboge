@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "enterprise-ai-productivity-guide"
 author: "杨东波"
 tags: ["AI办公提效", "企业培训", "岗位场景"]
+category: "企业 AI 培训"
 heroImage: "../../assets/work.jpg"
 ---
 

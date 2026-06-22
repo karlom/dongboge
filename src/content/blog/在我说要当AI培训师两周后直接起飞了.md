@@ -3,6 +3,7 @@ title: "在我说要当AI培训师两周后直接起飞了"
 description: "不知不觉这周已经过去两天了，昨天下午去见了老甘之后回来路上去花城汇吃了个黑山牛肉汤，因为上午已经收到了周日的课 [&hellip;]"
 pubDate: "Jul 19, 2025"
 tags: ["工作"]
+category: "企业 AI 培训"
 heroImage: '../../assets/work2.jpg'
 slug: "ai-trainer-career-took-off-after-two-weeks"
 ---

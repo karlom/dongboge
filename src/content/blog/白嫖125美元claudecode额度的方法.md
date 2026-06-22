@@ -3,6 +3,7 @@ title: "白嫖150美金额度+claude code 保姆级部署教程"
 description: "Claude Code 保姆级部署教程：Node.js 安装、全局安装 CLI、CodeMirror 注册送 125 美金、配置 ANTHROPIC_BASE_URL 与令牌，设定 125 美元额度与模型，稳定获取免费 AI 编程体验。"
 pubDate: "2025-10-21"
 tags: ["商业探索", "AI培训", "claude code教程"]
+category: "技术实践"
 heroImage: "../../assets/tech1.jpg"
 slug: "claude-code-150usd-free-setup"
 ---

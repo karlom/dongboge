@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "custom-ai-agent-vs-saas"
 author: "杨东波"
 tags: ["AI智能体", "SaaS选型", "Dify"]
+category: "AI 应用与智能体"
 heroImage: "../../assets/default.jpg"
 ---
 

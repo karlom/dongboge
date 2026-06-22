@@ -3,6 +3,7 @@ title: "陪人去越秀地产谈 AI 落地，然后踩坑踩了一天"
 description: "一顿饭局引出一个财务部的 AI 落地项目，下午回来又扎进日记系统搭建，踩坑无数，最后调通了。"
 pubDate: "Mar 05, 2026"
 tags: ["工作", "技术"]
+category: "技术实践"
 heroImage: "../../assets/work1.jpg"
 slug: "2026-03-05-cherry-studio-biztrip"
 ---

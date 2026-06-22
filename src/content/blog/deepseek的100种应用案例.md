@@ -3,6 +3,7 @@ title: "deepseek的100种应用案例"
 description: "# DeepSeek的100种应用场景 以下100个场景展示了DeepSeek在不同领域的广泛应用，体现了其强 [&hellip;]"
 pubDate: "Jul 19, 2025"
 tags: ["技术"]
+category: "AI 应用与智能体"
 heroImage: "../../assets/tech.jpg"
 slug: "deepseek-100-use-cases"
 ---

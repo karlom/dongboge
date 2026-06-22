@@ -3,6 +3,7 @@ title: "开了个新坑：写一份Dify的教程"
 description: "这周一的时候我把Dify搭建知识库+对接微信公众号的服务文章发出去之后就开始着手准备写一个Dify使用教程。 [&hellip;]"
 pubDate: "Jul 18, 2025"
 tags: ["工作"]
+category: "AI 应用与智能体"
 heroImage: "../../assets/work.jpg"
 slug: "started-writing-dify-tutorial"
 ---

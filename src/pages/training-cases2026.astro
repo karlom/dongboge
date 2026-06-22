@@ -1,0 +1,797 @@
+---
+export const prerender = true;
+
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import OptimizedImage from "../components/OptimizedImage.astro";
+import { cdnUrl } from "../cdnConfig";
+
+type TrainingCase = {
+  id: string;
+  name: string;
+  industry: string;
+  topic: string;
+  date: string;
+  sortDate: string;
+  participants: string;
+  duration: string;
+  format: string;
+  location: string;
+  headline: string;
+  summary: string;
+  feedback: string;
+  highlights: string[];
+  images: string[];
+  featured?: boolean;
+};
+
+const placeholderImage = "/images/blog_images/default2.jpg";
+
+const trainingCases: TrainingCase[] = [
+  {
+    id: "guangxi-jiaotou",
+    name: "广西交投",
+    industry: "国企央企",
+    topic: "AI基础与办公",
+    date: "2025-11-13",
+    sortDate: "2025-11-13",
+    participants: "10人",
+    duration: "6小时",
+    format: "线下内训",
+    location: "广西",
+    headline: "外省客户深度培训，单场高客单项目",
+    summary: "围绕企业办公提效与业务应用场景展开实操培训，重点帮助团队建立可直接复用的 AI 工作流。",
+    feedback: "反馈重点：课程节奏扎实，方法可直接迁移到一线业务流程。",
+    highlights: ["外省客户", "6小时深训", "渠道合作"],
+    images: [],
+    featured: true,
+  },
+  {
+    id: "yuexiu-telecom",
+    name: "越秀电信",
+    industry: "国企央企",
+    topic: "销售/营销",
+    date: "2025-11-27",
+    sortDate: "2025-11-27",
+    participants: "业务团队",
+    duration: "6小时",
+    format: "线下内训",
+    location: "广州",
+    headline: "转介绍成交的电信行业 AI 销售培训",
+    summary: "培训聚焦销售场景中的需求分析、方案生成、客户沟通与复盘提效，帮助团队把 AI 真正接入销售动作。",
+    feedback: "反馈重点：课程贴近销售日常，落地路径清晰。",
+    highlights: ["转介绍", "行业定制", "销售训练"],
+    images: [],
+  },
+  {
+    id: "tianhe-science",
+    name: "天河区科普促进会",
+    industry: "政府/协会",
+    topic: "AI基础与办公",
+    date: "2025-09-29",
+    sortDate: "2025-09-29",
+    participants: "协会成员",
+    duration: "6小时",
+    format: "线下工作坊",
+    location: "广州",
+    headline: "6 小时智能办公提效工作坊",
+    summary: "从日常文档、信息整理到内容生成与流程自动化，系统拆解 AI 办公提效方法，适合非技术团队快速上手。",
+    feedback: "反馈重点：案例真实、节省时间，回去即可组织内部复用。",
+    highlights: ["协会客户", "6小时", "办公提效"],
+    images: [],
+  },
+  {
+    id: "aqf",
+    name: "爱齐福",
+    industry: "互联网科技",
+    topic: "AI基础与办公",
+    date: "2025-08-01 至 2025-09",
+    sortDate: "2025-09-01",
+    participants: "三期工作坊",
+    duration: "6小时/期",
+    format: "线下工作坊",
+    location: "广州",
+    headline: "连续三期复购的 AI 办公工作坊",
+    summary: "围绕办公效率、内容产出和流程协同设计课程，多期迭代交付，帮助团队从尝试使用走向稳定使用。",
+    feedback: "反馈重点：内容不是空讲概念，而是能直接进入团队工作台。",
+    highlights: ["3期复购", "协会介绍", "工作坊"],
+    images: [],
+    featured: true,
+  },
+  {
+    id: "zhujiang-guangyao",
+    name: "珠江啤酒 + 广药集团",
+    industry: "医药健康",
+    topic: "DeepSeek/智能体",
+    date: "2025-05-29",
+    sortDate: "2025-05-29",
+    participants: "联合培训",
+    duration: "7小时",
+    format: "联合培训",
+    location: "广州",
+    headline: "跨企业联合培训，聚焦 DeepSeek 实战",
+    summary: "面向多业务背景学员设计统一课程框架，通过工具演示和现场练习，提升跨组织培训的可复制性。",
+    feedback: "反馈重点：案例兼顾战略理解和实操步骤，适合部门内部继续扩散。",
+    highlights: ["联合培训", "7小时", "DeepSeek实战"],
+    images: [],
+  },
+  {
+    id: "guangzhou-youth",
+    name: "广州团校",
+    industry: "教育培训",
+    topic: "AI基础与办公",
+    date: "2025-05-28",
+    sortDate: "2025-05-28",
+    participants: "100+人",
+    duration: "0.5小时",
+    format: "线下分享",
+    location: "广州团校",
+    headline: "面向青年团干部的 AI 素养提升课",
+    summary: "围绕青年干部日常工作中的内容整理、汇报表达与效率工具使用展开分享，帮助学员建立对 AI 的正确认知。",
+    feedback: "反馈重点：内容简洁明快，适合作为组织内部 AI 启蒙场。",
+    highlights: ["100+人", "高校群体", "已形成复购线索"],
+    images: [
+      "/images/training/guangzhou-youth/img1.jpg",
+      "/images/training/guangzhou-youth/img2.jpg",
+      "/images/training/guangzhou-youth/img3.jpg",
+      "/images/training/guangzhou-youth/img4.jpg",
+    ],
+    featured: true,
+  },
+  {
+    id: "caizhi-lin",
+    name: "广药集团采芝林",
+    industry: "医药健康",
+    topic: "AI基础与办公",
+    date: "2025-04-24",
+    sortDate: "2025-04-24",
+    participants: "企业团队",
+    duration: "8小时",
+    format: "线下内训",
+    location: "采芝林总部",
+    headline: "8 小时深训，聚焦医药企业 AI 办公提效",
+    summary: "课程从 AI 工具认知切入，延展到医药企业办公、营销与内容产出场景，强调一整天的高密度实战演练。",
+    feedback: "反馈重点：培训内容贴近业务，能明显减少重复性工作。",
+    highlights: ["广药系", "8小时", "场景实战"],
+    images: [
+      "/images/training/caizhi-lin/img1.jpg",
+      "/images/training/caizhi-lin/img2.jpg",
+      "/images/training/caizhi-lin/img3.jpg",
+      "/images/training/caizhi-lin/img4.jpg",
+    ],
+    featured: true,
+  },
+  {
+    id: "guangzhou-transport",
+    name: "广州交通集团",
+    industry: "国企央企",
+    topic: "AI基础与办公",
+    date: "2025-04-08",
+    sortDate: "2025-04-08",
+    participants: "约100人",
+    duration: "专题培训",
+    format: "线下内训",
+    location: "广州交通集团总部",
+    headline: "百人规模交通行业 AI 应用培训",
+    summary: "围绕智慧交通、组织协同和通用办公效率工具展开分享，帮助大型组织快速建立 AI 使用共识。",
+    feedback: "反馈重点：案例与国企工作场景结合紧密，推广难度低。",
+    highlights: ["约100人", "交通行业", "大型组织"],
+    images: [
+      "/images/training/guangzhou-transport/img1.jpg",
+      "/images/training/guangzhou-transport/img2.jpg",
+      "/images/training/guangzhou-transport/img3.jpg",
+      "/images/training/guangzhou-transport/img4.jpg",
+    ],
+    featured: true,
+  },
+  {
+    id: "news-association",
+    name: "广州市新闻工作者协会",
+    industry: "媒体机构",
+    topic: "新闻与内容",
+    date: "2025-03-26",
+    sortDate: "2025-03-26",
+    participants: "300+人",
+    duration: "大型分享",
+    format: "线下大会",
+    location: "广州",
+    headline: "300+ 人大场，形成后续转介绍链条",
+    summary: "围绕新闻生产、内容协作与 AI 辅助写作展开分享，是典型的大场传播型培训项目，也是多个后续合作的起点。",
+    feedback: "反馈重点：既开阔视野，又给出了能立刻使用的内容工作流。",
+    highlights: ["300+人", "转介绍起点", "媒体场景"],
+    images: [
+      "/images/training/news-association/img1.jpg",
+      "/images/training/news-association/img2.jpg",
+      "/images/training/news-association/img3.jpg",
+      "/images/training/news-association/img4.jpg",
+    ],
+    featured: true,
+  },
+  {
+    id: "pacific-computer",
+    name: "太平洋电脑网",
+    industry: "媒体机构",
+    topic: "DeepSeek/智能体",
+    date: "2025-03",
+    sortDate: "2025-03-20",
+    participants: "约70人/期",
+    duration: "5小时/期",
+    format: "训练营",
+    location: "广州",
+    headline: "第一场标杆训练营，连续三期复购",
+    summary: "以 DeepSeek 训练营形式交付，围绕内容团队与新媒体岗位的实际使用方式做集中训练，是复购表现最突出的早期案例之一。",
+    feedback: "反馈重点：训练营结构清晰，团队成员上手速度快。",
+    highlights: ["3期复购", "70人/期", "训练营"],
+    images: [],
+    featured: true,
+  },
+  {
+    id: "hengrun-school",
+    name: "恒润学校家委会",
+    industry: "教育培训",
+    topic: "AI基础与办公",
+    date: "2025-03-07",
+    sortDate: "2025-03-07",
+    participants: "家长群体",
+    duration: "1.5小时",
+    format: "线下分享",
+    location: "广州",
+    headline: "面向家长群体的 AI 启蒙与应用分享",
+    summary: "课程重点放在通俗易懂的 AI 使用认知和生活、学习场景中的效率提升，适合非技术背景人群快速理解。",
+    feedback: "反馈重点：讲法接地气，降低了普通家庭接触 AI 的门槛。",
+    highlights: ["1.5小时", "家长群体", "AI启蒙"],
+    images: [
+      "/images/training/hengrun-school/img1.jpg",
+      "/images/training/hengrun-school/img2.jpg",
+      "/images/training/hengrun-school/img3.jpg",
+      "/images/training/hengrun-school/img4.jpg",
+    ],
+  },
+  {
+    id: "huanan-tech",
+    name: "华南理工大学",
+    industry: "高等院校",
+    topic: "AI编程/开发",
+    date: "2025年高校合作分享",
+    sortDate: "2025-02-28",
+    participants: "师生群体",
+    duration: "专题分享",
+    format: "高校合作",
+    location: "华南理工大学",
+    headline: "高校合作案例，聚焦 AI 前沿与实践启发",
+    summary: "作为高校合作分享案例，内容更偏向 AI 技术趋势、应用实践与职业视野拓展，不作为独立付费培训项目展示。",
+    feedback: "反馈重点：兼顾技术前沿与职业发展视角，适合高校场景传播。",
+    highlights: ["高校合作", "技术前沿", "师生群体"],
+    images: [
+      "/images/training/huanan-tech/img1.jpg",
+      "/images/training/huanan-tech/img2.jpg",
+      "/images/training/huanan-tech/img3.jpg",
+      "/images/training/huanan-tech/img4.jpg",
+    ],
+  },
+];
+
+const sortedCases = trainingCases.sort((a, b) =>
+  b.sortDate.localeCompare(a.sortDate)
+);
+
+const industryFilters = [
+  "全部",
+  "高等院校",
+  "国企央企",
+  "医药健康",
+  "媒体机构",
+  "教育培训",
+  "政府/协会",
+  "互联网科技",
+];
+
+const topicFilters = [
+  "全部",
+  "AI基础与办公",
+  "DeepSeek/智能体",
+  "新闻与内容",
+  "AI编程/开发",
+  "销售/营销",
+];
+
+const featuredCases = sortedCases.filter((case_) => case_.featured).slice(0, 4);
+
+const stats = [
+  { value: "20+", label: "合作企业/机构", accent: "text-amber-300" },
+  { value: "1000+", label: "培训学员", accent: "text-cyan-300" },
+  { value: "98%+", label: "综合满意度", accent: "text-emerald-300" },
+  { value: "8+", label: "覆盖行业", accent: "text-rose-300" },
+];
+
+const keywords =
+  "企业AI培训案例,AI培训客户案例,DeepSeek培训,Dify培训,企业内训,AI办公提效,广州AI培训,企业数字化转型,AI实战培训";
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "企业AI培训案例 2026",
+  description:
+    "精选企业AI培训案例，涵盖国企、高校、媒体、医药与协会客户，展示AI办公提效、DeepSeek训练营与行业内训成果。",
+  url: "https://www.dongboge.cn/training-cases2026",
+  mainEntity: {
+    "@type": "ItemList",
+    itemListElement: sortedCases.map((case_, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: case_.name,
+      description: case_.headline,
+    })),
+  },
+};
+---
+
+<Layout
+  title="企业AI培训案例2026_精选客户案例与实战成果 - 东波哥"
+  description="查看东波哥 2025-2026 企业AI培训精选案例，覆盖国企、高校、媒体、医药、协会等行业，包含复购训练营、大场分享、AI办公提效与DeepSeek实战培训。"
+>
+  <meta slot="head" name="keywords" content={keywords} />
+  <meta slot="head" property="og:title" content="企业AI培训案例2026_精选客户案例与实战成果" />
+  <meta
+    slot="head"
+    property="og:description"
+    content="12条精选企业AI培训案例，覆盖国企、高校、媒体、医药与协会客户，展示复购、大场与行业定制培训成果。"
+  />
+  <meta slot="head" property="og:type" content="website" />
+  <meta
+    slot="head"
+    property="og:url"
+    content="https://www.dongboge.cn/training-cases2026"
+  />
+  <meta slot="head" property="og:image" content={cdnUrl("/images/hero1.png")} />
+  <meta slot="head" name="twitter:card" content="summary_large_image" />
+  <meta
+    slot="head"
+    name="twitter:title"
+    content="企业AI培训案例2026_精选客户案例与实战成果"
+  />
+  <meta
+    slot="head"
+    name="twitter:description"
+    content="复购训练营、大场分享、行业定制内训，集中展示东波哥企业AI培训代表案例。"
+  />
+  <meta slot="head" name="twitter:image" content={cdnUrl("/images/hero1.png")} />
+  <link
+    slot="head"
+    rel="canonical"
+    href="https://www.dongboge.cn/training-cases2026"
+  />
+  <script
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(structuredData)}
+  />
+
+  <div class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <Header />
+  </div>
+
+  <nav class="bg-white border-b border-slate-200 pt-20 pb-4" aria-label="面包屑导航">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <ol class="flex items-center space-x-2 text-sm text-slate-500">
+        <li><a href="/" class="hover:text-sky-700 transition-colors">首页</a></li>
+        <li><span>/</span></li>
+        <li><a href="/training-cases" class="hover:text-sky-700 transition-colors">培训案例</a></li>
+        <li><span>/</span></li>
+        <li class="text-slate-900 font-medium">培训案例 2026</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="relative overflow-hidden bg-slate-950 text-white">
+    <div class="absolute inset-0 hero-grid"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.22),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(251,191,36,0.18),_transparent_30%)]"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-16 sm:pt-20 sm:pb-20">
+      <div class="grid lg:grid-cols-[1.2fr_0.8fr] gap-10 items-end">
+        <div>
+          <span class="inline-flex items-center px-4 py-2 rounded-full border border-white/15 bg-white/5 text-sm text-slate-200 mb-6">
+            2025-2026 企业 AI 培训精选案例
+          </span>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+            看得见复购、行业跨度和真实交付密度的培训案例页
+          </h1>
+          <p class="text-lg sm:text-xl text-slate-300 leading-relaxed max-w-3xl">
+            新页面聚焦 12 条适合对外展示的代表案例，覆盖国企、高校、医药、媒体与协会客户。内容不再只停留在“做过什么”，而是明确呈现项目背景、培训形式、亮点标签与反馈重点。
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3 text-sm text-slate-200">
+            <span class="rounded-full bg-white/10 border border-white/10 px-4 py-2">复购训练营</span>
+            <span class="rounded-full bg-white/10 border border-white/10 px-4 py-2">300+人大场</span>
+            <span class="rounded-full bg-white/10 border border-white/10 px-4 py-2">行业定制内训</span>
+            <span class="rounded-full bg-white/10 border border-white/10 px-4 py-2">AI办公提效</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          {stats.map((stat) => (
+            <div class="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.35)] backdrop-blur-sm">
+              <div class={`text-3xl sm:text-4xl font-bold ${stat.accent}`}>{stat.value}</div>
+              <div class="mt-2 text-sm text-slate-300">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white py-14 sm:py-16 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8">
+        <div class="max-w-3xl">
+          <p class="text-sm font-semibold tracking-[0.2em] text-sky-700 uppercase mb-3">精选案例</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">先看四个最能代表交付能力的样本</h2>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">
+            这里优先展示复购、转介绍、大场和长时段深训四类代表性案例，帮助访客快速建立对交付能力的判断。
+          </p>
+        </div>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {featuredCases.map((case_) => (
+          <article class="rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <span class="inline-flex rounded-full bg-sky-100 text-sky-800 text-xs font-semibold px-3 py-1">
+                {case_.industry}
+              </span>
+              <span class="text-xs text-slate-500">{case_.date}</span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">{case_.name}</h3>
+            <p class="text-sm text-slate-700 leading-relaxed mb-5">{case_.headline}</p>
+            <div class="space-y-2 text-sm text-slate-600">
+              <div>人数：{case_.participants}</div>
+              <div>时长：{case_.duration}</div>
+              <div>形式：{case_.format}</div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-slate-100 py-16 sm:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
+        <div class="max-w-3xl">
+          <p class="text-sm font-semibold tracking-[0.2em] text-sky-700 uppercase mb-3">案例库</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">按行业和主题快速筛选你关心的客户案例</h2>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">
+            每个案例统一呈现项目信息、培训亮点、反馈重点与现场素材。没有现场图的项目会使用统一占位图，确保页面完整度与维护一致性。
+          </p>
+        </div>
+        <div class="rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm text-slate-600 shadow-sm">
+          当前展示 <span class="font-semibold text-slate-900">{sortedCases.length}</span> 条精选案例
+        </div>
+      </div>
+
+      <div class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm mb-8">
+        <div class="space-y-6">
+          <div>
+            <p class="text-sm font-semibold text-slate-800 mb-3">按行业筛选</p>
+            <div class="flex flex-wrap gap-3" data-filter-group="industry">
+              {industryFilters.map((filter) => (
+                <button
+                  type="button"
+                  class={`filter-chip ${filter === "全部" ? "is-active" : ""}`}
+                  data-filter-type="industry"
+                  data-filter-value={filter}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-slate-800 mb-3">按主题筛选</p>
+            <div class="flex flex-wrap gap-3" data-filter-group="topic">
+              {topicFilters.map((filter) => (
+                <button
+                  type="button"
+                  class={`filter-chip ${filter === "全部" ? "is-active" : ""}`}
+                  data-filter-type="topic"
+                  data-filter-value={filter}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cases-grid" class="grid gap-8 xl:grid-cols-2">
+        {sortedCases.map((case_) => {
+          const gallery = case_.images.length > 0 ? case_.images.slice(0, 4) : [placeholderImage];
+          const hasRealImages = case_.images.length > 0;
+
+          return (
+            <article
+              class="case-card overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm"
+              data-industry={case_.industry}
+              data-topic={case_.topic}
+            >
+              <div class="grid lg:grid-cols-[0.95fr_1.05fr]">
+                <div class={`p-4 sm:p-5 ${hasRealImages ? "bg-slate-100" : "bg-slate-900"}`}>
+                  {hasRealImages ? (
+                    <div class="grid grid-cols-2 gap-3">
+                      {gallery.map((image, index) => (
+                        <div class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-200">
+                          <OptimizedImage
+                            src={cdnUrl(image)}
+                            alt={`${case_.name} 培训现场图片 ${index + 1}`}
+                            class="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                            loading="lazy"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div class="relative overflow-hidden rounded-[24px] h-full min-h-[260px]">
+                      <OptimizedImage
+                        src={cdnUrl(placeholderImage)}
+                        alt={`${case_.name} 培训案例占位图`}
+                        class="absolute inset-0 h-full w-full object-cover opacity-30"
+                        loading="lazy"
+                      />
+                      <div class="absolute inset-0 bg-[linear-gradient(160deg,rgba(15,23,42,0.72),rgba(3,105,161,0.58))]"></div>
+                      <div class="relative h-full flex flex-col justify-between p-6 text-white">
+                        <div class="inline-flex w-fit rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs">
+                          统一案例封面
+                        </div>
+                        <div>
+                          <p class="text-xs tracking-[0.3em] uppercase text-sky-100 mb-3">Training Case</p>
+                          <h3 class="text-2xl font-bold leading-tight">{case_.name}</h3>
+                          <p class="mt-3 text-sm text-slate-200">{case_.topic}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div class="p-6 sm:p-8">
+                  <div class="flex flex-wrap items-center gap-2 mb-4">
+                    <span class="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-800">
+                      {case_.industry}
+                    </span>
+                    <span class="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                      {case_.topic}
+                    </span>
+                    {case_.featured && (
+                      <span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                        精选
+                      </span>
+                    )}
+                  </div>
+
+                  <div class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500 mb-5">
+                    <span>{case_.date}</span>
+                    <span>{case_.participants}</span>
+                    <span>{case_.duration}</span>
+                    <span>{case_.format}</span>
+                  </div>
+
+                  <h3 class="text-2xl font-bold text-slate-900 mb-3">{case_.name}</h3>
+                  <p class="text-lg font-semibold text-slate-800 mb-4">{case_.headline}</p>
+                  <p class="text-base text-slate-600 leading-relaxed mb-5">{case_.summary}</p>
+
+                  <div class="grid sm:grid-cols-2 gap-3 mb-5">
+                    <div class="rounded-2xl bg-slate-50 p-4">
+                      <div class="text-xs uppercase tracking-[0.2em] text-slate-500 mb-2">地点 / 形式</div>
+                      <div class="text-sm text-slate-800 leading-relaxed">{case_.location} · {case_.format}</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 p-4">
+                      <div class="text-xs uppercase tracking-[0.2em] text-slate-500 mb-2">反馈重点</div>
+                      <div class="text-sm text-slate-800 leading-relaxed">{case_.feedback}</div>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap gap-2">
+                    {case_.highlights.map((highlight) => (
+                      <span class="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700">
+                        {highlight}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div
+        id="empty-state"
+        class="hidden rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-slate-600 mt-8"
+      >
+        当前筛选条件下暂无案例，请切换其他行业或主题标签。
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white py-16 sm:py-20 border-t border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-8 lg:gap-12 items-start">
+        <div>
+          <p class="text-sm font-semibold tracking-[0.2em] text-sky-700 uppercase mb-3">服务特点</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">不仅能讲清楚 AI，还能把培训做成业务动作</h2>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">
+            这些案例能持续转介绍和复购，不是因为单次演讲热闹，而是课程内容和企业实际工作流高度贴合，培训后能立刻形成内部扩散与二次应用。
+          </p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+            <h3 class="text-xl font-bold text-slate-900 mb-3">定制化课程结构</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              根据岗位、行业和培训时长调整大纲，不用通用模板硬套客户场景。
+            </p>
+          </div>
+          <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+            <h3 class="text-xl font-bold text-slate-900 mb-3">从启蒙到深训</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              同时覆盖 30 分钟启发式分享、半天训练营和 6-8 小时深度工作坊。
+            </p>
+          </div>
+          <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+            <h3 class="text-xl font-bold text-slate-900 mb-3">强调落地反馈</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              用“是否能直接进入业务流程”来评估培训结果，而不是只看课堂氛围。
+            </p>
+          </div>
+          <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+            <h3 class="text-xl font-bold text-slate-900 mb-3">适配多行业</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              媒体、国企、高校、医药、协会和商业团队都可以在同一方法论下快速迁移。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-slate-950 py-16 sm:py-20 text-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-sm font-semibold tracking-[0.2em] text-amber-300 uppercase mb-4">下一步</p>
+      <h2 class="text-3xl sm:text-4xl font-bold mb-5">如果你也希望团队在 1 次培训后就建立可复用的 AI 工作流</h2>
+      <p class="text-lg text-slate-300 leading-relaxed max-w-3xl mx-auto mb-8">
+        可以直接约时间沟通培训对象、岗位结构和目标场景。我会按你的业务背景给出课程建议、交付形式和案例参考，不用先从一份通用课纲开始猜。
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          href="/contact"
+          class="inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-base font-semibold text-slate-900 transition hover:bg-slate-100"
+        >
+          预约企业培训沟通
+        </a>
+        <a
+          href="/services"
+          class="inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/5 px-8 py-4 text-base font-semibold text-white transition hover:bg-white/10"
+        >
+          查看培训服务说明
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+
+  <script is:inline>
+    (() => {
+      const activeFilters = {
+        industry: "全部",
+        topic: "全部",
+      };
+
+      const buttons = Array.from(document.querySelectorAll(".filter-chip"));
+      const cards = Array.from(document.querySelectorAll(".case-card"));
+      const emptyState = document.getElementById("empty-state");
+
+      const updateButtonState = () => {
+        buttons.forEach((button) => {
+          const type = button.getAttribute("data-filter-type");
+          const value = button.getAttribute("data-filter-value");
+          const isActive = type && value && activeFilters[type] === value;
+          button.classList.toggle("is-active", Boolean(isActive));
+        });
+      };
+
+      const applyFilters = () => {
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          const industry = card.getAttribute("data-industry");
+          const topic = card.getAttribute("data-topic");
+          const industryMatch =
+            activeFilters.industry === "全部" || activeFilters.industry === industry;
+          const topicMatch =
+            activeFilters.topic === "全部" || activeFilters.topic === topic;
+          const isVisible = industryMatch && topicMatch;
+
+          card.classList.toggle("hidden", !isVisible);
+          if (isVisible) {
+            visibleCount += 1;
+          }
+        });
+
+        if (emptyState) {
+          emptyState.classList.toggle("hidden", visibleCount > 0);
+        }
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const type = button.getAttribute("data-filter-type");
+          const value = button.getAttribute("data-filter-value");
+
+          if (!type || !value) {
+            return;
+          }
+
+          activeFilters[type] = value;
+          updateButtonState();
+          applyFilters();
+        });
+      });
+
+      updateButtonState();
+      applyFilters();
+    })();
+  </script>
+</Layout>
+
+<style>
+  .hero-grid {
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.85), transparent 95%);
+  }
+
+  .filter-chip {
+    border: 1px solid rgb(203 213 225);
+    background: rgb(248 250 252);
+    color: rgb(51 65 85);
+    border-radius: 9999px;
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .filter-chip:hover {
+    transform: translateY(-1px);
+    border-color: rgb(14 165 233);
+    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.08);
+  }
+
+  .filter-chip.is-active {
+    background: rgb(3 105 161);
+    border-color: rgb(3 105 161);
+    color: white;
+    box-shadow: 0 12px 32px rgba(3, 105, 161, 0.2);
+  }
+
+  .case-card {
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .case-card:hover {
+    transform: translateY(-4px);
+    border-color: rgb(125 211 252);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  }
+</style>

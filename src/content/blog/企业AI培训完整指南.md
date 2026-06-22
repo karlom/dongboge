@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "enterprise-ai-training-guide"
 author: "杨东波"
 tags: ["企业AI培训", "AI办公提效", "数字化转型"]
+category: "企业 AI 培训"
 heroImage: "../../assets/tech.jpg"
 ---
 

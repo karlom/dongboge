@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { BLOG_CATEGORIES } from './data/blogCategories';
 
 const blog = defineCollection({
 	// Load Markdown and MDX files in the `src/content/blog/` directory.
@@ -15,6 +16,7 @@ const blog = defineCollection({
 			reviewedDate: z.coerce.date().optional(),
 			heroImage: image().optional(),
 			tags: z.array(z.string()).default([]),
+			category: z.enum(BLOG_CATEGORIES),
 			author: z.string().default('杨东波'),
 			references: z.array(z.string().url()).default([]),
 			slug: z.string().min(1),

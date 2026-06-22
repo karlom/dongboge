@@ -7,6 +7,7 @@ reviewedDate: "2026-06-21"
 slug: "enterprise-ai-training-preparation"
 author: "杨东波"
 tags: ["企业AI培训", "培训准备", "AI安全"]
+category: "企业 AI 培训"
 heroImage: "../../assets/default2.jpg"
 ---
 
