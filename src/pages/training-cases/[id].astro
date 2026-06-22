@@ -1,0 +1,63 @@
+---
+export const prerender = true;
+
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { trainingCaseDetails, type TrainingCaseDetail } from "../../data/trainingCases";
+import { createBreadcrumbSchema, createGraph, ORGANIZATION_ID, organizationSchema, personSchema, SITE_URL } from "../../data/siteFacts";
+
+export function getStaticPaths() {
+  return trainingCaseDetails.map((caseItem) => ({ params: { id: caseItem.id }, props: { caseItem } }));
+}
+
+interface Props { caseItem: TrainingCaseDetail }
+const { caseItem } = Astro.props;
+const pageUrl = `${SITE_URL}/training-cases/${caseItem.id}/`;
+const caseSchema = {
+  "@type": "WebPage",
+  "@id": `${pageUrl}#webpage`,
+  name: caseItem.name,
+  description: caseItem.background,
+  url: pageUrl,
+  inLanguage: "zh-CN",
+  about: {
+    "@type": "Service",
+    name: caseItem.theme,
+    provider: { "@id": ORGANIZATION_ID },
+    areaServed: { "@type": "Place", name: caseItem.location },
+  },
+};
+---
+
+<Layout
+  title={`${caseItem.name} - 东波哥`}
+  description={`${caseItem.background}培训主题：${caseItem.theme}。`}
+  structuredData={createGraph(
+    organizationSchema,
+    personSchema,
+    caseSchema,
+    createBreadcrumbSchema([
+      { name: "首页", url: `${SITE_URL}/` },
+      { name: "培训案例", url: `${SITE_URL}/training-cases/` },
+      { name: caseItem.name, url: pageUrl },
+    ]),
+  )}
+>
+  <div class="fixed top-0 left-0 right-0 z-50 bg-white/95 border-b border-gray-200"><Header /></div>
+  <main class="pt-24 pb-20 bg-gray-50 min-h-screen">
+    <article class="max-w-4xl mx-auto px-6">
+      <nav aria-label="面包屑导航" class="text-sm text-gray-500 mb-8"><a href="/">首页</a> / <a href="/training-cases/">培训案例</a> / {caseItem.name}</nav>
+      <header class="bg-white rounded-2xl p-8 md:p-12 border border-gray-200 shadow-sm mb-8">
+        <p class="text-blue-700 font-semibold mb-3">{caseItem.category} · {caseItem.date}</p>
+        <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-6">{caseItem.name}</h1>
+        <p class="text-xl text-gray-600">{caseItem.theme}</p>
+      </header>
+      <section class="bg-white rounded-2xl p-8 border border-gray-200 mb-8"><h2 class="text-2xl font-bold mb-4">项目背景</h2><p class="leading-relaxed text-gray-700">{caseItem.background}</p><p class="mt-4 text-gray-600">地点：{caseItem.location}</p></section>
+      <section class="bg-white rounded-2xl p-8 border border-gray-200 mb-8"><h2 class="text-2xl font-bold mb-4">实施方式</h2><ol class="list-decimal pl-6 space-y-3">{caseItem.approach.map((item) => <li>{item}</li>)}</ol></section>
+      <section class="bg-amber-50 rounded-2xl p-8 border border-amber-200"><h2 class="text-2xl font-bold mb-4">信息说明</h2><p>本页只展示可公开的项目背景、主题和实施方式，不发布未经授权的内部数据、评价或量化结果。</p></section>
+      <div class="mt-10 flex gap-4"><a href="/training-cases/" class="px-6 py-3 rounded-lg border border-gray-300 bg-white">返回案例列表</a><a href="/contact/" class="px-6 py-3 rounded-lg bg-blue-600 text-white">咨询类似项目</a></div>
+    </article>
+  </main>
+  <Footer />
+</Layout>

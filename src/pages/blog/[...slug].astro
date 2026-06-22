@@ -3,6 +3,7 @@ export const prerender = true;
 
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import BlogPost from "../../layouts/BlogPost.astro";
+import { getPostSlug } from "../../utils/contentUtils";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -18,11 +19,8 @@ export async function getStaticPaths() {
       index < sortedPosts.length - 1 ? sortedPosts[index + 1] : null;
     const nextPost = index > 0 ? sortedPosts[index - 1] : null;
 
-    // 使用自定义 slug 或者文件名作为 URL slug
-    const urlSlug = post.data.slug || post.id;
-
     return {
-      params: { slug: urlSlug },
+      params: { slug: getPostSlug(post) },
       props: {
         post,
         prevPost,
@@ -42,6 +40,6 @@ const { post, prevPost, nextPost } = Astro.props;
 const { Content } = await render(post);
 ---
 
-<BlogPost {...post.data} prevPost={prevPost} nextPost={nextPost}>
+<BlogPost {...post.data} slug={getPostSlug(post)} prevPost={prevPost} nextPost={nextPost}>
   <Content />
 </BlogPost>

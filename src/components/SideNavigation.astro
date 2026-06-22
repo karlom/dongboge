@@ -131,6 +131,7 @@ const { sections } = Astro.props;
     const navLinks = document.querySelectorAll('.side-nav__link');
 
     if (!sideNav) return;
+    const sideNavElement = sideNav;
 
     // 滚动显示/隐藏导航
     let lastScrollY = window.scrollY;
@@ -143,12 +144,12 @@ const { sections } = Astro.props;
       if (currentScrollY > window.innerHeight * 0.5) {
         if (!showNav) {
           showNav = true;
-          sideNav.classList.add('visible');
+          sideNavElement.classList.add('visible');
         }
       } else {
         if (showNav) {
           showNav = false;
-          sideNav.classList.remove('visible');
+          sideNavElement.classList.remove('visible');
         }
       }
 
@@ -184,7 +185,7 @@ const { sections } = Astro.props;
     // 观察所有section
     navLinks.forEach(link => {
       const sectionId = link.getAttribute('data-section');
-      const section = document.getElementById(sectionId);
+      const section = sectionId ? document.getElementById(sectionId) : null;
       if (section) {
         sectionObserver.observe(section);
       }
@@ -195,10 +196,11 @@ const { sections } = Astro.props;
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const sectionId = link.getAttribute('data-section');
-        const section = document.getElementById(sectionId);
+        const section = sectionId ? document.getElementById(sectionId) : null;
 
         if (section) {
-          const headerHeight = document.querySelector('.fixed.top-0')?.offsetHeight || 0;
+          const header = document.querySelector<HTMLElement>('.fixed.top-0');
+          const headerHeight = header?.offsetHeight || 0;
           const sectionTop = section.offsetTop - headerHeight - 135;
 
           window.scrollTo({

@@ -9,6 +9,7 @@ import Header from "../../components/Header.astro";
 import OptimizedImage from "../../components/OptimizedImage.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 import { getProcessedBlogCollection } from "../../utils/contentUtils";
+import { getPostUrl } from "../../utils/contentUtils";
 
 // 使用处理过的博客集合
 const posts = (await getProcessedBlogCollection()).sort(
@@ -17,7 +18,7 @@ const posts = (await getProcessedBlogCollection()).sort(
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
     <style>
@@ -293,7 +294,7 @@ const posts = (await getProcessedBlogCollection()).sort(
               class="blog-card"
               data-search-content={`${post.data.title} ${post.data.description} ${post.data.tags?.join(" ") ?? ""}`}
             >
-              <a href={`/blog/${post.id}/`}>
+              <a href={getPostUrl(post)}>
                 {post.data.heroImage && (
                   <div class="blog-card-image">
                     <OptimizedImage
@@ -328,10 +329,10 @@ const posts = (await getProcessedBlogCollection()).sort(
     <!-- Footer - 暗区背景 -->
     <Footer />
     <script>
-      const searchInput = document.getElementById('blogSearch');
-      const emptyTip = document.getElementById('blogSearchEmpty');
+      const searchInput = document.getElementById('blogSearch') as HTMLInputElement | null;
+      const emptyTip = document.getElementById('blogSearchEmpty') as HTMLElement | null;
       const cards = Array.from(
-        document.querySelectorAll('[data-search-content]'),
+        document.querySelectorAll<HTMLElement>('[data-search-content]'),
       );
 
       function filterPosts() {

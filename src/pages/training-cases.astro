@@ -6,21 +6,23 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { cdnUrl } from "../cdnConfig";
 import OptimizedImage from "../components/OptimizedImage.astro";
-
-// SEO关键词
-const keywords = "企业AI培训,人工智能培训,AI技能培训,ChatGPT培训,Dify培训,智能体开发,机器学习培训,深度学习培训,企业数字化转型,AI内训,人工智能咨询,AI技术培训,企业AI应用,AI工具培训,广州AI培训";
+import {
+  createBreadcrumbSchema,
+  createGraph,
+  ORGANIZATION_ID,
+  organizationSchema,
+  personSchema,
+  SITE_URL,
+} from "../data/siteFacts";
 
 // 结构化数据
 const structuredData = {
-  "@context": "https://schema.org",
   "@type": "Service",
+  "@id": `${SITE_URL}/training-cases/#service`,
   "name": "企业AI培训服务",
   "description": "专业的企业人工智能培训服务，涵盖AI基础理论、实战应用、工具实操等全方位培训内容",
   "provider": {
-    "@type": "Person",
-    "name": "杨东波",
-    "jobTitle": "AI技术专家与企业培训师",
-    "affiliation": "iTechClub华南区广州分会"
+    "@id": ORGANIZATION_ID
   },
   "serviceType": "企业AI培训",
   "areaServed": "中国",
@@ -53,12 +55,6 @@ const structuredData = {
         }
       }
     ]
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.9",
-    "bestRating": "5",
-    "ratingCount": "500"
   }
 };
 
@@ -78,8 +74,6 @@ const trainingCases = [
       "/images/training/huanan-tech/img3.jpg",
       "/images/training/huanan-tech/img4.jpg"
     ],
-    participants: "80+",
-    feedback: "学员反馈课程内容丰富，实用性强，对AI技术有了更深入的理解。"
   },
   {
     id: "guangzhou-transport",
@@ -95,8 +89,6 @@ const trainingCases = [
       "/images/training/guangzhou-transport/img3.jpg",
       "/images/training/guangzhou-transport/img4.jpg"
     ],
-    participants: "60+",
-    feedback: "培训内容贴合行业实际，为集团AI应用提供了清晰的方向指引。"
   },
   {
     id: "caizhi-lin",
@@ -112,8 +104,6 @@ const trainingCases = [
       "/images/training/caizhi-lin/img3.jpg",
       "/images/training/caizhi-lin/img4.jpg"
     ],
-    participants: "40+",
-    feedback: "课程针对性强，为公司AI战略规划提供了宝贵建议。"
   },
   {
     id: "news-association",
@@ -129,8 +119,6 @@ const trainingCases = [
       "/images/training/news-association/img3.jpg",
       "/images/training/news-association/img4.jpg"
     ],
-    participants: "50+",
-    feedback: "开拓了新闻工作者对AI应用的视野，实用性很强。"
   },
   {
     id: "hengrun-school",
@@ -146,8 +134,6 @@ const trainingCases = [
       "/images/training/hengrun-school/img3.jpg",
       "/images/training/hengrun-school/img4.jpg"
     ],
-    participants: "35+",
-    feedback: "教师们对AI在教育中的应用有了全新认识，激发了创新教学的热情。"
   },
   {
     id: "guangzhou-youth",
@@ -163,49 +149,24 @@ const trainingCases = [
       "/images/training/guangzhou-youth/img3.jpg",
       "/images/training/guangzhou-youth/img4.jpg"
     ],
-    participants: "45+",
-    feedback: "内容生动有趣，让青年学员对AI技术产生了浓厚兴趣。"
   }
 ];
 
-// 统计数据
-const stats = {
-  companies: "13+",
-  participants: "1000+",
-  satisfaction: "98%+",
-  industries: "8+"
-};
 ---
 
 <Layout
   title="企业AI培训案例_人工智能培训服务_AI技能培训_智能体开发培训 - 东波哥"
-  description="专业企业AI培训服务，涵盖ChatGPT应用、Dify智能体开发、机器学习实战等。已为华南理工大学、广州交通集团等13+企业提供AI培训，500+学员，98%满意度。提供线上线下AI技术培训、企业数字化转型咨询服务。"
+  description="企业 AI 培训公开案例与服务场景，涵盖 AI 办公应用、Dify 智能体和企业数字化转型培训。"
+  structuredData={createGraph(
+    organizationSchema,
+    personSchema,
+    structuredData,
+    createBreadcrumbSchema([
+      { name: "首页", url: `${SITE_URL}/` },
+      { name: "企业 AI 培训案例", url: `${SITE_URL}/training-cases/` },
+    ]),
+  )}
 >
-  <!-- SEO Meta Tags -->
-  <meta slot="head" name="keywords" content={keywords} />
-  <meta slot="head" name="robots" content="index, follow" />
-  <meta slot="head" name="author" content="杨东波" />
-  <meta slot="head" name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- Open Graph Tags -->
-  <meta slot="head" property="og:title" content="企业AI培训案例_专业人工智能培训服务 - 东波哥" />
-  <meta slot="head" property="og:description" content="专业企业AI培训服务，已为13+企业提供AI培训，500+学员，98%满意度。涵盖ChatGPT、Dify、智能体开发等实战培训。" />
-  <meta slot="head" property="og:type" content="website" />
-  <meta slot="head" property="og:url" content="https://www.dongboge.cn/training-cases" />
-  <meta slot="head" property="og:image" content={cdnUrl("/images/training/og-image.jpg")} />
-  <meta slot="head" property="og:locale" content="zh_CN" />
-  
-  <!-- Twitter Card Tags -->
-  <meta slot="head" name="twitter:card" content="summary_large_image" />
-  <meta slot="head" name="twitter:title" content="企业AI培训案例_专业人工智能培训服务" />
-  <meta slot="head" name="twitter:description" content="专业企业AI培训服务，已为13+企业提供AI培训，500+学员，98%满意度" />
-  <meta slot="head" name="twitter:image" content={cdnUrl("/images/training/twitter-card.jpg")} />
-  
-  <!-- Structured Data -->
-  <script slot="head" type="application/ld+json" set:html={JSON.stringify(structuredData)} />
-  
-  <!-- Canonical URL -->
-  <link slot="head" rel="canonical" href="https://yoursite.com/training-cases" />
   <!-- Header -->
   <div class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
     <Header />
@@ -234,25 +195,6 @@ const stats = {
         </p>
       </div>
 
-      <!-- 统计数据 -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <div class="bg-white rounded-xl p-6 text-center shadow-lg">
-          <div class="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{stats.companies}</div>
-          <div class="text-sm sm:text-base text-gray-600">合作企业</div>
-        </div>
-        <div class="bg-white rounded-xl p-6 text-center shadow-lg">
-          <div class="text-2xl sm:text-3xl font-bold text-green-600 mb-2">{stats.participants}</div>
-          <div class="text-sm sm:text-base text-gray-600">培训学员</div>
-        </div>
-        <div class="bg-white rounded-xl p-6 text-center shadow-lg">
-          <div class="text-2xl sm:text-3xl font-bold text-purple-600 mb-2">{stats.satisfaction}</div>
-          <div class="text-sm sm:text-base text-gray-600">满意度</div>
-        </div>
-        <div class="bg-white rounded-xl p-6 text-center shadow-lg">
-          <div class="text-2xl sm:text-3xl font-bold text-orange-600 mb-2">{stats.industries}</div>
-          <div class="text-sm sm:text-base text-gray-600">涵盖行业</div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -281,9 +223,6 @@ const stats = {
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       {case_.category}
                     </span>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      {case_.participants}人参与
-                    </span>
                   </div>
                 </div>
               </div>
@@ -306,6 +245,7 @@ const stats = {
 
               <h4 class="text-lg font-semibold text-gray-900 mb-3">{case_.theme}</h4>
               <p class="text-gray-600 leading-relaxed">{case_.description}</p>
+              <a href={`/training-cases/${case_.id}/`} class="inline-flex mt-5 text-blue-700 font-semibold">查看案例详情 →</a>
             </div>
 
             <!-- 培训现场图片 -->
@@ -326,13 +266,6 @@ const stats = {
               </div>
             </div>
 
-            <!-- 培训反馈 -->
-            <div class="px-6 sm:px-8 pb-6 sm:pb-8">
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h6 class="text-sm font-semibold text-blue-900 mb-2">培训反馈</h6>
-                <p class="text-sm text-blue-800 italic">"{case_.feedback}"</p>
-              </div>
-            </div>
           </div>
         ))}
       </div>
@@ -486,7 +419,7 @@ const stats = {
           <div>
             <h4 class="text-lg font-semibold text-gray-900 mb-3">专业的AI培训团队</h4>
             <p class="mb-4">
-              我们拥有丰富的<strong>企业AI培训</strong>经验，已为<strong>华南理工大学</strong>、<strong>广州交通集团</strong>、<strong>采芝林药业</strong>等13+知名企业和机构提供专业的<strong>人工智能培训服务</strong>。培训内容涵盖<strong>ChatGPT应用</strong>、<strong>Dify智能体开发</strong>、<strong>机器学习实战</strong>等核心AI技能。
+              本页整理已公开的企业 AI 培训场景。每个案例按服务对象、培训主题、时间与现场材料展示；量化结果仅在具备统计记录和公开授权时发布。
             </p>
             <p>
               我们的<strong>AI技术培训</strong>注重实战应用，结合企业实际业务场景，帮助学员快速掌握<strong>人工智能工具</strong>的使用方法，提升工作效率，推动<strong>企业数字化转型</strong>。
@@ -506,12 +439,12 @@ const stats = {
         <div class="mt-8 p-6 bg-blue-50 rounded-lg">
           <h4 class="text-lg font-semibold text-gray-900 mb-3">为什么选择我们的AI培训服务？</h4>
           <ul class="grid md:grid-cols-2 gap-2 text-gray-700">
-            <li>✓ <strong>1000+学员</strong>的培训经验</li>
-            <li>✓ <strong>98%+</strong>的客户满意度</li>
-            <li>✓ 覆盖<strong>8+行业</strong>的实战案例</li>
-            <li>✓ <strong>专业认证</strong>的AI培训师</li>
-            <li>✓ <strong>定制化</strong>的培训方案</li>
-            <li>✓ <strong>持续跟进</strong>的技术支持</li>
+            <li>✓ 培训前梳理岗位任务与数据边界</li>
+            <li>✓ 使用脱敏业务材料进行现场练习</li>
+            <li>✓ 按管理、业务和技术角色分层设计</li>
+            <li>✓ 提供课程材料与可复用工作模板</li>
+            <li>✓ 通过前后测和课后试点评估效果</li>
+            <li>✓ 公开信息与客户授权范围保持一致</li>
           </ul>
         </div>
       </div>

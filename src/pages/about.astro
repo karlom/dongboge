@@ -3,6 +3,24 @@ export const prerender = true;
 
 import AboutHeroImage from "../assets/blog-placeholder-about.jpg";
 import Layout from "../layouts/BlogPost.astro";
+import {
+  createBreadcrumbSchema,
+  createGraph,
+  organizationSchema,
+  personSchema,
+  SITE_URL,
+  websiteSchema,
+} from "../data/siteFacts";
+
+const profilePageSchema = {
+  "@type": "ProfilePage",
+  "@id": `${SITE_URL}/about/#webpage`,
+  url: `${SITE_URL}/about/`,
+  name: "关于东波哥",
+  description: "杨东波（东波哥）的职业经历、专业方向与企业 AI 培训实践。",
+  inLanguage: "zh-CN",
+  mainEntity: personSchema,
+};
 ---
 
 <Layout
@@ -10,58 +28,17 @@ import Layout from "../layouts/BlogPost.astro";
   description="AI企业内训专家 | 程序员创业导师"
   pubDate={new Date("August 02 2025")}
   heroImage={AboutHeroImage}
+  structuredData={createGraph(
+    websiteSchema,
+    organizationSchema,
+    personSchema,
+    profilePageSchema,
+    createBreadcrumbSchema([
+      { name: "首页", url: `${SITE_URL}/` },
+      { name: "关于东波哥", url: `${SITE_URL}/about/` },
+    ]),
+  )}
 >
-  <!-- 结构化数据 -->
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "杨东波",
-      "alternateName": "东波哥",
-      "description": "AI企业内训专家，程序员创业导师，20年IT从业经验",
-      "jobTitle": "AI企业内训专家",
-      "worksFor": {
-        "@type": "Organization",
-        "name": "东波哥说"
-      },
-      "alumniOf": [
-        {
-          "@type": "Organization",
-          "name": "4399小游戏"
-        },
-        {
-          "@type": "Organization",
-          "name": "三七互娱"
-        },
-        {
-          "@type": "Organization",
-          "name": "广州益世界"
-        }
-      ],
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "广州",
-        "addressRegion": "广东",
-        "addressCountry": "中国"
-      },
-      "birthPlace": {
-        "@type": "Place",
-        "name": "广东湛江吴川"
-      },
-      "knowsAbout": [
-        "人工智能",
-        "企业内训",
-        "程序员职业规划",
-        "技术管理",
-        "创业经验",
-        "AIGC技术",
-        "软件开发"
-      ],
-      "url": "https://dongboge.cn/about",
-      "sameAs": ["https://dongboge.cn"]
-    }
-  </script>
-
   <!-- 面包屑导航 -->
   <nav class="mb-6" aria-label="面包屑导航">
     <ol class="flex items-center space-x-2 text-sm text-gray-600">
@@ -73,7 +50,7 @@ import Layout from "../layouts/BlogPost.astro";
   <div class="prose prose-lg max-w-none">
     <!-- 页面标题 -->
     <div class="text-center mb-12">
-      <h1 class="text-4xl font-bold text-gray-900 mb-4">关于东波哥</h1>
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">杨东波（东波哥）</h2>
       <p class="text-xl text-gray-700 font-medium">
         AI企业内训专家 | 程序员创业导师
       </p>

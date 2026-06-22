@@ -1,5 +1,14 @@
 import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 import { cdnUrl } from "../cdnConfig";
+
+export function getPostSlug(post: CollectionEntry<"blog">) {
+    return post.data.slug;
+}
+
+export function getPostUrl(post: CollectionEntry<"blog">) {
+    return `/blog/${getPostSlug(post)}/`;
+}
 
 /**
  * 处理博客集合，将图片路径转换为CDN路径

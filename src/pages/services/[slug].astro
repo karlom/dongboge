@@ -1,0 +1,67 @@
+---
+export const prerender = true;
+
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { servicePages, type ServicePage } from "../../data/services";
+import {
+  createBreadcrumbSchema,
+  createGraph,
+  ORGANIZATION_ID,
+  organizationSchema,
+  personSchema,
+  SITE_URL,
+} from "../../data/siteFacts";
+
+export function getStaticPaths() {
+  return servicePages.map((service) => ({ params: { slug: service.slug }, props: { service } }));
+}
+
+interface Props { service: ServicePage }
+const { service } = Astro.props;
+const pageUrl = `${SITE_URL}/services/${service.slug}/`;
+const serviceSchema = {
+  "@type": "Service",
+  "@id": `${pageUrl}#service`,
+  name: service.name,
+  description: service.description,
+  url: pageUrl,
+  provider: { "@id": ORGANIZATION_ID },
+  areaServed: { "@type": "Country", name: "中国" },
+};
+---
+
+<Layout
+  title={`${service.name} - 东波哥`}
+  description={service.description}
+  structuredData={createGraph(
+    organizationSchema,
+    personSchema,
+    serviceSchema,
+    createBreadcrumbSchema([
+      { name: "首页", url: `${SITE_URL}/` },
+      { name: "企业 AI 服务", url: `${SITE_URL}/services/` },
+      { name: service.name, url: pageUrl },
+    ]),
+  )}
+>
+  <div class="fixed top-0 left-0 right-0 z-50 bg-white/95 border-b border-gray-200"><Header /></div>
+  <main class="pt-24 pb-20 bg-gray-50 min-h-screen">
+    <article class="max-w-4xl mx-auto px-6">
+      <nav aria-label="面包屑导航" class="text-sm text-gray-500 mb-8"><a href="/">首页</a> / <a href="/services/">企业 AI 服务</a> / {service.name}</nav>
+      <header class="bg-white rounded-2xl p-8 md:p-12 shadow-sm border border-gray-200 mb-8">
+        <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-6">{service.name}</h1>
+        <p class="text-xl text-gray-600 leading-relaxed">{service.description}</p>
+      </header>
+      <div class="grid gap-8">
+        <section class="bg-white rounded-2xl p-8 border border-gray-200"><h2 class="text-2xl font-bold mb-4">这项服务适合谁？</h2><p class="text-gray-700 leading-relaxed">{service.audience}</p></section>
+        <section class="bg-white rounded-2xl p-8 border border-gray-200"><h2 class="text-2xl font-bold mb-4">会交付什么？</h2><ol class="list-decimal pl-6 space-y-3">{service.deliverables.map((item) => <li>{item}</li>)}</ol></section>
+        <section class="bg-white rounded-2xl p-8 border border-gray-200"><h2 class="text-2xl font-bold mb-4">如何实施？</h2><ol class="list-decimal pl-6 space-y-3">{service.process.map((item) => <li>{item}</li>)}</ol></section>
+        <section class="bg-amber-50 rounded-2xl p-8 border border-amber-200"><h2 class="text-2xl font-bold mb-4">边界与风险</h2><p class="text-gray-700 leading-relaxed">{service.boundaries}</p></section>
+      </div>
+      <div class="mt-10 flex flex-wrap gap-4"><a href={service.related} class="px-6 py-3 rounded-lg bg-blue-600 text-white">阅读相关指南</a><a href="/training-cases/" class="px-6 py-3 rounded-lg border border-gray-300 bg-white">查看培训案例</a><a href="/contact/" class="px-6 py-3 rounded-lg border border-gray-300 bg-white">联系咨询</a></div>
+    </article>
+  </main>
+  <Footer />
+</Layout>

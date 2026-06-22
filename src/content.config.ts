@@ -12,9 +12,12 @@ const blog = defineCollection({
 			// Transform string to Date object
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
+			reviewedDate: z.coerce.date().optional(),
 			heroImage: image().optional(),
-			tags: z.array(z.string()).optional(),
-			slug: z.string().optional(), // 添加可选的 slug 字段
+			tags: z.array(z.string()).default([]),
+			author: z.string().default('杨东波'),
+			references: z.array(z.string().url()).default([]),
+			slug: z.string().min(1),
 		}),
 });
 

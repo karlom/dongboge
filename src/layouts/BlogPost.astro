@@ -7,12 +7,28 @@ import FormattedDate from "../components/FormattedDate.astro";
 import Header from "../components/Header.astro";
 import BlogNavigation from "../components/BlogNavigation.astro";
 import OptimizedImage from "../components/OptimizedImage.astro";
+import {
+  createBreadcrumbSchema,
+  createGraph,
+  organizationSchema,
+  ORGANIZATION_ID,
+  personSchema,
+  PERSON_ID,
+  serializeJsonLd,
+  SITE_URL,
+} from "../data/siteFacts";
 
 interface Props {
   title: string;
   description: string;
+  slug?: string;
   pubDate: Date;
   updatedDate?: Date;
+  reviewedDate?: Date;
+  author?: string;
+  tags?: string[];
+  references?: string[];
+  structuredData?: Record<string, unknown>;
   heroImage?: any;
   prevPost?: CollectionEntry<"blog">;
   nextPost?: CollectionEntry<"blog">;
@@ -21,17 +37,71 @@ interface Props {
 const {
   title,
   description,
+  slug,
   pubDate,
   updatedDate,
+  reviewedDate,
+  author = "杨东波",
+  tags = [],
+  structuredData: suppliedStructuredData,
   heroImage,
   prevPost,
   nextPost,
 } = Astro.props;
+const isBlogPost = Boolean(slug);
+const canonical = isBlogPost ? `${SITE_URL}/blog/${slug}/` : Astro.url;
+const imagePath = heroImage
+  ? typeof heroImage === "string"
+    ? heroImage
+    : heroImage.src
+  : "/images/hero1.png";
+const imageUrl = new URL(imagePath, SITE_URL).toString();
+const articleSchema = isBlogPost
+  ? {
+      "@type": "BlogPosting",
+      "@id": `${canonical}#article`,
+      headline: title,
+      description,
+      image: imageUrl,
+      datePublished: pubDate.toISOString(),
+      dateModified: (reviewedDate ?? updatedDate ?? pubDate).toISOString(),
+      inLanguage: "zh-CN",
+      keywords: tags,
+      author: { "@id": PERSON_ID, name: author },
+      publisher: { "@id": ORGANIZATION_ID },
+      mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
+    }
+  : undefined;
+const structuredData = isBlogPost
+  ? createGraph(
+      organizationSchema,
+      personSchema,
+      articleSchema!,
+      createBreadcrumbSchema([
+        { name: "首页", url: `${SITE_URL}/` },
+        { name: "技术博客", url: `${SITE_URL}/blog/` },
+        { name: title, url: canonical.toString() },
+      ]),
+    )
+  : suppliedStructuredData;
 ---
 
-<html lang="en">
+<html lang="zh-CN">
   <head>
-    <BaseHead title={title} description={description} />
+    <BaseHead
+      title={title}
+      description={description}
+      image={heroImage}
+      imageAlt={`${title}文章配图`}
+      type={isBlogPost ? "article" : "profile"}
+      author={author}
+      publishedTime={isBlogPost ? pubDate : undefined}
+      modifiedTime={isBlogPost ? reviewedDate ?? updatedDate ?? pubDate : undefined}
+      canonical={canonical}
+    />
+    {structuredData && (
+      <script type="application/ld+json" set:html={serializeJsonLd(structuredData)} />
+    )}
     <style>
       /* CSS 变量定义 */
       :root {
@@ -102,6 +172,18 @@ const {
       .last-updated-on {
         font-style: italic;
         margin-top: 0.5rem;
+      }
+
+      .author-card {
+        margin-top: 3rem;
+        padding: 1.5rem;
+        border: 1px solid var(--border-color-light);
+        border-radius: 12px;
+        background: #f8fafc;
+      }
+
+      .author-card p {
+        margin: 0.5rem 0;
       }
 
       /* 主内容区域 */
@@ -274,7 +356,7 @@ const {
     </div>
 
     <main>
-      <article>
+      <article itemscope itemtype={isBlogPost ? "https://schema.org/BlogPosting" : "https://schema.org/ProfilePage"}>
         <!-- 文章标题区域 - 暗区背景 -->
         <header class="article-header">
           <div class="max-w-4xl mx-auto px-4">
@@ -317,6 +399,13 @@ const {
         <!-- 文章内容区域 - 亮区背景 -->
         <div class="prose">
           <slot />
+          {isBlogPost && (
+            <aside class="author-card" aria-label="作者信息">
+              <strong>作者：{author}（东波哥）</strong>
+              <p>企业 AI 培训师，关注 AI 办公提效、智能体应用与企业数字化转型。</p>
+              <a href="/about/" rel="author">查看作者介绍</a>
+            </aside>
+          )}
           <BlogNavigation prevPost={prevPost} nextPost={nextPost} />
         </div>
       </article>

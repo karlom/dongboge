@@ -14,6 +14,28 @@ Disallow: /api/
 Disallow: /_astro/
 Disallow: /node_modules/
 
+# AI 搜索引用：允许 ChatGPT 搜索发现与引用公开内容
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# OpenAI 模型训练抓取：当前延续全站公开内容可抓取策略
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# 用户主动要求 ChatGPT 访问页面
+User-agent: ChatGPT-User
+Allow: /
+
+# Perplexity 搜索抓取
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
 # 网站地图位置
 Sitemap: https://dongboge.cn/sitemap.xml
 Sitemap: https://dongboge.cn/sitemap-index.xml

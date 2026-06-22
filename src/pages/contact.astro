@@ -709,7 +709,7 @@ const budgetOptions = [
     info: ["border-blue-200", "bg-blue-50", "text-blue-700"],
   };
 
-  function setStatus(type, message) {
+  function setStatus(type: keyof typeof statusClassMap, message: string) {
     if (!statusBox) return;
     statusBox.classList.remove(
       "hidden",
@@ -735,7 +735,7 @@ const budgetOptions = [
     statusBox.textContent = "";
   }
 
-  function toggleFieldError(fieldName, hasError) {
+  function toggleFieldError(fieldName: string, hasError: boolean) {
     const errorEl = document.querySelector(`[data-error-for="${fieldName}"]`);
     const fieldEl = contactForm ? contactForm.querySelector(`[name="${fieldName}"]`) : null;
 
@@ -752,7 +752,7 @@ const budgetOptions = [
     }
   }
 
-  function toggleGroupError(groupName, hasError) {
+  function toggleGroupError(groupName: string, hasError: boolean) {
     const errorEl = document.querySelector(`[data-error-for="${groupName}"]`);
     const groupEl = document.querySelector(`[data-field-group="${groupName}"]`);
 
@@ -769,7 +769,7 @@ const budgetOptions = [
     }
   }
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
     if (!(contactForm instanceof HTMLFormElement)) return;
 
@@ -777,7 +777,7 @@ const budgetOptions = [
 
     const formData = new FormData(contactForm);
     const selectedTypes = Array.from(
-      document.querySelectorAll('input[name="consultationType"]:checked')
+      document.querySelectorAll<HTMLInputElement>('input[name="consultationType"]:checked')
     ).map((cb) => cb.value);
 
     const requiredFields = [

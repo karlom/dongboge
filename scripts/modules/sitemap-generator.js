@@ -6,6 +6,15 @@
 import fs from 'fs';
 import path from 'path';
 
+function escapeXml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
+
 // 解析markdown文件的frontmatter
 function parseFrontmatter(content) {
     const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---/;
@@ -42,15 +51,21 @@ function extractBlogPostInfo(filePath) {
         const frontmatter = parseFrontmatter(content);
         const fileName = path.basename(filePath, path.extname(filePath));
 
-        // 使用slug字段，如果没有则使用文件名
-        const slug = frontmatter.slug || fileName;
+        if (!frontmatter.slug) {
+            throw new Error(`缺少必填 slug: ${filePath}`);
+        }
+        const slug = frontmatter.slug;
+        const pubDate = new Date(frontmatter.updatedDate || frontmatter.pubDate);
+        if (Number.isNaN(pubDate.valueOf())) {
+            throw new Error(`日期无效: ${filePath}`);
+        }
 
         return {
             fileName,
             slug,
             title: frontmatter.title || fileName,
             description: frontmatter.description || '',
-            pubDate: frontmatter.pubDate ? new Date(frontmatter.pubDate) : new Date(),
+            pubDate,
             heroImage: frontmatter.heroImage || '',
             tags: frontmatter.tags || [],
             url: `/blog/${slug}/`
@@ -160,14 +175,40 @@ function generateSitemapXML(posts) {
         <priority>0.5</priority>
     </url>`;
 
+    const additionalPages = [
+        '/services/enterprise-ai-training/',
+        '/services/ai-consulting/',
+        '/services/ai-agent-development/',
+        '/services/dify-implementation/',
+        '/training-cases/huanan-tech/',
+        '/training-cases/guangzhou-transport/',
+        '/training-cases/caizhi-lin/',
+        '/training-cases/news-association/',
+        '/training-cases/hengrun-school/',
+        '/training-cases/guangzhou-youth/'
+    ];
+
+    for (const pageUrl of additionalPages) {
+        sitemap += `
+
+    <url>
+        <loc>${baseUrl}${pageUrl}</loc>
+        <lastmod>${currentDate}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>`;
+    }
+
     // 添加所有博客文章
     posts.forEach(post => {
         const lastmod = post.pubDate.toISOString().split('T')[0];
-        const url = `${baseUrl}${post.url}`;
+        const url = escapeXml(`${baseUrl}${post.url}`);
+        const title = escapeXml(post.title);
+        const description = escapeXml(post.description || post.title);
 
         sitemap += `
-    
-    <!-- 博客文章: ${post.title} -->
+
+    <!-- 博客文章 -->
     <url>
         <loc>${url}</loc>
         <lastmod>${lastmod}</lastmod>
@@ -191,9 +232,9 @@ function generateSitemapXML(posts) {
 
             sitemap += `
         <image:image>
-            <image:loc>${imageUrl}</image:loc>
-            <image:title>${post.title}</image:title>
-            <image:caption>${post.description || post.title}</image:caption>
+            <image:loc>${escapeXml(imageUrl)}</image:loc>
+            <image:title>${title}</image:title>
+            <image:caption>${description}</image:caption>
         </image:image>`;
         }
 
@@ -205,7 +246,7 @@ function generateSitemapXML(posts) {
     
 </urlset>`;
 
-    return sitemap;
+    return sitemap.replace(/[ \t]+$/gm, '');
 }
 
 // 生成sitemap索引文件
@@ -236,7 +277,7 @@ export async function generateSitemap() {
         const duplicateSlugs = slugs.filter((slug, index) => slugs.indexOf(slug) !== index);
 
         if (duplicateSlugs.length > 0) {
-            console.warn('⚠️ 发现重复的slug:', duplicateSlugs);
+            throw new Error(`发现重复 slug: ${[...new Set(duplicateSlugs)].join(', ')}`);
         }
 
         // 显示slug映射信息
@@ -275,12 +316,12 @@ export async function generateSitemap() {
 
         console.log(`✅ Sitemap已生成: ${sitemapPath}`);
         console.log(`✅ Sitemap索引已生成: ${sitemapIndexPath}`);
-        console.log(`📊 包含页面数量: ${posts.length + 7} 个页面`);
+        console.log(`📊 包含页面数量: ${posts.length + 17} 个页面`);
         console.log(`🔗 Sitemap URL: https://dongboge.cn/sitemap.xml`);
 
         return {
             success: true,
-            totalPages: posts.length + 7,
+            totalPages: posts.length + 17,
             blogPosts: posts.length,
             sitemapPath,
             sitemapIndexPath,
