@@ -31,10 +31,11 @@ if (typeof src === "string") {
   if (
     src.startsWith("http") ||
     src.startsWith("/images/") ||
+    src.startsWith("/_astro/") ||
     src.startsWith("/src/assets/")
   ) {
     // 已经是完整URL或已经处理过的路径，直接使用
-    finalSrc = src;
+    finalSrc = src.startsWith("/_astro/") ? cdnUrl(src) : src;
   } else {
     // 需要处理的相对路径
     finalSrc = processImagePath(src);
@@ -57,7 +58,9 @@ if (typeof src === "string") {
       finalSrc = processImagePath("default.png");
     }
   } else {
-    finalSrc = processImagePath(astroSrc);
+    finalSrc = astroSrc.startsWith("/_astro/")
+      ? cdnUrl(astroSrc)
+      : processImagePath(astroSrc);
   }
 } else {
   // 其他情况，转换为字符串后处理
